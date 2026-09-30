@@ -1,0 +1,22 @@
+<!-- Gọi Sidebar sinh viên -->
+<app-student-sidebar></app-student-sidebar>
+
+<!-- Khu vực nội dung chính bên phải -->
+<div class="main-container">
+    <!-- Topbar -->
+    <header class="topbar">
+        <h2 class="topbar-title">Tổng quan sinh viên</h2>
+        <div class="student-profile">
+            <div class="student-avatar">NA</div>
+            <div class="student-info">
+                <span class="student-name">Nguyễn Văn A</span>
+                <span class="student-role">B20DCCN001</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Nơi hiển thị động các trang con (Dashboard, Profile, Register-topic) -->
+    <div class="content">
+        <router-outlet></router-outlet>
+    </div>
+</div>
