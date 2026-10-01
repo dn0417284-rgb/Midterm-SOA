@@ -8,6 +8,9 @@ export class Detai {
   @Column()
   tenDetai: string;
 
+  @Column({ name: 'giang_vien_huong_dan' })
+  giangVienHuongDan: string;
+
   @Column({ type: 'text' })
   moTa: string;
   // 0 = Chưa đăng ký
