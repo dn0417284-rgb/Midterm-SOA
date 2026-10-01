@@ -27,10 +27,11 @@ export const routes: Routes = [
         path: 'admin',
         component: AdminLayout,
         children: [
-            { path: 'dashboard', component: AdminDashboard },
-            { path: 'students', component: AdminStudents },
-            { path: 'topics', component: AdminTopics },
-            { path: 'registrations', component: AdminRegistrations },
+            { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+            { path: 'dashboard', component: AdminDashboard, data: { title: 'Tổng quan hệ thống' } },
+            { path: 'students', component: AdminStudents, data: { title: 'Quản lý sinh viên' } },
+            { path: 'topics', component: AdminTopics, data: { title: 'Quản lý đề tài' } },
+            { path: 'registrations', component: AdminRegistrations, data: { title: 'Quản lý đăng ký' } },
             { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
         ]
     },
@@ -40,9 +41,9 @@ export const routes: Routes = [
         path: 'student',
         component: StudentLayout,
         children: [
-            { path: 'dashboard', component: StudentDashboard },
-            { path: 'profile', component: StudentProfile },
-            { path: 'register-topic', component: StudentTopicRegister },
+            { path: 'dashboard', component: StudentDashboard, data: { title: 'Tổng quan sinh viên' } },
+            { path: 'profile', component: StudentProfile, data: { title: 'Thông tin cá nhân' } },
+            { path: 'register-topic', component: StudentTopicRegister, data: { title: 'Đăng ký đề tài' } },
             { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
         ]
     },

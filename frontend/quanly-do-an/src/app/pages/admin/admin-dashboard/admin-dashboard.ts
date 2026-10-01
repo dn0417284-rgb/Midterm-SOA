@@ -9,5 +9,4 @@ import { CommonModule } from '@angular/common';
   styleUrl: './admin-dashboard.css',
 })
 export class AdminDashboard {
-
 }

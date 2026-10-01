@@ -9,5 +9,4 @@ import { Component } from '@angular/core';
   styleUrl: './admin-registrations.css',
 })
 export class AdminRegistrations {
-
 }

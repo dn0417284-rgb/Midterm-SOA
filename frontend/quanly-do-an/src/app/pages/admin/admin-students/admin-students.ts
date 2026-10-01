@@ -9,5 +9,22 @@ import { CommonModule } from '@angular/common';
   styleUrl: './admin-students.css',
 })
 export class AdminStudents {
+  isModalOpen = false;
 
+  selectedStudent = {
+    name: '---',
+    code: '---',
+    email: '---',
+    studentClass: '---',
+    major: '---'
+  };
+
+  openModal(name: string, code: string, email: string, studentClass: string, major: string) {
+    this.selectedStudent = { name, code, email, studentClass, major };
+    this.isModalOpen = true;
+  }
+
+  closeModal() {
+    this.isModalOpen = false;
+  }
 }

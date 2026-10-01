@@ -8,7 +8,7 @@
         </div>
     </div>
 
-    <!-- Bảng danh sách sinh viên -->
+    <!-- Bảng danh sách sinh viên tích hợp cơ sở dữ liệu -->
     <div class="card-table">
         <table>
             <thead>
@@ -26,8 +26,7 @@
                     <td>a.nguyen@edu.vn</td>
                     <td>
                         <div class="action-buttons">
-                            <button class="btn-icon btn-view">Chi tiết</button>
-                            <button class="btn-icon btn-edit">Sửa</button>
+                            <button class="btn-icon btn-view" (click)="openModal('Nguyễn Văn A', 'B20DCCN001', 'a.nguyen@edu.vn', 'D20CNPM01', 'Công nghệ thông tin')">Chi tiết</button>
                             <button class="btn-icon btn-delete">Xóa</button>
                         </div>
                     </td>
@@ -38,8 +37,7 @@
                     <td>c.le@edu.vn</td>
                     <td>
                         <div class="action-buttons">
-                            <button class="btn-icon btn-view">Chi tiết</button>
-                            <button class="btn-icon btn-edit">Sửa</button>
+                            <button class="btn-icon btn-view" (click)="openModal('Lê Thị C', 'B20DCCN045', 'c.le@edu.vn', 'D20HTTT02', 'Hệ thống thông tin')">Chi tiết</button>
                             <button class="btn-icon btn-delete">Xóa</button>
                         </div>
                     </td>
@@ -50,13 +48,29 @@
                     <td>e.tran@edu.vn</td>
                     <td>
                         <div class="action-buttons">
-                            <button class="btn-icon btn-view">Chi tiết</button>
-                            <button class="btn-icon btn-edit">Sửa</button>
+                            <button class="btn-icon btn-view" (click)="openModal('Trần Hoàng E', 'B20DCCN112', 'e.tran@edu.vn', 'D20KTPM03', 'Kỹ thuật phần mềm')">Chi tiết</button>
                             <button class="btn-icon btn-delete">Xóa</button>
                         </div>
                     </td>
                 </tr>
             </tbody>
         </table>
+    </div>
+</div>
+
+<!-- Popup Modal Xem Chi Tiết Sinh Viên -->
+<div class="modal-overlay" [class.active]="isModalOpen">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>Thông tin chi tiết sinh viên</h3>
+            <button class="close-btn" (click)="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <p><strong>Họ và tên:</strong> <span>{{ selectedStudent.name }}</span></p>
+            <p><strong>Mã sinh viên:</strong> <span>{{ selectedStudent.code }}</span></p>
+            <p><strong>Email:</strong> <span>{{ selectedStudent.email }}</span></p>
+            <p><strong>Lớp hành chính:</strong> <span>{{ selectedStudent.studentClass }}</span></p>
+            <p><strong>Chuyên ngành:</strong> <span>{{ selectedStudent.major }}</span></p>
+        </div>
     </div>
 </div>

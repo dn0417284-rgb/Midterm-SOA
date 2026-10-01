@@ -5,12 +5,12 @@
             <div class="search-box">
                 <input type="text" placeholder="Tìm theo tên sinh viên, mã đề tài...">
             </div>
-            <select class="filter-select">
+            <!-- <select class="filter-select">
                 <option value="">Tất cả trạng thái</option>
                 <option value="pending">Chờ duyệt</option>
                 <option value="approved">Đã duyệt</option>
                 <option value="rejected">Đã hủy</option>
-            </select>
+            </select> -->
         </div>
     </div>
 
@@ -19,47 +19,21 @@
         <table>
             <thead>
                 <tr>
+                    <th>MSSV</th>
+                    <th>Sinh viên</th>
                     <th>Mã ĐT</th>
-                    <th>Tên đề tài & Giảng viên</th>
-                    <th>Sinh viên thực hiện</th>
-                    <th>Trạng thái</th>
-                    <th>Thao tác duyệt</th>
+                    <th>Tên đề tài</th>
+                    <th>Ngày đăng ký</th>
+                    <th>Thao tác</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td><strong>DT001</strong></td>
-                    <td>
-                        <div>Ứng dụng AI trong giáo dục thông minh</div>
-                        <small style="color: #4b5563;">GVHD: TS. Trần Văn B</small>
-                    </td>
-                    <td>
-                        <div class="student-info-cell">
-                            <span class="student-name">Nguyễn Văn A</span>
-                            <span class="student-code">B20DCCN001</span>
-                        </div>
-                    </td>
-                    <td><span class="badge badge-warning">Chờ duyệt</span></td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn-icon btn-approve">Duyệt</button>
-                            <button class="btn-icon btn-reject">Hủy</button>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td><strong>DT002</strong></td>
-                    <td>
-                        <div>Website thương mại điện tử tích hợp thanh toán</div>
-                        <small style="color: #4b5563;">GVHD: ThS. Phạm Văn D</small>
-                    </td>
-                    <td>
-                        <div class="student-info-cell">
-                            <span class="student-name">Trần Hoàng E</span>
-                            <span class="student-code">B20DCCN112</span>
-                        </div>
-                    </td>
-                    <td><span class="badge badge-success">Đã duyệt</span></td>
+                    <td><strong>B20DCCN001</strong></td>
+                    <td>Nguyễn Văn A</td>
+                    <td>DT001</td>
+                    <td class="topic-name-cell">Ứng dụng AI trong giáo dục thông minh</td>
+                    <td>28/05/2026</td>
                     <td>
                         <div class="action-buttons">
                             <button class="btn-icon btn-reject">Hủy đăng ký</button>
@@ -67,22 +41,26 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><strong>DT003</strong></td>
-                    <td>
-                        <div>Ứng dụng di động quản lý sức khỏe cá nhân</div>
-                        <small style="color: #4b5563;">GVHD: TS. Hoàng Văn F</small>
-                    </td>
-                    <td>
-                        <div class="student-info-cell">
-                            <span class="student-name">Phạm Văn G</span>
-                            <span class="student-code">B20DCCN200</span>
-                        </div>
-                    </td>
-                    <td><span class="badge badge-warning">Chờ duyệt</span></td>
+                    <td><strong>B20DCCN112</strong></td>
+                    <td>Trần Hoàng E</td>
+                    <td>DT002</td>
+                    <td class="topic-name-cell">Website thương mại điện tử tích hợp thanh toán</td>
+                    <td>29/05/2026</td>
                     <td>
                         <div class="action-buttons">
-                            <button class="btn-icon btn-approve">Duyệt</button>
-                            <button class="btn-icon btn-reject">Hủy</button>
+                            <button class="btn-icon btn-reject">Hủy đăng ký</button>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>B20DCCN200</strong></td>
+                    <td>Phạm Văn G</td>
+                    <td>DT003</td>
+                    <td class="topic-name-cell">Ứng dụng di động quản lý sức khỏe cá nhân</td>
+                    <td>30/05/2026</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-icon btn-reject">Hủy đăng ký</button>
                         </div>
                     </td>
                 </tr>
