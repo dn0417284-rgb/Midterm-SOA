@@ -10,13 +10,8 @@ export class Detai {
 
   @Column({ type: 'text' })
   moTa: string;
-
-  @Column({ type: 'date' })
-  ngayBatDau: Date;
-
-  @Column({ type: 'date' })
-  ngayKetThuc: Date;
-
-  @Column()
-  trangThai: string;
+  // 0 = Chưa đăng ký
+  // 1 = Đã đăng ký
+  @Column({ type: 'tinyint', default: 0 })
+  trangThai: number;
 }

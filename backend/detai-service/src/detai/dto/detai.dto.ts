@@ -2,16 +2,12 @@
 export class CreateDetaiDto {
   tenDetai: string;
   moTa: string;
-  ngayBatDau: Date;
-  ngayKetThuc: Date;
-  trangThai: string;
+  trangThai?: number;
 }
 
 // Format cập nhật đề tài (giữ các thông tin không thay đổi)
 export class UpdateDetaiDto {
   tenDetai?: string;
   moTa?: string;
-  ngayBatDau?: Date;
-  ngayKetThuc?: Date;
-  trangThai?: string;
+  trangThai?: number;
 }
