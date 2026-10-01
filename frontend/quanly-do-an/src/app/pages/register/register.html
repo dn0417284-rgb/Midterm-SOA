@@ -1,0 +1,420 @@
+<div class="register-page">
+  <div class="register-card">
+
+    <!-- HEADER -->
+    <div class="register-header">
+      <div class="logo">
+        📚
+      </div>
+
+      <h1>Đăng ký tài khoản</h1>
+
+      <p>
+        Tạo tài khoản để quản lý đồ án
+      </p>
+    </div>
+
+
+    <!-- ERROR MESSAGE -->
+    @if (errorMessage) {
+      <div class="message error">
+        <span>⚠</span>
+        <span>{{ errorMessage }}</span>
+      </div>
+    }
+
+
+    <!-- SUCCESS MESSAGE -->
+    @if (successMessage) {
+      <div class="message success">
+        <span>✓</span>
+        <span>{{ successMessage }}</span>
+      </div>
+    }
+
+
+    <!-- REGISTER FORM -->
+    <form
+      [formGroup]="registerForm"
+      (ngSubmit)="onSubmit()"
+    >
+
+      <!-- ========================= -->
+      <!-- MÃ SINH VIÊN -->
+      <!-- ========================= -->
+      <div class="form-group">
+
+        <label for="MSV">
+          Mã sinh viên
+        </label>
+
+        <div class="input-wrapper">
+
+          <span class="input-icon">
+            🎓
+          </span>
+
+          <input
+            id="MSV"
+            type="text"
+            formControlName="MSV"
+            placeholder="Nhập mã sinh viên"
+            autocomplete="username"
+            inputmode="numeric"
+          />
+
+        </div>
+
+
+        <!-- MSV RỖNG -->
+        @if (
+          registerForm.controls.MSV.touched &&
+          registerForm.controls.MSV.hasError('required')
+        ) {
+          <small class="field-error">
+            Mã sinh viên không được để trống.
+          </small>
+        }
+
+
+        <!-- MSV KHÔNG PHẢI SỐ -->
+        @if (
+          registerForm.controls.MSV.touched &&
+          registerForm.controls.MSV.hasError('pattern')
+        ) {
+          <small class="field-error">
+            Mã sinh viên chỉ được chứa chữ số.
+          </small>
+        }
+
+      </div>
+
+
+      <!-- ========================= -->
+      <!-- HỌ VÀ TÊN -->
+      <!-- ========================= -->
+      <div class="form-group">
+
+        <label for="TENSV">
+          Họ và tên
+        </label>
+
+        <div class="input-wrapper">
+
+          <span class="input-icon">
+            👤
+          </span>
+
+          <input
+            id="TENSV"
+            type="text"
+            formControlName="TENSV"
+            placeholder="Nhập họ và tên"
+            autocomplete="name"
+          />
+
+        </div>
+
+
+        @if (
+          registerForm.controls.TENSV.touched &&
+          registerForm.controls.TENSV.hasError('required')
+        ) {
+          <small class="field-error">
+            Họ và tên không được để trống.
+          </small>
+        }
+
+      </div>
+
+
+      <!-- ========================= -->
+      <!-- EMAIL -->
+      <!-- ========================= -->
+      <div class="form-group">
+
+        <label for="EMAIL">
+          Email
+        </label>
+
+        <div class="input-wrapper">
+
+          <span class="input-icon">
+            ✉
+          </span>
+
+          <input
+            id="EMAIL"
+            type="email"
+            formControlName="EMAIL"
+            placeholder="Nhập email sinh viên"
+            autocomplete="email"
+          />
+
+        </div>
+
+
+        <!-- EMAIL RỖNG -->
+        @if (
+          registerForm.controls.EMAIL.touched &&
+          registerForm.controls.EMAIL.hasError('required')
+        ) {
+          <small class="field-error">
+            Email không được để trống.
+          </small>
+        }
+
+
+        <!-- EMAIL SAI ĐỊNH DẠNG -->
+        @if (
+          registerForm.controls.EMAIL.touched &&
+          registerForm.controls.EMAIL.hasError('email')
+        ) {
+          <small class="field-error">
+            Vui lòng nhập email hợp lệ.
+          </small>
+        }
+
+      </div>
+
+
+      <!-- ========================= -->
+      <!-- MẬT KHẨU -->
+      <!-- ========================= -->
+      <div class="form-group">
+
+        <label for="MATKHAU">
+          Mật khẩu
+        </label>
+
+        <div class="input-wrapper">
+
+          <span class="input-icon">
+            🔒
+          </span>
+
+          <input
+            id="MATKHAU"
+            [type]="
+              showPassword
+                ? 'text'
+                : 'password'
+            "
+            formControlName="MATKHAU"
+            placeholder="Nhập mật khẩu"
+            autocomplete="new-password"
+          />
+
+
+          <!-- HIỆN / ẨN MẬT KHẨU -->
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="
+              showPassword =
+                !showPassword
+            "
+            [attr.aria-label]="
+              showPassword
+                ? 'Ẩn mật khẩu'
+                : 'Hiện mật khẩu'
+            "
+          >
+            {{
+              showPassword
+                ? '🙈'
+                : '👁'
+            }}
+          </button>
+
+        </div>
+
+
+        <!-- PASSWORD RULES -->
+        @if (
+          registerForm.controls.MATKHAU.touched &&
+          registerForm.controls.MATKHAU.invalid
+        ) {
+
+          <div class="password-rules">
+
+            <div>
+              • Tối thiểu 8 ký tự
+            </div>
+
+            <div>
+              • Ít nhất 1 chữ hoa
+            </div>
+
+            <div>
+              • Ít nhất 1 chữ thường
+            </div>
+
+            <div>
+              • Ít nhất 1 chữ số
+            </div>
+
+            <div>
+              • Ít nhất 1 ký tự đặc biệt
+            </div>
+
+          </div>
+
+        }
+
+      </div>
+
+
+      <!-- ========================= -->
+      <!-- XÁC NHẬN MẬT KHẨU -->
+      <!-- ========================= -->
+      <div class="form-group">
+
+        <label for="XAC_NHAN_MAT_KHAU">
+          Xác nhận mật khẩu
+        </label>
+
+        <div class="input-wrapper">
+
+          <span class="input-icon">
+            🔒
+          </span>
+
+          <input
+            id="XAC_NHAN_MAT_KHAU"
+            [type]="
+              showConfirmPassword
+                ? 'text'
+                : 'password'
+            "
+            formControlName="XAC_NHAN_MAT_KHAU"
+            placeholder="Nhập lại mật khẩu"
+            autocomplete="new-password"
+          />
+
+
+          <!-- HIỆN / ẨN XÁC NHẬN MẬT KHẨU -->
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="
+              showConfirmPassword =
+                !showConfirmPassword
+            "
+            [attr.aria-label]="
+              showConfirmPassword
+                ? 'Ẩn mật khẩu'
+                : 'Hiện mật khẩu'
+            "
+          >
+            {{
+              showConfirmPassword
+                ? '🙈'
+                : '👁'
+            }}
+          </button>
+
+        </div>
+
+
+        @if (
+          registerForm.controls
+            .XAC_NHAN_MAT_KHAU
+            .touched &&
+          registerForm.controls
+            .XAC_NHAN_MAT_KHAU
+            .hasError('required')
+        ) {
+          <small class="field-error">
+            Vui lòng xác nhận mật khẩu.
+          </small>
+        }
+
+      </div>
+
+
+      <!-- ========================= -->
+      <!-- REGISTER BUTTON -->
+      <!-- ========================= -->
+      <button
+        type="submit"
+        class="register-button"
+        [disabled]="isLoading"
+      >
+
+        @if (isLoading) {
+
+          <span class="spinner"></span>
+
+          Đang đăng ký...
+
+        } @else {
+
+          Đăng ký
+
+        }
+
+      </button>
+
+    </form>
+
+
+    <!-- ========================= -->
+    <!-- DIVIDER -->
+    <!-- ========================= -->
+    <div class="divider">
+      <span>hoặc</span>
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- GOOGLE -->
+    <!-- ========================= -->
+    <button
+      type="button"
+      class="google-button"
+      disabled
+      title="Tính năng sẽ được thêm sau"
+    >
+
+      <span class="google-icon">
+        G
+      </span>
+
+      Đăng ký bằng Google
+
+    </button>
+
+
+    <!-- ========================= -->
+    <!-- ACCOUNT LINKS -->
+    <!-- ========================= -->
+    <div class="account-links">
+
+      <div>
+        Đã có tài khoản?
+
+        <a routerLink="/login">
+          Đăng nhập
+        </a>
+      </div>
+
+
+      <div>
+        <a
+          routerLink="/forgot-password"
+        >
+          Quên mật khẩu?
+        </a>
+      </div>
+
+    </div>
+
+
+    <!-- FOOTER -->
+    <div class="register-footer">
+      © 2026 Quản lý đồ án
+    </div>
+
+  </div>
+</div>
