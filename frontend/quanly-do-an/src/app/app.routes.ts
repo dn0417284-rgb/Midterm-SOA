@@ -15,6 +15,7 @@ import { StudentLayout } from './pages/student/student-layout/student-layout';
 import { StudentDashboard } from './pages/student/student-dashboard/student-dashboard';
 import { StudentProfile } from './pages/student/student-profile/student-profile';
 import { StudentTopicRegister } from './pages/student/student-topic-register/student-topic-register';
+import { StudentMyTopic } from './pages/student/student-my-topic/student-my-topic';
 
 export const routes: Routes = [
     // 1. Trang chủ và Xác thực
@@ -44,6 +45,7 @@ export const routes: Routes = [
             { path: 'dashboard', component: StudentDashboard, data: { title: 'Tổng quan sinh viên' } },
             { path: 'profile', component: StudentProfile, data: { title: 'Thông tin cá nhân' } },
             { path: 'register-topic', component: StudentTopicRegister, data: { title: 'Đăng ký đề tài' } },
+            { path: 'my-topic', component: StudentMyTopic, data: { title: 'Đề tài của tôi' } },
             { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
         ]
     },

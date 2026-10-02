@@ -14,10 +14,13 @@ import { filter, map } from 'rxjs';
 export class AdminLayout {
   pageTitle = 'Tổng quan hệ thống';
 
-  constructor(private router: Router, private activatedRoute: ActivatedRoute) { }
+  constructor(private router: Router, private activatedRoute: ActivatedRoute) {}
 
   ngOnInit() {
-    // Lắng nghe sự kiện đổi trang để cập nhật tiêu đề ngay lập tức
+    // 1. Lấy tiêu đề ngay lúc vừa tải lại trang (F5) dựa trên URL hiện tại
+    this.updateTitleFromRoute(this.activatedRoute);
+
+    // 2. Lắng nghe sự kiện chuyển trang khi click vào sidebar
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
       map(() => {
@@ -30,5 +33,16 @@ export class AdminLayout {
     ).subscribe(title => {
       this.pageTitle = title;
     });
+  }
+
+  // Hàm phụ trợ để quét và lấy title từ route hiện tại khi load trang
+  private updateTitleFromRoute(route: ActivatedRoute) {
+    let activeRoute = route;
+    while (activeRoute.firstChild) {
+      activeRoute = activeRoute.firstChild;
+    }
+    if (activeRoute.snapshot.data['title']) {
+      this.pageTitle = activeRoute.snapshot.data['title'];
+    }
   }
 }

@@ -1,5 +1,5 @@
 <div class="register-topic-container">
-    <!-- Thanh công cụ: Tìm kiếm và Lọc -->
+    <!-- Thanh công cụ: Tìm kiếm, Lọc và Nút Thêm đề tài mới -->
     <div class="action-bar">
         <div class="search-filter-group">
             <div class="search-box">
@@ -12,6 +12,7 @@
                 <option value="gv3">TS. Hoàng Văn F</option>
             </select>
         </div>
+        <button class="btn-add-topic" (click)="openAddTopicModal()">Thêm đề tài mới</button>
     </div>
 
     <!-- Bảng danh sách đề tài mở để đăng ký -->
@@ -22,46 +23,94 @@
                     <th>Mã ĐT</th>
                     <th>Tên đề tài</th>
                     <th>Giảng viên hướng dẫn</th>
-                    <th>Đã đăng ký</th>
                     <th>Trạng thái</th>
                     <th>Thao tác</th>
                 </tr>
             </thead>
             <tbody>
-                <!-- Đề tài đang mở (Xanh) -> Cho phép nhấn đăng ký -->
+                <!-- Đề tài đã đăng ký (Đỏ) -->
                 <tr>
                     <td><strong>DT001</strong></td>
                     <td>Ứng dụng AI trong giáo dục thông minh</td>
                     <td>TS. Trần Văn B</td>
-                    <td>1 / 2</td>
-                    <td><span class="badge badge-success">Đang mở</span></td>
+                    <td><span class="badge badge-danger">Đã đăng ký</span></td>
                     <td>
-                        <button class="btn-register">Đăng ký</button>
+                        <button class="btn-disabled" disabled title="Đề tài đã được đăng ký">Đăng ký</button>
                     </td>
                 </tr>
-                <!-- Đề tài đã đủ (Đỏ) -> Không cho phép nhấn đăng ký -->
+                <!-- Đề tài chưa đăng ký (Xanh) -->
                 <tr>
                     <td><strong>DT002</strong></td>
                     <td>Website thương mại điện tử tích hợp thanh toán</td>
                     <td>ThS. Phạm Văn D</td>
-                    <td>2 / 2</td>
-                    <td><span class="badge badge-danger">Đã đủ</span></td>
+                    <td><span class="badge badge-success">Chưa đăng ký</span></td>
                     <td>
-                        <button class="btn-disabled" disabled title="Đề tài đã đủ số lượng thành viên">Đăng ký</button>
+                        <button class="btn-register" (click)="openRegisterSuccessModal()">Đăng ký</button>
                     </td>
                 </tr>
-                <!-- Đề tài đang mở (Xanh) -> Cho phép nhấn đăng ký -->
+                <!-- Đề tài chưa đăng ký (Xanh) -->
                 <tr>
                     <td><strong>DT003</strong></td>
                     <td>Ứng dụng di động quản lý sức khỏe cá nhân</td>
                     <td>TS. Hoàng Văn F</td>
-                    <td>0 / 2</td>
-                    <td><span class="badge badge-success">Đang mở</span></td>
+                    <td><span class="badge badge-success">Chưa đăng ký</span></td>
                     <td>
-                        <button class="btn-register">Đăng ký</button>
+                        <button class="btn-register" (click)="openRegisterSuccessModal()">Đăng ký</button>
                     </td>
                 </tr>
             </tbody>
         </table>
+    </div>
+</div>
+
+<!-- Popup Modal Thêm Đề Tài Mới -->
+<div class="modal-overlay" [class.active]="isAddTopicModalOpen">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>Thêm đề tài mới</h3>
+            <button class="close-btn" (click)="closeAddTopicModal()">✕</button>
+        </div>
+        <form (submit)="submitAddTopic($event)">
+            <div class="form-group">
+                <label>Mã đề tài</label>
+                <input type="text" placeholder="Ví dụ: DT004" required>
+            </div>
+            <div class="form-group">
+                <label>Tên đề tài</label>
+                <input type="text" placeholder="Nhập tên đề tài..." required>
+            </div>
+            <div class="form-group">
+                <label>Giảng viên hướng dẫn</label>
+                <input type="text" placeholder="Ví dụ: TS. Nguyễn Văn X" required>
+            </div>
+            <div class="form-group">
+                <label>Mô tả đề tài</label>
+                <textarea rows="3" placeholder="Nhập mô tả chi tiết..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" (click)="closeAddTopicModal()">Hủy</button>
+                <button type="submit" class="btn-submit">Lưu</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Popup Modal Thông Báo Thêm Thành Công -->
+<div class="modal-overlay" [class.active]="isAddSuccessModalOpen">
+    <div class="modal-card-success">
+        <div class="success-icon">✓</div>
+        <h3>Lưu đề tài thành công!</h3>
+        <p>Hệ thống đã ghi nhận đề tài mới của bạn.</p>
+        <button type="button" class="btn-close-modal" (click)="closeAddSuccessModal()">Đóng</button>
+    </div>
+</div>
+
+<!-- Popup Modal Đăng Ký Thành Công -->
+<div class="modal-overlay" [class.active]="isRegisterSuccessModalOpen">
+    <div class="modal-card-success">
+        <div class="success-icon">✓</div>
+        <h3>Đăng ký thành công!</h3>
+        <p>Hệ thống đã ghi nhận đề tài vào mục "Đề tài của tôi".</p>
+        <button type="button" class="btn-close-modal" (click)="closeRegisterSuccessModal()">Đóng</button>
     </div>
 </div>

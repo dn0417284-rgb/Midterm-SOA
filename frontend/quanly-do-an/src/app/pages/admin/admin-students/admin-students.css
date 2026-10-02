@@ -7,12 +7,14 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
 }
 .search-filter-group {
     display: flex;
     gap: 12px;
     flex-grow: 1;
-    max-width: 400px;
+    max-width: 650px;
 }
 .search-box {
     flex-grow: 1;
@@ -78,12 +80,22 @@ tr:hover td {
     cursor: pointer;
     transition: all 0.2s;
 }
-.btn-view { color: #0284c7; border-color: #bae6fd; }
-.btn-view:hover { background: #f0f9ff; }
-.btn-delete { color: #dc2626; border-color: #fecaca; }
-.btn-delete:hover { background: #fef2f2; }
+.btn-view { 
+    color: #0284c7; 
+    border-color: #bae6fd; 
+}
+.btn-view:hover { 
+    background: #f0f9ff; 
+}
+.btn-delete { 
+    color: #dc2626; 
+    border-color: #fecaca; 
+}
+.btn-delete:hover { 
+    background: #fef2f2; 
+}
 
-/* Popup Modal Styles */
+/* Modal Popup Styles */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -105,17 +117,16 @@ tr:hover td {
 }
 .modal-card {
     background: #fff;
-    width: 500px;
+    width: 450px;
     border-radius: 12px;
-    padding: 30px;
+    padding: 24px 30px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    position: relative;
 }
 .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     border-bottom: 1px solid #e2e8f0;
     padding-bottom: 12px;
 }
@@ -123,6 +134,9 @@ tr:hover td {
     margin: 0;
     font-size: 18px;
     color: #0f766e;
+}
+.delete-header h3 {
+    color: #dc2626;
 }
 .close-btn {
     background: none;
@@ -141,9 +155,92 @@ tr:hover td {
     margin: 0;
     display: flex;
     justify-content: space-between;
-    padding: 8px 0;
+    padding: 6px 0;
     border-bottom: 1px dashed #e2e8f0;
 }
 .modal-body p strong {
     color: #4b5563;
+}
+.modal-body p span {
+    color: #1f2937;
+}
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 15px;
+}
+.btn-cancel {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    color: #1f2937;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.btn-confirm-delete {
+    background: #dc2626;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-confirm-delete:hover {
+    background: #b91c1c;
+}
+
+/* Modal Thành Công */
+.modal-card-success {
+    background: #fff;
+    width: 400px;
+    border-radius: 12px;
+    padding: 24px 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    text-align: center;
+}
+.success-icon {
+    width: 50px;
+    height: 50px;
+    background: #d1fae5;
+    color: #059669;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin: 0 auto 16px auto;
+}
+.modal-card-success h3 {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+    color: #0f766e;
+}
+.modal-card-success p {
+    margin: 0 0 20px 0;
+    font-size: 14px;
+    color: #4b5563;
+    line-height: 1.5;
+}
+.btn-success-close {
+    background: #0d9488;
+    color: #fff;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.2s;
+}
+.btn-success-close:hover {
+    background: #0f766e;
 }

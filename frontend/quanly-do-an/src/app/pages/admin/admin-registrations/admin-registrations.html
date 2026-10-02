@@ -5,12 +5,6 @@
             <div class="search-box">
                 <input type="text" placeholder="Tìm theo tên sinh viên, mã đề tài...">
             </div>
-            <!-- <select class="filter-select">
-                <option value="">Tất cả trạng thái</option>
-                <option value="pending">Chờ duyệt</option>
-                <option value="approved">Đã duyệt</option>
-                <option value="rejected">Đã hủy</option>
-            </select> -->
         </div>
     </div>
 
@@ -36,7 +30,7 @@
                     <td>28/05/2026</td>
                     <td>
                         <div class="action-buttons">
-                            <button class="btn-icon btn-reject">Hủy đăng ký</button>
+                            <button class="btn-icon btn-reject" (click)="openCancelModal()">Hủy đăng ký</button>
                         </div>
                     </td>
                 </tr>
@@ -48,7 +42,7 @@
                     <td>29/05/2026</td>
                     <td>
                         <div class="action-buttons">
-                            <button class="btn-icon btn-reject">Hủy đăng ký</button>
+                            <button class="btn-icon btn-reject" (click)="openCancelModal()">Hủy đăng ký</button>
                         </div>
                     </td>
                 </tr>
@@ -60,11 +54,38 @@
                     <td>30/05/2026</td>
                     <td>
                         <div class="action-buttons">
-                            <button class="btn-icon btn-reject">Hủy đăng ký</button>
+                            <button class="btn-icon btn-reject" (click)="openCancelModal()">Hủy đăng ký</button>
                         </div>
                     </td>
                 </tr>
             </tbody>
         </table>
+    </div>
+</div>
+
+<!-- Popup Modal Xác nhận Hủy Đăng Ký -->
+<div class="modal-overlay" [class.active]="isCancelModalOpen">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>Xác nhận hủy đăng ký</h3>
+            <button class="close-btn" (click)="closeCancelModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <p>Bạn có chắc chắn muốn hủy đăng ký đề tài của sinh viên này không?</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-close-modal" (click)="closeCancelModal()">Quay lại</button>
+            <button type="button" class="btn-confirm-cancel" (click)="confirmCancel()">Xác nhận hủy</button>
+        </div>
+    </div>
+</div>
+
+<!-- Popup Modal Thông Báo Hủy Thành Công -->
+<div class="modal-overlay" [class.active]="isSuccessModalOpen">
+    <div class="modal-card-success">
+        <div class="success-icon">✓</div>
+        <h3>Đã hủy đăng ký</h3>
+        <p>Hệ thống đã ghi nhận việc hủy đăng ký đề tài thành công.</p>
+        <button type="button" class="btn-success-close" (click)="closeSuccessModal()">Đóng</button>
     </div>
 </div>

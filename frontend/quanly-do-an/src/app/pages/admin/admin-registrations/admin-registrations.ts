@@ -9,4 +9,23 @@ import { Component } from '@angular/core';
   styleUrl: './admin-registrations.css',
 })
 export class AdminRegistrations {
+  isCancelModalOpen = false;
+  isSuccessModalOpen = false;
+
+  openCancelModal() {
+    this.isCancelModalOpen = true;
+  }
+
+  closeCancelModal() {
+    this.isCancelModalOpen = false;
+  }
+
+  confirmCancel() {
+    this.closeCancelModal();
+    this.isSuccessModalOpen = true;
+  }
+
+  closeSuccessModal() {
+    this.isSuccessModalOpen = false;
+  }
 }

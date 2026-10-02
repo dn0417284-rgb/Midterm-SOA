@@ -27,7 +27,7 @@
                     <td>
                         <div class="action-buttons">
                             <button class="btn-icon btn-view" (click)="openModal('Nguyễn Văn A', 'B20DCCN001', 'a.nguyen@edu.vn', 'D20CNPM01', 'Công nghệ thông tin')">Chi tiết</button>
-                            <button class="btn-icon btn-delete">Xóa</button>
+                            <button class="btn-icon btn-delete" (click)="openDeleteModal('B20DCCN001', 'Nguyễn Văn A')">Xóa</button>
                         </div>
                     </td>
                 </tr>
@@ -38,7 +38,7 @@
                     <td>
                         <div class="action-buttons">
                             <button class="btn-icon btn-view" (click)="openModal('Lê Thị C', 'B20DCCN045', 'c.le@edu.vn', 'D20HTTT02', 'Hệ thống thông tin')">Chi tiết</button>
-                            <button class="btn-icon btn-delete">Xóa</button>
+                            <button class="btn-icon btn-delete" (click)="openDeleteModal('B20DCCN045', 'Lê Thị C')">Xóa</button>
                         </div>
                     </td>
                 </tr>
@@ -49,7 +49,7 @@
                     <td>
                         <div class="action-buttons">
                             <button class="btn-icon btn-view" (click)="openModal('Trần Hoàng E', 'B20DCCN112', 'e.tran@edu.vn', 'D20KTPM03', 'Kỹ thuật phần mềm')">Chi tiết</button>
-                            <button class="btn-icon btn-delete">Xóa</button>
+                            <button class="btn-icon btn-delete" (click)="openDeleteModal('B20DCCN112', 'Trần Hoàng E')">Xóa</button>
                         </div>
                     </td>
                 </tr>
@@ -72,5 +72,32 @@
             <p><strong>Lớp hành chính:</strong> <span>{{ selectedStudent.studentClass }}</span></p>
             <p><strong>Chuyên ngành:</strong> <span>{{ selectedStudent.major }}</span></p>
         </div>
+    </div>
+</div>
+
+<!-- Popup Modal Xác Nhận Xóa Sinh Viên -->
+<div class="modal-overlay" [class.active]="isDeleteModalOpen">
+    <div class="modal-card">
+        <div class="modal-header delete-header">
+            <h3>Xác nhận xóa sinh viên</h3>
+            <button class="close-btn" (click)="closeDeleteModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <p>Bạn có chắc chắn muốn xóa sinh viên không? Hành động này không thể hoàn tác.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-cancel" (click)="closeDeleteModal()">Quay lại</button>
+            <button type="button" class="btn-confirm-delete" (click)="confirmDelete()">Xác nhận xóa</button>
+        </div>
+    </div>
+</div>
+
+<!-- Popup Modal Thông Báo Xóa Thành Công -->
+<div class="modal-overlay" [class.active]="isSuccessModalOpen">
+    <div class="modal-card-success">
+        <div class="success-icon">✓</div>
+        <h3>Xóa thành công!</h3>
+        <p>Hệ thống đã xóa sinh viên khỏi cơ sở dữ liệu.</p>
+        <button type="button" class="btn-success-close" (click)="closeSuccessModal()">Đóng</button>
     </div>
 </div>

@@ -43,7 +43,7 @@
                         <div class="action-buttons">
                             <button class="btn-icon btn-view" (click)="openDetailModal('DT001', 'Ứng dụng AI trong giáo dục thông minh và phân tích dữ liệu học tập nâng cao', 'Nghiên cứu và phát triển hệ thống hỗ trợ học tập thông minh sử dụng trí tuệ nhân tạo.', 'TS. Trần Văn B', 'Đã đăng ký')">Chi tiết</button>
                             <button class="btn-icon btn-disabled" title="Chỉ được phép chỉnh sửa những đề tài chưa đăng ký">Sửa</button>
-                            <button class="btn-icon btn-delete">Xóa</button>
+                            <button class="btn-icon btn-delete" (click)="openDeleteModal('DT001')">Xóa</button>
                         </div>
                     </td>
                 </tr>
@@ -56,8 +56,8 @@
                     <td>
                         <div class="action-buttons">
                             <button class="btn-icon btn-view" (click)="openDetailModal('DT002', 'Website thương mại điện tử tích hợp thanh toán trực tuyến qua ví điện tử', 'Xây dựng nền tảng bán hàng trực tuyến tích hợp các cổng thanh toán.', 'ThS. Phạm Văn D', 'Chưa đăng ký')">Chi tiết</button>
-                            <button class="btn-icon btn-edit">Sửa</button>
-                            <button class="btn-icon btn-delete">Xóa</button>
+                            <button class="btn-icon btn-edit" (click)="openEditModal('DT002', 'Website thương mại điện tử tích hợp thanh toán trực tuyến qua ví điện tử', 'Xây dựng nền tảng bán hàng trực tuyến tích hợp các cổng thanh toán.', 'ThS. Phạm Văn D')">Sửa</button>
+                            <button class="btn-icon btn-delete" (click)="openDeleteModal('DT002')">Xóa</button>
                         </div>
                     </td>
                 </tr>
@@ -70,8 +70,8 @@
                     <td>
                         <div class="action-buttons">
                             <button class="btn-icon btn-view" (click)="openDetailModal('DT003', 'Ứng dụng di động quản lý sức khỏe cá nhân tích hợp cảm biến thông minh', 'Giúp người dùng theo dõi chế độ ăn uống và tập luyện hàng ngày.', 'TS. Hoàng Văn F', 'Chưa đăng ký')">Chi tiết</button>
-                            <button class="btn-icon btn-edit">Sửa</button>
-                            <button class="btn-icon btn-delete">Xóa</button>
+                            <button class="btn-icon btn-edit" (click)="openEditModal('DT003', 'Ứng dụng di động quản lý sức khỏe cá nhân tích hợp cảm biến thông minh', 'Giúp người dùng theo dõi chế độ ăn uống và tập luyện hàng ngày.', 'TS. Hoàng Văn F')">Sửa</button>
+                            <button class="btn-icon btn-delete" (click)="openDeleteModal('DT003')">Xóa</button>
                         </div>
                     </td>
                 </tr>
@@ -109,6 +109,55 @@
                 <button type="submit" class="btn-submit">Lưu đề tài</button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- Form Sửa đề tài (Modal) -->
+<div class="modal-overlay" [class.active]="isEditModalOpen">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>Chỉnh sửa đề tài</h3>
+            <button class="close-btn" (click)="closeEditModal()">✕</button>
+        </div>
+        <form (submit)="onSubmitEditTopic($event)">
+            <div class="form-group">
+                <label>Mã đề tài</label>
+                <input type="text" name="topic_code" [value]="editTopicData.code" disabled>
+            </div>
+            <div class="form-group">
+                <label>Tên đề tài</label>
+                <input type="text" name="topic_name" [(ngModel)]="editTopicData.name" required>
+            </div>
+            <div class="form-group">
+                <label>Mô tả đề tài</label>
+                <textarea name="description" rows="3" [(ngModel)]="editTopicData.desc"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Giảng viên hướng dẫn</label>
+                <input type="text" name="lecturer" [(ngModel)]="editTopicData.lecturer" required>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" (click)="closeEditModal()">Hủy</button>
+                <button type="submit" class="btn-submit">Cập nhật</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Popup Modal Xác nhận Xóa -->
+<div class="modal-overlay" [class.active]="isDeleteModalOpen">
+    <div class="modal-card">
+        <div class="modal-header delete-header">
+            <h3>Xác nhận xóa đề tài</h3>
+            <button class="close-btn" (click)="closeDeleteModal()">✕</button>
+        </div>
+        <div class="modal-body-detail">
+            <p>Bạn có chắc chắn muốn xóa đề tài này không? Hành động này không thể hoàn tác.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-cancel" (click)="closeDeleteModal()">Quay lại</button>
+            <button type="button" class="btn-confirm-delete" (click)="confirmDelete()">Xác nhận xóa</button>
+        </div>
     </div>
 </div>
 

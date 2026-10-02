@@ -153,7 +153,7 @@ tr:hover td {
 }
 .modal-card {
     background: #fff;
-    width: 480px;
+    width: 350px;
     border-radius: 12px;
     padding: 24px 30px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.1);
@@ -170,6 +170,9 @@ tr:hover td {
     margin: 0;
     font-size: 18px;
     color: #0f766e;
+}
+.delete-header h3 {
+    color: #dc2626;
 }
 .close-btn {
     background: none;
@@ -219,6 +222,17 @@ tr:hover td {
     cursor: pointer;
 }
 .btn-submit:hover { background: #0f766e; }
+.btn-confirm-delete {
+    background: #dc2626;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.btn-confirm-delete:hover { background: #b91c1c; }
 .btn-cancel {
     background: #fff;
     border: 1px solid #e2e8f0;
