@@ -1,238 +1,39 @@
-<div class="login-page">
-  <div class="login-card">
-
-    <!-- HEADER -->
-    <div class="login-header">
-      <div class="logo">
-        📚
-      </div>
-
-      <h1>Đăng nhập</h1>
-
-      <p>
-        Quản lý đồ án sinh viên
-      </p>
-    </div>
-
-    <!-- ERROR MESSAGE -->
-    @if (errorMessage) {
-      <div class="message error">
-        <span>⚠</span>
-        <span>{{ errorMessage }}</span>
-      </div>
-    }
-
-    <form
-      [formGroup]="loginForm"
-      (ngSubmit)="onSubmit()"
-    >
-
-      <!-- EMAIL -->
-      <div class="form-group">
-
-        <label for="EMAIL">
-          Email
-        </label>
-
-        <div class="input-wrapper">
-
-          <span class="input-icon">
-            ✉
-          </span>
-
-          <input
-            id="EMAIL"
-            type="email"
-            formControlName="EMAIL"
-            placeholder="Nhập email"
-            autocomplete="email"
-            (blur)="
-              loginForm.controls.EMAIL.markAsTouched()
-            "
-          />
-
+<div class="container">
+    <form (submit)="onLogin($event)" id="form-login">
+        <h1>Đăng nhập</h1>
+        <div class="input-box">
+            <label for="email">Email</label>
+            <input type="text" id="email" name="username" placeholder="vidu@edu.vn" required>
+            <i class='bx bx-envelope'></i>
         </div>
-
-        <!-- EMAIL REQUIRED -->
-        @if (
-          loginForm.controls.EMAIL.touched &&
-          loginForm.controls.EMAIL.hasError('required')
-        ) {
-          <small class="field-error">
-            Email không được để trống.
-          </small>
-        }
-
-        <!-- EMAIL INVALID -->
-        @if (
-          loginForm.controls.EMAIL.touched &&
-          loginForm.controls.EMAIL.hasError('email')
-        ) {
-          <small class="field-error">
-            Email không đúng định dạng.
-          </small>
-        }
-
-      </div>
-
-
-      <!-- PASSWORD -->
-      <div class="form-group">
-
-        <label for="MATKHAU">
-          Mật khẩu
-        </label>
-
-        <div class="input-wrapper">
-
-          <span class="input-icon">
-            🔒
-          </span>
-
-          <input
-            id="MATKHAU"
-            [type]="
-              showPassword
-                ? 'text'
-                : 'password'
-            "
-            formControlName="MATKHAU"
-            placeholder="Nhập mật khẩu"
-            autocomplete="current-password"
-            (blur)="
-              loginForm.controls.MATKHAU.markAsTouched()
-            "
-          />
-
-          <!-- SHOW / HIDE PASSWORD -->
-          <button
-            type="button"
-            class="password-toggle"
-            (click)="
-              showPassword = !showPassword
-            "
-            [attr.aria-label]="
-              showPassword
-                ? 'Ẩn mật khẩu'
-                : 'Hiện mật khẩu'
-            "
-          >
-            {{
-              showPassword
-                ? '🙈'
-                : '👁'
-            }}
-          </button>
-
+        <div class="input-box">
+            <label for="password">Mật khẩu</label>
+            <input type="password" id="password" name="password" placeholder="••••••••" required>
+            <i class='bx bx-lock-alt'></i>
         </div>
-
-        <!-- PASSWORD REQUIRED -->
-        @if (
-          loginForm.controls.MATKHAU.touched &&
-          loginForm.controls.MATKHAU.hasError('required')
-        ) {
-          <small class="field-error">
-            Mật khẩu không được để trống.
-          </small>
-        }
-
-      </div>
-
-
-      <!-- REMEMBER + FORGOT -->
-      <div class="login-options">
-
-        <label class="remember-me">
-
-          <input
-            type="checkbox"
-            [(ngModel)]="rememberMe"
-            [ngModelOptions]="{
-              standalone: true
-            }"
-          />
-
-          <span>
-            Ghi nhớ đăng nhập
-          </span>
-
-        </label>
-
-        <a
-          routerLink="/forgot-password"
-          class="forgot-password"
-        >
-          Quên mật khẩu?
-        </a>
-
-      </div>
-
-
-      <!-- LOGIN BUTTON -->
-      <button
-        type="submit"
-        class="login-button"
-        [disabled]="isLoading"
-      >
-
-        @if (isLoading) {
-
-          <span class="spinner"></span>
-
-          Đang đăng nhập...
-
-        } @else {
-
-          Đăng nhập
-
-        }
-
-      </button>
-
+        <div class="remember-forgot">
+            <label><input type="checkbox" name="remember">Nhớ tài khoản</label>
+            <a>Quên mật khẩu?</a>
+        </div>
+        <button type="submit" class="btn" name="btn_login" value="login">Đăng nhập</button>
+        <div class="register-link">
+            <p>Chưa có tài khoản? <a routerLink="/register">Đăng ký ngay</a></p>
+        </div>
+        <div class="divider">
+            <div class="line-left"></div>
+            <span>hoặc</span>
+            <div class="line-right"></div>
+        </div>
+        <div class="social-login">
+            <a href="javascript:void(0)" class="gmail">
+                <img src="google.png" alt="Google">
+            </a>
+            <a href="javascript:void(0)" class="mezon">
+                <img src="discord.png" alt="Discord">
+            </a>
+        </div>
+        <div class="notice">
+            <p>Bằng việc tiếp tục, bạn đồng ý với <a>Chính sách bảo mật</a> của chúng tôi</p>
+        </div>
     </form>
-
-
-    <!-- DIVIDER -->
-    <div class="divider">
-      <span>hoặc</span>
-    </div>
-
-
-    <!-- GOOGLE LOGIN -->
-    <button
-      type="button"
-      class="google-button"
-      disabled
-      title="Tính năng sẽ được thêm sau"
-    >
-
-      <span class="google-icon">
-        G
-      </span>
-
-      Đăng nhập bằng Google
-
-    </button>
-
-
-    <!-- REGISTER -->
-    <div class="account-links">
-
-      <span>
-        Chưa có tài khoản?
-      </span>
-
-      <a routerLink="/register">
-        Đăng ký ngay
-      </a>
-
-    </div>
-
-
-    <!-- FOOTER -->
-    <div class="login-footer">
-      © 2026 Quản lý đồ án
-    </div>
-
-  </div>
 </div>
