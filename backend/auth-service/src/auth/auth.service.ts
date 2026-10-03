@@ -1,4 +1,3 @@
-
 import {
   BadRequestException,
   Injectable,
@@ -24,18 +23,14 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-
   // =========================
   // ĐĂNG KÝ
   // =========================
 
   async register(data: RegisterDto) {
     const msv = data.MSV.trim();
-
     const tensv = data.TENSV.trim();
-
     const email = data.EMAIL.trim();
-
 
     // =========================
     // KIỂM TRA MSV
@@ -54,10 +49,8 @@ export class AuthService {
       );
     }
 
-
     // =========================
     // KIỂM TRA EMAIL
-    // Không phân biệt hoa / thường
     // =========================
 
     const emailExists =
@@ -77,7 +70,6 @@ export class AuthService {
       );
     }
 
-
     // =========================
     // HASH MẬT KHẨU
     // =========================
@@ -88,9 +80,8 @@ export class AuthService {
         10,
       );
 
-
     // =========================
-    // TẠO TÀI KHOẢN SINH VIÊN
+    // TẠO TÀI KHOẢN
     // =========================
 
     const sinhVien =
@@ -99,31 +90,27 @@ export class AuthService {
 
         TENSV: tensv,
 
-        // Chưa nhập khi đăng ký
         KHOA: null,
 
         LOP: null,
 
-        // Chưa có điểm
         DIEMTB: null,
 
-        // Email do người dùng tự nhập
-        // Không liên quan đến MSV
         EMAIL: email,
 
-        // Lưu password dạng bcrypt hash
         MATKHAU: hashedPassword,
 
-        // Tài khoản mới mặc định là sinh viên
         VAITRO: 'SINHVIEN',
       });
-
 
     const savedSinhVien =
       await this.sinhVienRepository.save(
         sinhVien,
       );
 
+    // =========================
+    // TRẢ KẾT QUẢ ĐĂNG KÝ
+    // =========================
 
     return {
       message:
@@ -134,6 +121,12 @@ export class AuthService {
 
         TENSV: savedSinhVien.TENSV,
 
+        KHOA: savedSinhVien.KHOA,
+
+        DIEMTB: savedSinhVien.DIEMTB,
+
+        LOP: savedSinhVien.LOP,
+
         EMAIL: savedSinhVien.EMAIL,
 
         VAITRO: savedSinhVien.VAITRO,
@@ -141,37 +134,15 @@ export class AuthService {
     };
   }
 
-
   // =========================
   // ĐĂNG NHẬP
   // =========================
 
   async login(data: LoginDto) {
-
-    // Xóa khoảng trắng đầu/cuối
     const email = data.EMAIL.trim();
-
 
     // =========================
     // TÌM SINH VIÊN
-    // =========================
-    //
-    // MATKHAU trong Entity có:
-    //
-    // select: false
-    //
-    // nên bắt buộc phải dùng addSelect()
-    // để lấy password hash.
-    //
-    // LOWER() giúp email không phân biệt
-    // chữ hoa / chữ thường.
-    //
-    // Ví dụ:
-    // Test@gmail.com
-    // test@gmail.com
-    // TEST@GMAIL.COM
-    //
-    // đều có thể tìm được cùng tài khoản.
     // =========================
 
     const sinhVien =
@@ -191,9 +162,8 @@ export class AuthService {
 
         .getOne();
 
-
     // =========================
-    // KHÔNG TÌM THẤY TÀI KHOẢN
+    // KHÔNG TÌM THẤY
     // =========================
 
     if (
@@ -205,7 +175,6 @@ export class AuthService {
       );
     }
 
-
     // =========================
     // KIỂM TRA MẬT KHẨU
     // =========================
@@ -216,13 +185,11 @@ export class AuthService {
         sinhVien.MATKHAU,
       );
 
-
     if (!passwordValid) {
       throw new UnauthorizedException(
         'Email hoặc mật khẩu không đúng',
       );
     }
-
 
     // =========================
     // TẠO JWT PAYLOAD
@@ -236,7 +203,6 @@ export class AuthService {
       role: sinhVien.VAITRO,
     };
 
-
     // =========================
     // TẠO ACCESS TOKEN
     // =========================
@@ -245,7 +211,6 @@ export class AuthService {
       await this.jwtService.signAsync(
         payload,
       );
-
 
     // =========================
     // TRẢ KẾT QUẢ
@@ -261,6 +226,12 @@ export class AuthService {
         MSV: sinhVien.MSV,
 
         TENSV: sinhVien.TENSV,
+
+        KHOA: sinhVien.KHOA,
+
+        DIEMTB: sinhVien.DIEMTB,
+
+        LOP: sinhVien.LOP,
 
         EMAIL: sinhVien.EMAIL,
 

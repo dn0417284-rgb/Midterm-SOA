@@ -24,8 +24,9 @@ export class SinhVien {
     name: 'KHOA',
     type: 'varchar',
     length: 100,
+    nullable: true,
   })
-  KHOA: string;
+  KHOA: string | null;
 
   @Column({
     name: 'DIEMTB',
@@ -40,8 +41,9 @@ export class SinhVien {
     name: 'LOP',
     type: 'varchar',
     length: 50,
+    nullable: true,
   })
-  LOP: string;
+  LOP: string | null;
 
   @Column({
     name: 'EMAIL',
