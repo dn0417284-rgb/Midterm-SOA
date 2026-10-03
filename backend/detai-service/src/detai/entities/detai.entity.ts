@@ -3,12 +3,12 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 @Entity('detai')
 export class Detai {
   @PrimaryGeneratedColumn()
-  id: number;
+  MDT: number;
 
   @Column()
   tenDetai: string;
 
-  @Column({ name: 'giang_vien_huong_dan' })
+  @Column({ name: 'giangVienHuongDan' })
   giangVienHuongDan: string;
 
   @Column({ type: 'text' })

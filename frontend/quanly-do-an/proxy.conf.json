@@ -2,16 +2,25 @@
   "/api/sinhvien": {
     "target": "http://localhost:3001",
     "secure": false,
-    "changeOrigin": true
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api/sinhvien": "/sinhvien"
+    }
   },
   "/api/detai": {
     "target": "http://localhost:3002",
     "secure": false,
-    "changeOrigin": true
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api/detai": "/detai"
+    }
   },
   "/api/dangky": {
     "target": "http://localhost:3003",
     "secure": false,
-    "changeOrigin": true
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api/dangky": "/dangky"
+    }
   }
 }

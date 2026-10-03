@@ -1,0 +1,22 @@
+<!-- Gọi Sidebar dùng chung -->
+<app-admin-sidebar></app-admin-sidebar>
+
+<!-- Khu vực nội dung chính bên phải -->
+<div class="main-container">
+    <!-- Topbar phía trên -->
+    <header class="topbar">
+        <h2 class="topbar-title">{{ pageTitle }}</h2>
+        <div class="admin-profile">
+            <div class="admin-avatar">AD</div>
+            <div class="admin-info">
+                <span class="admin-name">Quản Trị Viên</span>
+                <span class="admin-role">Administrator</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Nơi hiển thị động các trang con (Students, Topics, Registrations) -->
+    <div class="content">
+        <router-outlet></router-outlet>
+    </div>
+</div>

@@ -52,11 +52,11 @@ export class DetaiService {
   }
 
   // Lấy chi tiết đề tài theo ID
-  async findOne(id: number): Promise<Detai> {
-    const detai = await this.detaiRepo.findOneBy({ id });
+  async findOne(MDT: number): Promise<Detai> {
+    const detai = await this.detaiRepo.findOneBy({ MDT });
 
     if (!detai) {
-      throw new NotFoundException(`Không tìm thấy đề tài với id = ${id}`);
+      throw new NotFoundException(`Không tìm thấy đề tài với id = ${MDT}`);
     }
 
     return detai;
