@@ -1,7 +1,6 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Detai, DetaiService } from '../../../core/services/detai';
 
 @Component({
   selector: 'app-admin-topics',
@@ -10,177 +9,80 @@ import { Detai, DetaiService } from '../../../core/services/detai';
   templateUrl: './admin-topics.html',
   styleUrl: './admin-topics.css',
 })
-export class AdminTopics implements OnInit {
-  topics: Detai[] = [];
-
+export class AdminTopics {
   isAddModalOpen = false;
   isEditModalOpen = false;
   isDeleteModalOpen = false;
   isDetailModalOpen = false;
 
-  topicToDelete: number | null = null;
-  selectedTopic: Detai | null = null;
+  topicToDelete = '';
 
-  editTopicData: Partial<Detai> = {};
+  selectedTopic = {
+    code: '---',
+    name: '---',
+    desc: '---',
+    lecturer: '---',
+    status: '---'
+  };
 
-  searchText = '';
-  filterStatus = '';
-  filterLecturer = '';
+  editTopicData = {
+    code: '',
+    name: '',
+    desc: '',
+    lecturer: ''
+  };
 
-  constructor(
-    private detaiService: DetaiService,
-    private cdr: ChangeDetectorRef,
-  ) {}
-
-  ngOnInit(): void {
-    this.loadTopics();
-  }
-  loadTopics(): void {
-    this.detaiService.getAll().subscribe({
-      next: (data) => {
-        this.topics = data;
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('Lỗi khi lấy danh sách đề tài:', err);
-      },
-    });
-  }
-
-  openTopicModal(): void {
-    this.editTopicData = {};
+  openTopicModal() {
     this.isAddModalOpen = true;
   }
 
-  closeTopicModal(): void {
+  closeTopicModal() {
     this.isAddModalOpen = false;
-    this.editTopicData = {};
   }
 
-  onSubmitAddTopic(event: Event): void {
+  onSubmitAddTopic(event: Event) {
     event.preventDefault();
-
-    const newTopic: Detai = {
-      MDT: 0,
-      name: this.editTopicData.name ?? '',
-      desc: this.editTopicData.desc ?? '',
-      lecturer: this.editTopicData.lecturer ?? '',
-      status: 0,
-    };
-
-    this.detaiService.add(newTopic).subscribe({
-      next: (data) => {
-        this.loadTopics();
-        this.closeTopicModal();
-      },
-
-      error: (error) => {
-        console.error('Lỗi khi thêm đề tài:', error);
-      },
-    });
+    this.closeTopicModal();
   }
 
-  openEditModal(MDT: number, name: string, desc: string, lecturer: string): void {
-    this.editTopicData = {
-      MDT,
-      name,
-      desc,
-      lecturer,
-    };
-
+  // Mở modal Sửa
+  openEditModal(code: string, name: string, desc: string, lecturer: string) {
+    this.editTopicData = { code, name, desc, lecturer };
     this.isEditModalOpen = true;
   }
 
-  closeEditModal(): void {
+  closeEditModal() {
     this.isEditModalOpen = false;
-    this.editTopicData = {};
   }
 
-  onSubmitEditTopic(event: Event): void {
+  onSubmitEditTopic(event: Event) {
     event.preventDefault();
-
-    if (this.editTopicData.MDT == null) {
-      console.error('Không có mã đề tài để cập nhật');
-      return;
-    }
-
-    this.detaiService.update(this.editTopicData.MDT, this.editTopicData).subscribe({
-      next: (data) => {
-        this.loadTopics();
-        this.closeEditModal();
-      },
-
-      error: (error) => {
-        console.error('Lỗi khi cập nhật đề tài:', error);
-      },
-    });
+    // Xử lý cập nhật dữ liệu đề tài tại đây
+    this.closeEditModal();
   }
 
-  openDeleteModal(MDT: number): void {
-    this.topicToDelete = MDT;
+  // Mở modal Xóa
+  openDeleteModal(code: string) {
+    this.topicToDelete = code;
     this.isDeleteModalOpen = true;
   }
 
-  closeDeleteModal(): void {
+  closeDeleteModal() {
     this.isDeleteModalOpen = false;
-    this.topicToDelete = null;
   }
 
-  confirmDelete(): void {
-    if (this.topicToDelete == null) {
-      return;
-    }
-
-    this.detaiService.delete(this.topicToDelete).subscribe({
-      next: (data) => {
-        this.loadTopics();
-        this.closeDeleteModal();
-      },
-
-      error: (error) => {
-        console.error('Lỗi khi xóa đề tài:', error);
-      },
-    });
+  confirmDelete() {
+    // Xử lý xóa đề tài có mã `this.topicToDelete` tại đây
+    this.closeDeleteModal();
   }
 
-  openDetailModal(MDT: number, name: string, desc: string, lecturer: string, status: number): void {
-    this.selectedTopic = {
-      MDT,
-      name,
-      desc,
-      lecturer,
-      status,
-    };
-
+  openDetailModal(code: string, name: string, desc: string, lecturer: string, status: string) {
+    this.selectedTopic = { code, name, desc, lecturer, status };
     this.isDetailModalOpen = true;
   }
 
-  closeDetailModal(): void {
+  closeDetailModal() {
     this.isDetailModalOpen = false;
-    this.selectedTopic = null;
   }
 
-  get filteredTopics(): Detai[] {
-    return this.topics.filter((topic) => {
-      // Tìm theo tên hoặc mã đề tài
-      const keyword = this.searchText.trim().toLowerCase();
-
-      const matchSearch =
-        !keyword ||
-        topic.name.toLowerCase().includes(keyword) ||
-        topic.MDT.toString().includes(keyword);
-
-      // Lọc trạng thái
-      const matchStatus = !this.filterStatus || topic.status.toString() === this.filterStatus;
-
-      // Lọc giảng viên
-      const matchLecturer = !this.filterLecturer || topic.lecturer === this.filterLecturer;
-
-      return matchSearch && matchStatus && matchLecturer;
-    });
-  }
-
-  getStatusText(status: number): string {
-    return status === 0 ? 'Chưa đăng ký' : 'Đã đăng ký';
-  }
 }

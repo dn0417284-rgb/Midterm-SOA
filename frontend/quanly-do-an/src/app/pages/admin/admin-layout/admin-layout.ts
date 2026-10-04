@@ -1,48 +1,119 @@
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+
+import {
+  ActivatedRoute,
+  NavigationEnd,
+  Router,
+  RouterOutlet,
+} from '@angular/router';
+
 import { AdminSidebar } from '../../../components/admin-sidebar/admin-sidebar';
-import { filter, map } from 'rxjs';
+
+import {
+  Subject,
+  filter,
+  map,
+  takeUntil,
+} from 'rxjs';
 
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, AdminSidebar, RouterLink, RouterLinkActive],
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    AdminSidebar,
+  ],
   templateUrl: './admin-layout.html',
   styleUrl: './admin-layout.css',
 })
-export class AdminLayout {
+export class AdminLayout
+  implements OnInit, OnDestroy {
+
   pageTitle = 'Tổng quan hệ thống';
 
-  constructor(private router: Router, private activatedRoute: ActivatedRoute) {}
+  private readonly destroy$ =
+    new Subject<void>();
 
-  ngOnInit() {
-    // 1. Lấy tiêu đề ngay lúc vừa tải lại trang (F5) dựa trên URL hiện tại
-    this.updateTitleFromRoute(this.activatedRoute);
+  constructor(
+    private readonly router: Router,
+    private readonly activatedRoute: ActivatedRoute,
+  ) {}
 
-    // 2. Lắng nghe sự kiện chuyển trang khi click vào sidebar
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd),
-      map(() => {
-        let route = this.activatedRoute;
-        while (route.firstChild) {
-          route = route.firstChild;
-        }
-        return route.snapshot.data['title'] || 'Quản lý Đồ án Tốt nghiệp';
-      })
-    ).subscribe(title => {
-      this.pageTitle = title;
-    });
+  // ============================
+  // KHỞI TẠO
+  // ============================
+
+  ngOnInit(): void {
+
+    this.updateTitleFromRoute(
+      this.activatedRoute,
+    );
+
+    this.router.events
+      .pipe(
+        filter(
+          (event) =>
+            event instanceof NavigationEnd,
+        ),
+
+        map(() => {
+
+          let route =
+            this.activatedRoute;
+
+          while (route.firstChild) {
+            route = route.firstChild;
+          }
+
+          return (
+            route.snapshot.data['title'] ??
+            'Quản lý Đồ án Tốt nghiệp'
+          );
+        }),
+
+        takeUntil(this.destroy$),
+      )
+      .subscribe((title) => {
+
+        this.pageTitle = title;
+
+      });
   }
 
-  // Hàm phụ trợ để quét và lấy title từ route hiện tại khi load trang
-  private updateTitleFromRoute(route: ActivatedRoute) {
+  // ============================
+  // LẤY TITLE BAN ĐẦU
+  // ============================
+
+  private updateTitleFromRoute(
+    route: ActivatedRoute,
+  ): void {
+
     let activeRoute = route;
+
     while (activeRoute.firstChild) {
-      activeRoute = activeRoute.firstChild;
+      activeRoute =
+        activeRoute.firstChild;
     }
-    if (activeRoute.snapshot.data['title']) {
-      this.pageTitle = activeRoute.snapshot.data['title'];
+
+    const title =
+      activeRoute.snapshot.data['title'];
+
+    if (title) {
+
+      this.pageTitle = title;
+
     }
+  }
+
+  // ============================
+  // HỦY SUBSCRIPTION
+  // ============================
+
+  ngOnDestroy(): void {
+
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

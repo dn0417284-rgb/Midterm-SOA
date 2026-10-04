@@ -1,6 +1,14 @@
 {
-  "/api/sinhvien": {
+  "/api/auth": {
     "target": "http://localhost:3001",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api/auth": "/auth"
+    }
+  },
+  "/api/sinhvien": {
+    "target": "http://localhost:3000",
     "secure": false,
     "changeOrigin": true,
     "pathRewrite": {

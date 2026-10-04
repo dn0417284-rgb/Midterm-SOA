@@ -1,44 +1,252 @@
 <div class="profile-card">
-    <!-- Phần Header của Profile -->
+
+    <!-- ============================ -->
+    <!-- HEADER -->
+    <!-- ============================ -->
+
     <div class="profile-header">
-        <div class="profile-avatar-large">NA</div>
+
+        <div class="profile-avatar-large">
+            {{ studentAvatar }}
+        </div>
+
         <div class="profile-user-meta">
-            <h3>Nguyễn Văn A</h3>
-            <p>Mã sinh viên: B20DCCN001 | Chuyên ngành: Công nghệ thông tin</p>
+
+            <h3>
+                {{ studentName }}
+            </h3>
+
+            <p>
+                Mã sinh viên: {{ studentCode }}
+
+                <span *ngIf="studentFaculty">
+                    | Khoa: {{ studentFaculty }}
+                </span>
+            </p>
+
         </div>
+
     </div>
 
-    <!-- Form thông tin chi tiết -->
+
+    <!-- ============================ -->
+    <!-- THÔNG BÁO THÀNH CÔNG -->
+    <!-- ============================ -->
+
+    <div
+        *ngIf="successMessage"
+        class="alert alert-success"
+    >
+        {{ successMessage }}
+    </div>
+
+
+    <!-- ============================ -->
+    <!-- THÔNG BÁO LỖI -->
+    <!-- ============================ -->
+
+    <div
+        *ngIf="errorMessage"
+        class="alert alert-error"
+    >
+        {{ errorMessage }}
+    </div>
+
+
+    <!-- ============================ -->
+    <!-- FORM -->
+    <!-- ============================ -->
+
     <div class="form-grid">
+
+        <!-- ============================ -->
+        <!-- HỌ VÀ TÊN -->
+        <!-- KHÔNG CHO PHÉP CHỈNH SỬA -->
+        <!-- ============================ -->
+
         <div class="form-group">
-            <label>Họ và tên</label>
-            <input type="text" class="form-control" value="Nguyễn Văn A" readonly>
+
+            <label>
+                Họ và tên
+            </label>
+
+            <input
+                type="text"
+                class="form-control"
+                [value]="studentName"
+                readonly
+            >
+
         </div>
+
+
+        <!-- ============================ -->
+        <!-- MÃ SINH VIÊN -->
+        <!-- KHÔNG CHO PHÉP CHỈNH SỬA -->
+        <!-- ============================ -->
+
         <div class="form-group">
-            <label>Mã sinh viên</label>
-            <input type="text" class="form-control" value="B20DCCN001" readonly>
+
+            <label>
+                Mã sinh viên
+            </label>
+
+            <input
+                type="text"
+                class="form-control"
+                [value]="studentCode"
+                readonly
+            >
+
         </div>
+
+
+        <!-- ============================ -->
+        <!-- EMAIL -->
+        <!-- ============================ -->
+
         <div class="form-group">
-            <label>Email sinh viên</label>
-            <input type="email" class="form-control" value="a.nguyen@edu.vn">
+
+            <label>
+                Email sinh viên
+            </label>
+
+            <!-- Chế độ xem -->
+            <input
+                *ngIf="!isEditing"
+                type="email"
+                class="form-control"
+                [value]="studentEmail"
+                readonly
+            >
+
+            <!-- Chế độ chỉnh sửa -->
+            <input
+                *ngIf="isEditing"
+                type="email"
+                class="form-control"
+                [(ngModel)]="editEmail"
+                name="editEmail"
+            >
+
         </div>
-        <div class="form-group" style="display: flex; flex-direction: column; gap: 8px;">
-            <label>Số điện thoại</label>
-            <input type="text" class="form-control" value="0912345678">
-        </div>
+
+
+        <!-- ============================ -->
+        <!-- LỚP -->
+        <!-- ============================ -->
+
         <div class="form-group">
-            <label>Lớp hành chính</label>
-            <input type="text" class="form-control" value="D20CNPM01" readonly>
+
+            <label>
+                Lớp hành chính
+            </label>
+
+            <!-- Chế độ xem -->
+            <input
+                *ngIf="!isEditing"
+                type="text"
+                class="form-control"
+                [value]="studentClass"
+                readonly
+            >
+
+            <!-- Chế độ chỉnh sửa -->
+            <input
+                *ngIf="isEditing"
+                type="text"
+                class="form-control"
+                [(ngModel)]="editClass"
+                name="editClass"
+            >
+
         </div>
+
+
+        <!-- ============================ -->
+        <!-- KHOA -->
+        <!-- ============================ -->
+
         <div class="form-group">
-            <label>Khoa</label>
-            <input type="text" class="form-control" value="Công nghệ Thông tin" readonly>
+
+            <label>
+                Khoa
+            </label>
+
+            <!-- Chế độ xem -->
+            <input
+                *ngIf="!isEditing"
+                type="text"
+                class="form-control"
+                [value]="studentFaculty"
+                readonly
+            >
+
+            <!-- Chế độ chỉnh sửa -->
+            <input
+                *ngIf="isEditing"
+                type="text"
+                class="form-control"
+                [(ngModel)]="editFaculty"
+                name="editFaculty"
+            >
+
         </div>
+
     </div>
 
-    <!-- Nút thao tác -->
-    <div class="form-actions">
-        <button type="button" class="btn btn-outline">Hủy thay đổi</button>
-        <button type="button" class="btn btn-primary">Lưu thông tin</button>
+
+    <!-- ============================ -->
+    <!-- NÚT CHỈNH SỬA -->
+    <!-- ============================ -->
+
+    <div
+        class="form-actions"
+        *ngIf="!isEditing"
+    >
+
+        <button
+            type="button"
+            class="btn btn-primary"
+            (click)="startEditing()"
+        >
+            Chỉnh sửa
+        </button>
+
     </div>
+
+
+    <!-- ============================ -->
+    <!-- NÚT HỦY + LƯU -->
+    <!-- ============================ -->
+
+    <div
+        class="form-actions"
+        *ngIf="isEditing && hasChanges"
+    >
+
+        <button
+            type="button"
+            class="btn btn-outline"
+            (click)="cancelEditing()"
+            [disabled]="isSaving"
+        >
+            Hủy thay đổi
+        </button>
+
+
+        <button
+            type="button"
+            class="btn btn-primary"
+            (click)="saveChanges()"
+            [disabled]="isSaving"
+        >
+
+            Lưu thông tin
+
+        </button>
+
+    </div>
+
 </div>
+

@@ -1,42 +1,169 @@
 <div class="container">
-    <form (submit)="onRegister($event)" id="form-login">
-        <h1>Đăng ký</h1>
-        <div class="input-box">
-            <label for="fullname">Họ và tên</label>
-            <input type="text" id="fullname" name="fullname" placeholder="Nguyễn Văn A" required>
-            <i class='bx bx-user'></i>
-        </div>
-        <div class="input-box">
-            <label for="email">Email</label>
-            <input type="text" id="email" name="username" placeholder="vidu@edu.vn" required>
-            <i class='bx bx-envelope'></i>
-        </div>
-        <div class="input-box">
-            <label for="password">Mật khẩu</label>
-            <input type="password" id="password" name="password" placeholder="••••••••" required>
-            <i class='bx bx-lock-alt'></i>
-        </div>
-        <div class="terms-agreement">
-            <label>
-                <input type="checkbox" name="remember" required>Tôi đồng ý với <a>Điều khoản dịch vụ</a>
-            </label>
-        </div>
-        <button type="submit" class="btn" name="btn_register" value="register">Tạo tài khoản</button>
-        <div class="divider">
-            <div class="line-left"></div>
-            <span>hoặc</span>
-            <div class="line-right"></div>
-        </div>
-        <div class="social-login">
-            <a href="javascript:void(0)" class="gmail">
-                <img src="google.png" alt="Google">
-            </a>
-            <a href="javascript:void(0)" class="mezon">
-                <img src="discord.png" alt="Discord">
-            </a>
-        </div>
-        <div class="login-redirect">
-            <p>Đã có tài khoản? <a routerLink="/login">Đăng nhập</a></p>
-        </div>
-    </form>
+  <form
+    (submit)="onRegister($event)"
+    id="form-login"
+  >
+    <h1>Đăng ký</h1>
+
+    <div class="input-box">
+      <label for="msv">Mã sinh viên</label>
+
+      <input
+        type="text"
+        id="msv"
+        name="msv"
+        [(ngModel)]="MSV"
+        placeholder="4651050332"
+        inputmode="numeric"
+        required
+      />
+
+      <i class="bx bx-id-card"></i>
+    </div>
+
+    <div class="input-box">
+      <label for="fullname">
+        Họ và tên
+      </label>
+
+      <input
+        type="text"
+        id="fullname"
+        name="fullname"
+        [(ngModel)]="TENSV"
+        placeholder="Nguyễn Văn A"
+        required
+      />
+
+      <i class="bx bx-user"></i>
+    </div>
+
+    <div class="input-box">
+      <label for="email">Email</label>
+
+      <input
+        type="email"
+        id="email"
+        name="email"
+        [(ngModel)]="EMAIL"
+        placeholder="vidu@gmail.com"
+        autocomplete="email"
+        required
+      />
+
+      <i class="bx bx-envelope"></i>
+    </div>
+
+    <div class="input-box">
+      <label for="password">
+        Mật khẩu
+      </label>
+
+      <input
+        type="password"
+        id="password"
+        name="password"
+        [(ngModel)]="MATKHAU"
+        placeholder="••••••••"
+        autocomplete="new-password"
+        required
+      />
+
+      <i class="bx bx-lock-alt"></i>
+    </div>
+
+    <div class="input-box">
+      <label for="confirm-password">
+        Xác nhận mật khẩu
+      </label>
+
+      <input
+        type="password"
+        id="confirm-password"
+        name="confirm-password"
+        [(ngModel)]="XAC_NHAN_MAT_KHAU"
+        placeholder="••••••••"
+        autocomplete="new-password"
+        required
+      />
+
+      <i class="bx bx-lock-alt"></i>
+    </div>
+
+    <div class="terms-agreement">
+      <label>
+        <input
+          type="checkbox"
+          name="terms"
+          required
+        />
+
+        Tôi đồng ý với
+        <a>Điều khoản dịch vụ</a>
+      </label>
+    </div>
+
+    @if (errorMessage) {
+      <div class="error-message">
+        {{ errorMessage }}
+      </div>
+    }
+
+    @if (successMessage) {
+      <div class="success-message">
+        {{ successMessage }}
+      </div>
+    }
+
+    <button
+      type="submit"
+      class="btn"
+      name="btn_register"
+      value="register"
+      [disabled]="isLoading"
+    >
+      {{
+        isLoading
+          ? 'Đang tạo tài khoản...'
+          : 'Tạo tài khoản'
+      }}
+    </button>
+
+    <div class="divider">
+      <div class="line-left"></div>
+      <span>hoặc</span>
+      <div class="line-right"></div>
+    </div>
+
+    <div class="social-login">
+      <a
+        href="javascript:void(0)"
+        class="gmail"
+      >
+        <img
+          src="google.png"
+          alt="Google"
+        />
+      </a>
+
+      <a
+        href="javascript:void(0)"
+        class="mezon"
+      >
+        <img
+          src="discord.png"
+          alt="Discord"
+        />
+      </a>
+    </div>
+
+    <div class="login-redirect">
+      <p>
+        Đã có tài khoản?
+        <a routerLink="/login">
+          Đăng nhập
+        </a>
+      </p>
+    </div>
+  </form>
 </div>
