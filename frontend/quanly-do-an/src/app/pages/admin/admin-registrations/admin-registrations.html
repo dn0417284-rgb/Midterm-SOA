@@ -1,0 +1,91 @@
+<div class="registrations-container">
+    <!-- Thanh công cụ: Tìm kiếm và Bộ lọc -->
+    <div class="action-bar">
+        <div class="search-filter-group">
+            <div class="search-box">
+                <input type="text" placeholder="Tìm theo tên sinh viên, mã đề tài...">
+            </div>
+        </div>
+    </div>
+
+    <!-- Bảng danh sách đăng ký -->
+    <div class="card-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>MSSV</th>
+                    <th>Sinh viên</th>
+                    <th>Mã ĐT</th>
+                    <th>Tên đề tài</th>
+                    <th>Ngày đăng ký</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>B20DCCN001</strong></td>
+                    <td>Nguyễn Văn A</td>
+                    <td>DT001</td>
+                    <td class="topic-name-cell">Ứng dụng AI trong giáo dục thông minh</td>
+                    <td>28/05/2026</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-icon btn-reject" (click)="openCancelModal()">Hủy đăng ký</button>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>B20DCCN112</strong></td>
+                    <td>Trần Hoàng E</td>
+                    <td>DT002</td>
+                    <td class="topic-name-cell">Website thương mại điện tử tích hợp thanh toán</td>
+                    <td>29/05/2026</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-icon btn-reject" (click)="openCancelModal()">Hủy đăng ký</button>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>B20DCCN200</strong></td>
+                    <td>Phạm Văn G</td>
+                    <td>DT003</td>
+                    <td class="topic-name-cell">Ứng dụng di động quản lý sức khỏe cá nhân</td>
+                    <td>30/05/2026</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-icon btn-reject" (click)="openCancelModal()">Hủy đăng ký</button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Popup Modal Xác nhận Hủy Đăng Ký -->
+<div class="modal-overlay" [class.active]="isCancelModalOpen">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>Xác nhận hủy đăng ký</h3>
+            <button class="close-btn" (click)="closeCancelModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <p>Bạn có chắc chắn muốn hủy đăng ký đề tài của sinh viên này không?</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-close-modal" (click)="closeCancelModal()">Quay lại</button>
+            <button type="button" class="btn-confirm-cancel" (click)="confirmCancel()">Xác nhận hủy</button>
+        </div>
+    </div>
+</div>
+
+<!-- Popup Modal Thông Báo Hủy Thành Công -->
+<div class="modal-overlay" [class.active]="isSuccessModalOpen">
+    <div class="modal-card-success">
+        <div class="success-icon">✓</div>
+        <h3>Đã hủy đăng ký</h3>
+        <p>Hệ thống đã ghi nhận việc hủy đăng ký đề tài thành công.</p>
+        <button type="button" class="btn-success-close" (click)="closeSuccessModal()">Đóng</button>
+    </div>
+</div>

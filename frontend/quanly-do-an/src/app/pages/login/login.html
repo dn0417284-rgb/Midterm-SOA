@@ -1,0 +1,39 @@
+<div class="container">
+    <form (submit)="onLogin($event)" id="form-login">
+        <h1>Đăng nhập</h1>
+        <div class="input-box">
+            <label for="email">Email</label>
+            <input type="text" id="email" name="username" placeholder="vidu@edu.vn" required>
+            <i class='bx bx-envelope'></i>
+        </div>
+        <div class="input-box">
+            <label for="password">Mật khẩu</label>
+            <input type="password" id="password" name="password" placeholder="••••••••" required>
+            <i class='bx bx-lock-alt'></i>
+        </div>
+        <div class="remember-forgot">
+            <label><input type="checkbox" name="remember">Nhớ tài khoản</label>
+            <a>Quên mật khẩu?</a>
+        </div>
+        <button type="submit" class="btn" name="btn_login" value="login">Đăng nhập</button>
+        <div class="register-link">
+            <p>Chưa có tài khoản? <a routerLink="/register">Đăng ký ngay</a></p>
+        </div>
+        <div class="divider">
+            <div class="line-left"></div>
+            <span>hoặc</span>
+            <div class="line-right"></div>
+        </div>
+        <div class="social-login">
+            <a href="javascript:void(0)" class="gmail">
+                <img src="google.png" alt="Google">
+            </a>
+            <a href="javascript:void(0)" class="mezon">
+                <img src="discord.png" alt="Discord">
+            </a>
+        </div>
+        <div class="notice">
+            <p>Bằng việc tiếp tục, bạn đồng ý với <a>Chính sách bảo mật</a> của chúng tôi</p>
+        </div>
+    </form>
+</div>
