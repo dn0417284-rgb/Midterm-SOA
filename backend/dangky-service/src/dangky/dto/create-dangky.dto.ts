@@ -1,4 +1,4 @@
+import { IsInt } from 'class-validator';
 export class CreateDangKyDto {
-  msv: string;
-  detaiId: number;
+  @IsInt() detaiId: number;
 }

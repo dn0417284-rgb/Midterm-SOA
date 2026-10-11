@@ -8,7 +8,7 @@ import { AppService } from './app.service.js';
 import { DangkyModule } from './dangky/dangky.module.js';
 
 export const {
-  ObserveModule,
+  //ObserveModule,
   ObserveInstrument,
 } = createObserveModule();
 
@@ -28,14 +28,14 @@ export const {
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
       autoLoadEntities: true,
-      synchronize: true,
+      synchronize: false,
     }),
 
-    ObserveModule.forRoot({
-      appKey: 'YOUR_APP_KEY',
-      appSecret: 'YOUR_APP_SECRET',
-      serviceId: 'dangky-service',
-    }),
+    // ObserveModule.forRoot({
+    //   appKey: 'YOUR_APP_KEY',
+    //   appSecret: 'YOUR_APP_SECRET',
+    //   serviceId: 'dangky-service',
+    // }),
 
     DangkyModule,
   ],

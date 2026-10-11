@@ -1,0 +1,2097 @@
+﻿==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\auth-service\src\auth\decorators\roles.decorator.ts ====================
+import { SetMetadata } from '@nestjs/common';
+
+export const ROLES_KEY = 'roles';
+
+export const Roles = (...roles: string[]) =>
+  SetMetadata(ROLES_KEY, roles);
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\auth-service\src\auth\dto\login.dto.ts ====================
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+} from 'class-validator';
+
+export class LoginDto {
+  @IsEmail()
+  EMAIL: string;
+
+  @IsString()
+  @IsNotEmpty()
+  MATKHAU: string;
+}
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\auth-service\src\auth\dto\register.dto.ts ====================
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  Matches,
+  MinLength,
+} from 'class-validator';
+
+export class RegisterDto {
+  @IsString()
+  @IsNotEmpty()
+  @Matches(/^\d+$/, {
+    message: 'Mã sinh viên chỉ được chứa chữ số',
+  })
+  MSV: string;
+
+  @IsString()
+  @IsNotEmpty()
+  TENSV: string;
+
+  @IsEmail()
+  EMAIL: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(8, {
+    message:
+      'Mật khẩu phải có ít nhất 8 ký tự',
+  })
+  @Matches(/[A-Z]/, {
+    message:
+      'Mật khẩu phải có ít nhất 1 chữ hoa',
+  })
+  @Matches(/[a-z]/, {
+    message:
+      'Mật khẩu phải có ít nhất 1 chữ thường',
+  })
+  @Matches(/[0-9]/, {
+    message:
+      'Mật khẩu phải có ít nhất 1 chữ số',
+  })
+  @Matches(/[^A-Za-z0-9]/, {
+    message:
+      'Mật khẩu phải có ít nhất 1 ký tự đặc biệt',
+  })
+  MATKHAU: string;
+}
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\auth-service\src\auth\entities\sinhvien.entity.ts ====================
+import {
+  Column,
+  Entity,
+  PrimaryColumn,
+} from 'typeorm';
+
+@Entity('SINHVIEN')
+export class SinhVien {
+  @PrimaryColumn({
+    name: 'MSV',
+    type: 'varchar',
+    length: 20,
+  })
+  MSV: string;
+
+  @Column({
+    name: 'TENSV',
+    type: 'varchar',
+    length: 100,
+  })
+  TENSV: string;
+
+  @Column({
+    name: 'KHOA',
+    type: 'varchar',
+    length: 100,
+    nullable: true,
+  })
+  KHOA: string | null;
+
+  @Column({
+    name: 'DIEMTB',
+    type: 'decimal',
+    precision: 3,
+    scale: 2,
+    nullable: true,
+  })
+  DIEMTB: number | null;
+
+  @Column({
+    name: 'LOP',
+    type: 'varchar',
+    length: 50,
+    nullable: true,
+  })
+  LOP: string | null;
+
+  @Column({
+    name: 'EMAIL',
+    type: 'varchar',
+    length: 100,
+    unique: true,
+    nullable: true,
+  })
+  EMAIL: string | null;
+
+  @Column({
+    name: 'MATKHAU',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+    select: false,
+  })
+  MATKHAU: string | null;
+
+  @Column({
+    name: 'VAITRO',
+    type: 'varchar',
+    length: 20,
+    default: 'SINHVIEN',
+  })
+  VAITRO: string;
+}
+
+
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\auth-service\src\auth\guards\jwt-auth.guard.ts ====================
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+
+import { JwtService } from '@nestjs/jwt';
+import type { Request } from 'express';
+
+@Injectable()
+export class JwtAuthGuard implements CanActivate {
+  constructor(
+    private readonly jwtService: JwtService,
+  ) {}
+
+  async canActivate(
+    context: ExecutionContext,
+  ): Promise<boolean> {
+    const request =
+      context.switchToHttp().getRequest<Request>();
+
+    const authHeader =
+      request.headers.authorization;
+
+    if (!authHeader) {
+      throw new UnauthorizedException(
+        'Chưa đăng nhập',
+      );
+    }
+
+    const [type, token] =
+      authHeader.split(' ');
+
+    if (
+      type !== 'Bearer' ||
+      !token
+    ) {
+      throw new UnauthorizedException(
+        'Token không hợp lệ',
+      );
+    }
+
+    try {
+      const payload =
+        await this.jwtService.verifyAsync(token);
+
+      (request as Request & { user: any }).user =
+        payload;
+
+      return true;
+    } catch {
+      throw new UnauthorizedException(
+        'Token không hợp lệ hoặc đã hết hạn',
+      );
+    }
+  }
+}
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\auth-service\src\auth\guards\roles.guard.ts ====================
+import {
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
+
+import { Reflector } from '@nestjs/core';
+
+import { ROLES_KEY } from '../decorators/roles.decorator.js';
+
+@Injectable()
+export class RolesGuard implements CanActivate {
+  constructor(
+    private readonly reflector: Reflector,
+  ) {}
+
+  canActivate(
+    context: ExecutionContext,
+  ): boolean {
+    const requiredRoles =
+      this.reflector.getAllAndOverride<string[]>(
+        ROLES_KEY,
+        [
+          context.getHandler(),
+          context.getClass(),
+        ],
+      );
+
+    if (!requiredRoles) {
+      return true;
+    }
+
+    const request =
+      context.switchToHttp().getRequest();
+
+    const user = request.user;
+
+    if (!user) {
+      throw new ForbiddenException(
+        'Không tìm thấy thông tin người dùng',
+      );
+    }
+
+    if (!requiredRoles.includes(user.role)) {
+      throw new ForbiddenException(
+        'Bạn không có quyền truy cập chức năng này',
+      );
+    }
+
+    return true;
+  }
+}
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\auth-service\src\auth\auth.controller.ts ====================
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+
+import type { Request } from 'express';
+
+import { AuthService } from './auth.service.js';
+import { RegisterDto } from './dto/register.dto.js';
+import { LoginDto } from './dto/login.dto.js';
+import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
+import { RolesGuard } from './guards/roles.guard.js';
+import { Roles } from './decorators/roles.decorator.js';
+
+@Controller('auth')
+export class AuthController {
+  constructor(
+    private readonly authService: AuthService,
+  ) {}
+
+  // =========================
+  // REGISTER
+  // =========================
+
+  @Post('register')
+  register(@Body() data: RegisterDto) {
+    return this.authService.register(data);
+  }
+
+  // =========================
+  // LOGIN
+  // =========================
+
+  @Post('login')
+  login(@Body() data: LoginDto) {
+    return this.authService.login(data);
+  }
+
+  // =========================
+  // TEST JWT
+  // =========================
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  me(
+    @Req() request: Request & { user: any },
+  ) {
+    return {
+      message: 'Token hợp lệ',
+      user: request.user,
+    };
+  }
+
+  // =========================
+  // TEST ADMIN
+  // =========================
+
+  @Get('admin-test')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  adminTest(
+    @Req() request: Request & { user: any },
+  ) {
+    return {
+      message: 'Bạn có quyền ADMIN',
+      user: request.user,
+    };
+  }
+
+  // =========================
+  // TEST SINH VIÊN
+  // =========================
+
+  @Get('student-test')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('SINHVIEN')
+  studentTest(
+    @Req() request: Request & { user: any },
+  ) {
+    return {
+      message: 'Bạn có quyền SINHVIEN',
+      user: request.user,
+    };
+  }
+}
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\auth-service\src\auth\auth.module.ts ====================
+import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+
+import { SinhVien } from './entities/sinhvien.entity.js';
+import { AuthController } from './auth.controller.js';
+import { AuthService } from './auth.service.js';
+
+@Module({
+  imports: [
+    TypeOrmModule.forFeature([SinhVien]),
+
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+
+        signOptions: {
+          expiresIn: '1d',
+        },
+      }),
+    }),
+  ],
+
+  controllers: [AuthController],
+  providers: [AuthService],
+})
+export class AuthModule {}
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\auth-service\src\auth\auth.service.ts ====================
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
+import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
+
+import { SinhVien } from './entities/sinhvien.entity.js';
+import { RegisterDto } from './dto/register.dto.js';
+import { LoginDto } from './dto/login.dto.js';
+
+@Injectable()
+export class AuthService {
+  constructor(
+    @InjectRepository(SinhVien)
+    private readonly sinhVienRepository: Repository<SinhVien>,
+
+    private readonly jwtService: JwtService,
+  ) {}
+
+  // =========================
+  // ĐĂNG KÝ
+  // =========================
+
+  async register(data: RegisterDto) {
+    const msv = data.MSV.trim();
+    const tensv = data.TENSV.trim();
+    const email = data.EMAIL.trim();
+
+    // =========================
+    // KIỂM TRA MSV
+    // =========================
+
+    const msvExists =
+      await this.sinhVienRepository.findOne({
+        where: {
+          MSV: msv,
+        },
+      });
+
+    if (msvExists) {
+      throw new BadRequestException(
+        'Mã sinh viên đã được sử dụng',
+      );
+    }
+
+    // =========================
+    // KIỂM TRA EMAIL
+    // =========================
+
+    const emailExists =
+      await this.sinhVienRepository
+        .createQueryBuilder('sinhVien')
+        .where(
+          'LOWER(sinhVien.EMAIL) = LOWER(:email)',
+          {
+            email,
+          },
+        )
+        .getOne();
+
+    if (emailExists) {
+      throw new BadRequestException(
+        'Email đã được sử dụng',
+      );
+    }
+
+    // =========================
+    // HASH MẬT KHẨU
+    // =========================
+
+    const hashedPassword =
+      await bcrypt.hash(
+        data.MATKHAU,
+        10,
+      );
+
+    // =========================
+    // TẠO TÀI KHOẢN
+    // =========================
+
+    const sinhVien =
+      this.sinhVienRepository.create({
+        MSV: msv,
+
+        TENSV: tensv,
+
+        KHOA: null,
+
+        LOP: null,
+
+        DIEMTB: null,
+
+        EMAIL: email,
+
+        MATKHAU: hashedPassword,
+
+        VAITRO: 'SINHVIEN',
+      });
+
+    const savedSinhVien =
+      await this.sinhVienRepository.save(
+        sinhVien,
+      );
+
+    // =========================
+    // TRẢ KẾT QUẢ ĐĂNG KÝ
+    // =========================
+
+    return {
+      message:
+        'Đăng ký tài khoản thành công',
+
+      user: {
+        MSV: savedSinhVien.MSV,
+
+        TENSV: savedSinhVien.TENSV,
+
+        KHOA: savedSinhVien.KHOA,
+
+        DIEMTB: savedSinhVien.DIEMTB,
+
+        LOP: savedSinhVien.LOP,
+
+        EMAIL: savedSinhVien.EMAIL,
+
+        VAITRO: savedSinhVien.VAITRO,
+      },
+    };
+  }
+
+  // =========================
+  // ĐĂNG NHẬP
+  // =========================
+
+  async login(data: LoginDto) {
+    const email = data.EMAIL.trim();
+
+    // =========================
+    // TÌM SINH VIÊN
+    // =========================
+
+    const sinhVien =
+      await this.sinhVienRepository
+        .createQueryBuilder('sinhVien')
+
+        .addSelect(
+          'sinhVien.MATKHAU',
+        )
+
+        .where(
+          'LOWER(sinhVien.EMAIL) = LOWER(:email)',
+          {
+            email,
+          },
+        )
+
+        .getOne();
+
+    // =========================
+    // KHÔNG TÌM THẤY
+    // =========================
+
+    if (
+      !sinhVien ||
+      !sinhVien.MATKHAU
+    ) {
+      throw new UnauthorizedException(
+        'Email hoặc mật khẩu không đúng',
+      );
+    }
+
+    // =========================
+    // KIỂM TRA MẬT KHẨU
+    // =========================
+
+    const passwordValid =
+      await bcrypt.compare(
+        data.MATKHAU,
+        sinhVien.MATKHAU,
+      );
+
+    if (!passwordValid) {
+      throw new UnauthorizedException(
+        'Email hoặc mật khẩu không đúng',
+      );
+    }
+
+    // =========================
+    // TẠO JWT PAYLOAD
+    // =========================
+
+    const payload = {
+      sub: sinhVien.MSV,
+
+      email: sinhVien.EMAIL,
+
+      role: sinhVien.VAITRO,
+    };
+
+    // =========================
+    // TẠO ACCESS TOKEN
+    // =========================
+
+    const accessToken =
+      await this.jwtService.signAsync(
+        payload,
+      );
+
+    // =========================
+    // TRẢ KẾT QUẢ
+    // =========================
+
+    return {
+      message:
+        'Đăng nhập thành công',
+
+      access_token: accessToken,
+
+      user: {
+        MSV: sinhVien.MSV,
+
+        TENSV: sinhVien.TENSV,
+
+        KHOA: sinhVien.KHOA,
+
+        DIEMTB: sinhVien.DIEMTB,
+
+        LOP: sinhVien.LOP,
+
+        EMAIL: sinhVien.EMAIL,
+
+        VAITRO: sinhVien.VAITRO,
+      },
+    };
+  }
+}
+
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\auth-service\src\app.controller.ts ====================
+import { Controller, Get } from '@nestjs/common';
+import { AppService } from './app.service';
+
+@Controller()
+export class AppController {
+  constructor(private readonly appService: AppService) {}
+
+  @Get()
+  getHello(): string {
+    return this.appService.getHello();
+  }
+}
+
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\auth-service\src\app.module.ts ====================
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+import { AppController } from './app.controller.js';
+import { AppService } from './app.service.js';
+import { AuthModule } from './auth/auth.module.js';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: process.env.DB_HOST,
+      port: Number(process.env.DB_PORT),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE,
+      autoLoadEntities: true,
+      synchronize: false,
+    }),
+
+    AuthModule,
+  ],
+
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\auth-service\src\app.service.ts ====================
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
+export class AppService {
+  getHello(): string {
+    return 'Hello World!';
+  }
+}
+
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\auth-service\src\main.ts ====================
+import { ValidationPipe } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
+
+import { AppModule } from './app.module.js';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  app.enableCors();
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
+
+  await app.listen(process.env.PORT ?? 3001);
+}
+
+bootstrap();
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\dangky-service\src\dangky\dto\create-dangky.dto.ts ====================
+export class CreateDangKyDto {
+  msv: string;
+  detaiId: number;
+}
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\dangky-service\src\dangky\dto\update-dangky.dto.ts ====================
+export class UpdateDangKyDto {
+  trangThai?: string;
+}
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\dangky-service\src\dangky\entities\dangky.entity.ts ====================
+import {
+  Column,
+  Entity,
+  PrimaryColumn,
+} from 'typeorm';
+
+@Entity('DANGKY')
+export class DangKy {
+  @PrimaryColumn({
+    name: 'MSV',
+    type: 'varchar',
+    length: 20,
+  })
+  MSV: string;
+
+  @PrimaryColumn({
+    name: 'DETAI_ID',
+    type: 'int',
+  })
+  DETAI_ID: number;
+
+  @Column({
+    name: 'NGAY_DANG_KY',
+    type: 'datetime',
+  })
+  NGAY_DANG_KY: Date;
+
+  @Column({
+    name: 'TRANG_THAI',
+    type: 'varchar',
+    length: 30,
+    default: 'CHO_DUYET',
+  })
+  TRANG_THAI: string;
+}
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\dangky-service\src\dangky\dangky.controller.ts ====================
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+} from '@nestjs/common';
+
+import { DangkyService } from './dangky.service.js';
+import { CreateDangKyDto } from './dto/create-dangky.dto.js';
+import { UpdateDangKyDto } from './dto/update-dangky.dto.js';
+
+@Controller('dangky')
+export class DangkyController {
+  constructor(
+    private readonly dangkyService: DangkyService,
+  ) {}
+
+  @Get()
+  findAll() {
+    return this.dangkyService.findAll();
+  }
+
+  @Get('sinhvien/:msv')
+  findBySinhVien(
+    @Param('msv') msv: string,
+  ) {
+    return this.dangkyService.findBySinhVien(msv);
+  }
+
+  @Get('detai/:detaiId')
+  findByDetai(
+    @Param('detaiId', ParseIntPipe) detaiId: number,
+  ) {
+    return this.dangkyService.findByDetai(detaiId);
+  }
+
+  @Get(':detaiId/:msv')
+  findOne(
+    @Param('detaiId', ParseIntPipe) detaiId: number,
+    @Param('msv') msv: string,
+  ) {
+    return this.dangkyService.findOne(
+      detaiId,
+      msv,
+    );
+  }
+
+  @Post()
+  create(
+    @Body() dto: CreateDangKyDto,
+  ) {
+    return this.dangkyService.create(dto);
+  }
+
+  @Put(':detaiId/:msv')
+  update(
+    @Param('detaiId', ParseIntPipe) detaiId: number,
+    @Param('msv') msv: string,
+    @Body() dto: UpdateDangKyDto,
+  ) {
+    return this.dangkyService.update(
+      detaiId,
+      msv,
+      dto,
+    );
+  }
+
+  @Delete(':detaiId/:msv')
+  remove(
+    @Param('detaiId', ParseIntPipe) detaiId: number,
+    @Param('msv') msv: string,
+  ) {
+    return this.dangkyService.remove(
+      detaiId,
+      msv,
+    );
+  }
+}
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\dangky-service\src\dangky\dangky.module.ts ====================
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { HttpModule } from '@nestjs/axios';
+import { DangkyController } from './dangky.controller.js';
+import { DangkyService } from './dangky.service.js';
+import { DangKy } from './entities/dangky.entity.js';
+
+@Module({
+
+  imports: [
+    TypeOrmModule.forFeature([DangKy]),
+    HttpModule,
+  ],
+  controllers: [DangkyController],
+  providers: [DangkyService],
+  exports: [DangkyService],
+})
+export class DangkyModule {}
+
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\dangky-service\src\dangky\dangky.service.ts ====================
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+import { InjectRepository } from '@nestjs/typeorm';
+import { firstValueFrom } from 'rxjs';
+import { Repository } from 'typeorm';
+
+import { DangKy } from './entities/dangky.entity.js';
+import { CreateDangKyDto } from './dto/create-dangky.dto.js';
+import { UpdateDangKyDto } from './dto/update-dangky.dto.js';
+
+@Injectable()
+export class DangkyService {
+  private readonly sinhVienUrl =
+    process.env.SINHVIEN_SERVICE_URL ?? 'http://localhost:3001';
+
+  private readonly deTaiUrl =
+    process.env.DETAI_SERVICE_URL ?? 'http://localhost:3002';
+
+  constructor(
+    @InjectRepository(DangKy)
+    private readonly dangKyRepository: Repository<DangKy>,
+
+    private readonly httpService: HttpService,
+  ) {}
+
+  /**
+   * Lấy tất cả đăng ký
+   */
+  async findAll(): Promise<DangKy[]> {
+    return this.dangKyRepository.find();
+  }
+
+  /**
+   * Lấy một đăng ký theo đề tài + sinh viên
+   */
+  async findOne(
+    detaiId: number,
+    msv: string,
+  ): Promise<DangKy> {
+    const dangKy = await this.dangKyRepository.findOne({
+      where: {
+        DETAI_ID: detaiId,
+        MSV: msv,
+      },
+    });
+
+    if (!dangKy) {
+      throw new NotFoundException(
+        `Không tìm thấy đăng ký của sinh viên ${msv} với đề tài ${detaiId}`,
+      );
+    }
+
+    return dangKy;
+  }
+
+  /**
+   * Lấy danh sách đề tài mà sinh viên đã đăng ký
+   */
+  async findBySinhVien(msv: string): Promise<DangKy[]> {
+    return this.dangKyRepository.find({
+      where: {
+        MSV: msv,
+      },
+    });
+  }
+
+  /**
+   * Lấy danh sách sinh viên đăng ký một đề tài
+   */
+  async findByDetai(detaiId: number): Promise<DangKy[]> {
+    return this.dangKyRepository.find({
+      where: {
+        DETAI_ID: detaiId,
+      },
+    });
+  }
+
+  /**
+   * Gọi SINHVIEN Service để kiểm tra sinh viên
+   */
+  private async validateSinhVien(msv: string) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(
+          `${this.sinhVienUrl}/sinhvien/${encodeURIComponent(msv)}`,
+      ));
+
+      return response.data;
+    } catch {
+      throw new BadRequestException(
+        `Không thể xác thực sinh viên ${msv}`,
+      );
+    }
+  }
+
+  /**
+   * Gọi DETAI Service để kiểm tra đề tài
+   */
+  private async validateDeTai(detaiId: number) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(
+          `${this.deTaiUrl}/detai/${detaiId}`,
+        ),
+      );
+
+      return response.data;
+    } catch {
+      throw new BadRequestException(
+        `Không thể xác thực đề tài ${detaiId}`,
+      );
+    }
+  }
+
+  /**
+   * Đăng ký đề tài
+   */
+  async create(dto: CreateDangKyDto): Promise<DangKy> {
+    // 1. Kiểm tra sinh viên thông qua SINHVIEN Service
+    await this.validateSinhVien(dto.msv);
+
+    // 2. Kiểm tra đề tài thông qua DETAI Service
+    const deTai = await this.validateDeTai(dto.detaiId);
+
+    // 3. Kiểm tra trạng thái đề tài
+    if (
+      deTai.trangThai &&
+      deTai.trangThai !== 'MO'
+    ) {
+      throw new BadRequestException(
+        'Đề tài hiện không mở đăng ký',
+      );
+    }
+
+    // 4. Kiểm tra đăng ký trùng
+    const existing = await this.dangKyRepository.findOne({
+      where: {
+        MSV: dto.msv,
+        DETAI_ID: dto.detaiId,
+      },
+    });
+
+    if (existing) {
+      throw new ConflictException(
+        'Sinh viên đã đăng ký đề tài này',
+      );
+    }
+
+    // 5. Tạo đăng ký
+    const dangKy = this.dangKyRepository.create({
+      MSV: dto.msv,
+      DETAI_ID: dto.detaiId,
+      NGAY_DANG_KY: new Date(),
+      TRANG_THAI: 'CHO_DUYET',
+    });
+
+    return this.dangKyRepository.save(dangKy);
+  }
+
+  /**
+   * Cập nhật trạng thái đăng ký
+   */
+  async update(
+    detaiId: number,
+    msv: string,
+    dto: UpdateDangKyDto,
+  ): Promise<DangKy> {
+    const dangKy = await this.findOne(
+      detaiId,
+      msv,
+    );
+
+    if (dto.trangThai !== undefined) {
+      dangKy.TRANG_THAI = dto.trangThai;
+    }
+
+    return this.dangKyRepository.save(dangKy);
+  }
+
+  /**
+   * Xóa đăng ký
+   */
+  async remove(
+    detaiId: number,
+    msv: string,
+  ): Promise<{ deleted: boolean }> {
+    const dangKy = await this.findOne(
+      detaiId,
+      msv,
+    );
+
+    await this.dangKyRepository.remove(dangKy);
+
+    return {
+      deleted: true,
+    };
+  }
+}
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\dangky-service\src\app.controller.ts ====================
+import { Controller, Get } from '@nestjs/common';
+import { AppService } from './app.service.js';
+
+@Controller()
+export class AppController {
+  constructor(private readonly appService: AppService) {}
+
+  @Get()
+  getHello(): string {
+    return this.appService.getHello();
+  }
+}
+
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\dangky-service\src\app.module.ts ====================
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { createObserveModule } from '@nestjs/observe';
+
+import { AppController } from './app.controller.js';
+import { AppService } from './app.service.js';
+import { DangkyModule } from './dangky/dangky.module.js';
+
+export const {
+  ObserveModule,
+  ObserveInstrument,
+} = createObserveModule();
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT
+        ? parseInt(process.env.DB_PORT, 10)
+        : 3306,
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE,
+      autoLoadEntities: true,
+      synchronize: true,
+    }),
+
+    ObserveModule.forRoot({
+      appKey: 'YOUR_APP_KEY',
+      appSecret: 'YOUR_APP_SECRET',
+      serviceId: 'dangky-service',
+    }),
+
+    DangkyModule,
+  ],
+
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\dangky-service\src\app.service.ts ====================
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
+export class AppService {
+  getHello(): string {
+    return 'Hello World!';
+  }
+}
+
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\dangky-service\src\main.ts ====================
+import { NestFactory } from '@nestjs/core';
+import { AppModule, ObserveInstrument } from './app.module.js';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule, {
+    instrument: ObserveInstrument,
+  });
+  await app.listen(process.env.PORT ?? 3000);
+}
+await bootstrap();
+
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\detai-service\src\detai\dto\detai.dto.ts ====================
+// Format tạo đề tài
+export class CreateDetaiDto {
+  tenDetai: string;
+  moTa: string;
+  giangVienHuongDan: string;
+  trangThai?: number;
+}
+
+// Format cập nhật đề tài (giữ các thông tin không thay đổi)
+export class UpdateDetaiDto {
+  tenDetai?: string;
+  giangVienHuongDan?: string;
+  moTa?: string;
+  trangThai?: number;
+}
+
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\detai-service\src\detai\entities\detai.entity.ts ====================
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+
+@Entity('detai')
+export class Detai {
+  @PrimaryGeneratedColumn()
+  MDT: number;
+
+  @Column()
+  tenDetai: string;
+
+  @Column({ name: 'giangVienHuongDan' })
+  giangVienHuongDan: string;
+
+  @Column({ type: 'text' })
+  moTa: string;
+  // 0 = Chưa đăng ký
+  // 1 = Đã đăng ký
+  @Column({ type: 'tinyint', default: 0 })
+  trangThai: number;
+}
+
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\detai-service\src\detai\detai.controller.ts ====================
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
+
+import { CreateDetaiDto, UpdateDetaiDto } from './dto/detai.dto.js';
+import { DetaiService } from './detai.service.js';
+
+@Controller('detai')
+export class DetaiController {
+  constructor(private readonly detaiService: DetaiService) {}
+
+  // Thêm đề tài
+  @Post()
+  create(@Body() dto: CreateDetaiDto) {
+    return this.detaiService.create(dto);
+  }
+
+  // Lấy danh sách đề tài
+  @Get()
+  findAll() {
+    return this.detaiService.findAll();
+  }
+
+  // Tìm kiếm đề tài
+  @Get('search')
+  search(@Query('keyword') keyword: string) {
+    return this.detaiService.search(keyword);
+  }
+
+  // Lấy chi tiết đề tài
+  @Get(':id')
+  findOne(@Param('id') id: number) {
+    return this.detaiService.findOne(id);
+  }
+
+  // Cập nhật thông tin đề tài
+  @Put(':id')
+  update(@Param('id') id: number, @Body() dto: UpdateDetaiDto) {
+    return this.detaiService.update(id, dto);
+  }
+
+  // Thay đổi trạng thái đề tài
+  @Put(':id/status')
+  updateStatus(@Param('id') id: number, @Body('trangThai') trangThai: number) {
+    return this.detaiService.updateStatus(id, trangThai);
+  }
+
+  // Xóa đề tài
+  @Delete(':id')
+  remove(@Param('id') id: number) {
+    return this.detaiService.remove(id);
+  }
+}
+
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\detai-service\src\detai\detai.module.ts ====================
+import { Module } from '@nestjs/common';
+import { DetaiController } from './detai.controller.js';
+import { DetaiService } from './detai.service.js';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Detai } from './entities/detai.entity.js';
+
+@Module({
+  imports: [TypeOrmModule.forFeature([Detai])],
+  controllers: [DetaiController],
+  providers: [DetaiService],
+})
+export class DetaiModule {}
+
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\detai-service\src\detai\detai.service.ts ====================
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, Like } from 'typeorm';
+
+import { Detai } from './entities/detai.entity.js';
+import { CreateDetaiDto, UpdateDetaiDto } from './dto/detai.dto.js';
+
+@Injectable()
+export class DetaiService {
+  constructor(
+    @InjectRepository(Detai)
+    private readonly detaiRepo: Repository<Detai>,
+  ) {}
+
+  // Thêm đề tài
+  async create(dto: CreateDetaiDto): Promise<Detai> {
+    const existingDetai = await this.detaiRepo.findOne({
+      where: {
+        tenDetai: dto.tenDetai,
+      },
+    });
+    if (existingDetai) {
+      throw new ConflictException(`Đề tài "${dto.tenDetai}" đã tồn tại`);
+    }
+    const detai = this.detaiRepo.create({
+      ...dto,
+      trangThai: 0,
+    });
+
+    return await this.detaiRepo.save(detai);
+  }
+
+  // Lấy danh sách đề tài
+  async findAll(): Promise<Detai[]> {
+    return await this.detaiRepo.find();
+  }
+
+  // Tìm kiếm đề tài theo từ khóa
+  async search(keyword: string): Promise<Detai[]> {
+    return await this.detaiRepo.find({
+      where: [
+        { tenDetai: Like(`%${keyword}%`) },
+        { moTa: Like(`%${keyword}%`) },
+      ],
+    });
+  }
+
+  // Lấy chi tiết đề tài theo ID
+  async findOne(MDT: number): Promise<Detai> {
+    const detai = await this.detaiRepo.findOneBy({ MDT });
+
+    if (!detai) {
+      throw new NotFoundException(`Không tìm thấy đề tài với id = ${MDT}`);
+    }
+
+    return detai;
+  }
+
+  // Cập nhật thông tin đề tài
+  async update(id: number, dto: UpdateDetaiDto): Promise<Detai> {
+    const detai = await this.findOne(id);
+
+    if (
+      dto.trangThai !== undefined &&
+      dto.trangThai !== 0 &&
+      dto.trangThai !== 1
+    ) {
+      throw new BadRequestException('Trạng thái chỉ được phép là 0 hoặc 1');
+    }
+
+    Object.assign(detai, dto);
+
+    return await this.detaiRepo.save(detai);
+  }
+
+  // Thay đổi trạng thái đề tài
+  async updateStatus(id: number, trangThai: number): Promise<Detai> {
+    const detai = await this.findOne(id);
+
+    if (trangThai !== 0 && trangThai !== 1) {
+      throw new BadRequestException('Trạng thái chỉ được phép là 0 hoặc 1');
+    }
+
+    detai.trangThai = trangThai;
+
+    return await this.detaiRepo.save(detai);
+  }
+
+  // Xóa đề tài
+  async remove(id: number): Promise<{ deleted: boolean }> {
+    const result = await this.detaiRepo.delete(id);
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`Không tìm thấy đề tài với id = ${id}`);
+    }
+
+    return { deleted: true };
+  }
+}
+
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\detai-service\src\app.controller.ts ====================
+import { Controller, Get } from '@nestjs/common';
+import { AppService } from './app.service.js';
+
+@Controller()
+export class AppController {
+  constructor(private readonly appService: AppService) {}
+
+  @Get()
+  getHello(): string {
+    return this.appService.getHello();
+  }
+}
+
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\detai-service\src\app.module.ts ====================
+import { Module } from '@nestjs/common';
+import { createObserveModule } from '@nestjs/observe';
+import { AppController } from './app.controller.js';
+import { AppService } from './app.service.js';
+import { DetaiModule } from './detai/detai.module.js';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
+export const { ObserveModule, ObserveInstrument } = createObserveModule();
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: process.env.DB_HOST,
+      port: parseInt(process.env.DB_PORT || '3306', 10),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      autoLoadEntities: true,
+      synchronize: true,
+    }),
+    DetaiModule,
+  ],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
+
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\detai-service\src\app.service.ts ====================
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
+export class AppService {
+  getHello(): string {
+    return 'Hello World!';
+  }
+}
+
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\detai-service\src\main.ts ====================
+import { NestFactory } from '@nestjs/core';
+import { AppModule, ObserveInstrument } from './app.module.js';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  app.enableCors({
+    origin: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+  });
+
+  await app.listen(3002);
+}
+bootstrap();
+
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\sinhvien-service\src\sinhvien\decorators\roles.decorator.ts ====================
+import { SetMetadata } from '@nestjs/common';
+
+export const ROLES_KEY = 'roles';
+
+export const Roles = (...roles: string[]) =>
+  SetMetadata(ROLES_KEY, roles);
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\sinhvien-service\src\sinhvien\dto\create-sinhvien.dto.ts ====================
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
+
+export class CreateSinhVienDto {
+  @IsString()
+  @IsNotEmpty()
+  MSV: string;
+
+  @IsString()
+  @IsNotEmpty()
+  TENSV: string;
+
+  @IsString()
+  @IsNotEmpty()
+  KHOA: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(10)
+  DIEMTB?: number | null;
+
+  @IsString()
+  @IsNotEmpty()
+  LOP: string;
+
+  @IsOptional()
+  @IsEmail()
+  EMAIL?: string | null;
+
+  @IsOptional()
+  @IsString()
+  MATKHAU?: string | null;
+}
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\sinhvien-service\src\sinhvien\entities\sinhvien.entity.ts ====================
+import {
+  Entity,
+  Column,
+  PrimaryColumn,
+} from 'typeorm';
+
+@Entity('SINHVIEN')
+export class SinhVien {
+  @PrimaryColumn({
+    name: 'MSV',
+    type: 'varchar',
+    length: 20,
+  })
+  MSV: string;
+
+  @Column({
+    name: 'TENSV',
+    type: 'varchar',
+    length: 100,
+  })
+  TENSV: string;
+
+  @Column({
+    name: 'KHOA',
+    type: 'varchar',
+    length: 100,
+    nullable: true,
+  })
+  KHOA: string | null;
+
+  @Column({
+    name: 'DIEMTB',
+    type: 'decimal',
+    precision: 3,
+    scale: 2,
+    nullable: true,
+  })
+  DIEMTB: number | null;
+
+  @Column({
+    name: 'LOP',
+    type: 'varchar',
+    length: 50,
+    nullable: true,
+  })
+  LOP: string | null;
+
+  @Column({
+    name: 'EMAIL',
+    type: 'varchar',
+    length: 100,
+    unique: true,
+    nullable: true,
+  })
+  EMAIL: string | null;
+
+  @Column({
+    name: 'MATKHAU',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+    select: false,
+  })
+  MATKHAU: string | null;
+
+  @Column({
+    name: 'VAITRO',
+    type: 'varchar',
+    length: 20,
+    default: 'SINHVIEN',
+  })
+  VAITRO: string;
+}
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\sinhvien-service\src\sinhvien\guards\jwt-auth.guard.ts ====================
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+
+import { JwtService } from '@nestjs/jwt';
+import type { Request } from 'express';
+
+@Injectable()
+export class JwtAuthGuard implements CanActivate {
+  constructor(
+    private readonly jwtService: JwtService,
+  ) {}
+
+  async canActivate(
+    context: ExecutionContext,
+  ): Promise<boolean> {
+    const request =
+      context.switchToHttp().getRequest<Request>();
+
+    const authHeader =
+      request.headers.authorization;
+
+    if (!authHeader) {
+      throw new UnauthorizedException(
+        'Chưa đăng nhập',
+      );
+    }
+
+    const [type, token] =
+      authHeader.split(' ');
+
+    if (
+      type !== 'Bearer' ||
+      !token
+    ) {
+      throw new UnauthorizedException(
+        'Token không hợp lệ',
+      );
+    }
+
+    try {
+      const payload =
+        await this.jwtService.verifyAsync(token);
+
+      (
+        request as Request & {
+          user: any;
+        }
+      ).user = payload;
+
+      return true;
+    } catch {
+      throw new UnauthorizedException(
+        'Token không hợp lệ hoặc đã hết hạn',
+      );
+    }
+  }
+}
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\sinhvien-service\src\sinhvien\guards\roles.guard.ts ====================
+import {
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
+
+import { Reflector } from '@nestjs/core';
+
+import { ROLES_KEY } from '../decorators/roles.decorator.js';
+
+@Injectable()
+export class RolesGuard implements CanActivate {
+  constructor(
+    private readonly reflector: Reflector,
+  ) {}
+
+  canActivate(
+    context: ExecutionContext,
+  ): boolean {
+    const requiredRoles =
+      this.reflector.getAllAndOverride<string[]>(
+        ROLES_KEY,
+        [
+          context.getHandler(),
+          context.getClass(),
+        ],
+      );
+
+    if (!requiredRoles) {
+      return true;
+    }
+
+    const request =
+      context.switchToHttp().getRequest();
+
+    const user = request.user;
+
+    if (!user) {
+      throw new ForbiddenException(
+        'Không tìm thấy thông tin người dùng',
+      );
+    }
+
+    if (!requiredRoles.includes(user.role)) {
+      throw new ForbiddenException(
+        'Bạn không có quyền truy cập chức năng này',
+      );
+    }
+
+    return true;
+  }
+}
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\sinhvien-service\src\sinhvien\sinhvien.controller.ts ====================
+import {
+  Body,
+  Controller,
+  Delete,
+  ForbiddenException,
+  Get,
+  Param,
+  Post,
+  Put,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+
+import type { Request } from 'express';
+
+import { SinhvienService } from './sinhvien.service.js';
+import { CreateSinhVienDto } from './dto/create-sinhvien.dto.js';
+
+import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
+import { RolesGuard } from './guards/roles.guard.js';
+import { Roles } from './decorators/roles.decorator.js';
+
+interface JwtUser {
+  sub: string;
+  email: string;
+  role: string;
+}
+
+type AuthenticatedRequest = Request & {
+  user: JwtUser;
+};
+
+@Controller('sinhvien')
+@UseGuards(JwtAuthGuard, RolesGuard)
+export class SinhvienController {
+  constructor(
+    private readonly sinhvienService: SinhvienService,
+  ) {}
+
+  // ADMIN - LẤY DANH SÁCH SINH VIÊN
+  @Get()
+  @Roles('ADMIN')
+  findAll() {
+    return this.sinhvienService.findAll();
+  }
+
+  // ADMIN - LẤY THÔNG TIN SINH VIÊN
+  @Get(':msv')
+  @Roles('ADMIN')
+  findOne(
+    @Param('msv') msv: string,
+  ) {
+    return this.sinhvienService.findOne(msv);
+  }
+
+  // ADMIN - TẠO SINH VIÊN
+  @Post()
+  @Roles('ADMIN')
+  create(
+    @Body() data: CreateSinhVienDto,
+  ) {
+    return this.sinhvienService.create(data);
+  }
+
+  // ADMIN / SINHVIEN - CẬP NHẬT THÔNG TIN
+  @Put(':msv')
+  @Roles('ADMIN', 'SINHVIEN')
+  update(
+    @Param('msv') msv: string,
+
+    @Body()
+    data: {
+      EMAIL?: string;
+      KHOA?: string;
+      LOP?: string;
+    },
+
+    @Req() req: AuthenticatedRequest,
+  ) {
+    const user = req.user;
+
+    const currentMsv = user.sub;
+    const currentRole = user.role;
+
+    // SINHVIEN chỉ được sửa thông tin của chính mình
+    if (
+      currentRole === 'SINHVIEN' &&
+      currentMsv !== msv
+    ) {
+      throw new ForbiddenException(
+        'Bạn không có quyền cập nhật thông tin của sinh viên khác.',
+      );
+    }
+
+    // Chỉ cho phép cập nhật 3 trường:
+    // EMAIL, KHOA, LOP
+    const updateData = {
+      EMAIL:
+        data.EMAIL !== undefined
+          ? data.EMAIL.trim()
+          : undefined,
+
+      KHOA:
+        data.KHOA !== undefined
+          ? data.KHOA.trim() || null
+          : undefined,
+
+      LOP:
+        data.LOP !== undefined
+          ? data.LOP.trim() || null
+          : undefined,
+    };
+
+    return this.sinhvienService.update(
+      msv,
+      updateData,
+    );
+  }
+
+  // ADMIN - XÓA SINH VIÊN
+  @Delete(':msv')
+  @Roles('ADMIN')
+  remove(
+    @Param('msv') msv: string,
+  ) {
+    return this.sinhvienService.remove(msv);
+  }
+}
+
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\sinhvien-service\src\sinhvien\sinhvien.module.ts ====================
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+
+import { SinhvienController } from './sinhvien.controller.js';
+import { SinhvienService } from './sinhvien.service.js';
+import { SinhVien } from './entities/sinhvien.entity.js';
+
+import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
+import { RolesGuard } from './guards/roles.guard.js';
+
+@Module({
+  imports: [
+    TypeOrmModule.forFeature([SinhVien]),
+
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+
+        signOptions: {
+          expiresIn: '1d',
+        },
+      }),
+    }),
+  ],
+
+  controllers: [SinhvienController],
+
+  providers: [
+    SinhvienService,
+    JwtAuthGuard,
+    RolesGuard,
+  ],
+})
+export class SinhvienModule {}
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\sinhvien-service\src\sinhvien\sinhvien.service.ts ====================
+import {
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
+import { SinhVien } from './entities/sinhvien.entity.js';
+
+@Injectable()
+export class SinhvienService {
+  constructor(
+    @InjectRepository(SinhVien)
+    private readonly sinhVienRepository: Repository<SinhVien>,
+  ) {}
+
+  // GET /sinhvien
+  async findAll(): Promise<SinhVien[]> {
+    return this.sinhVienRepository.find();
+  }
+
+  // GET /sinhvien/:msv
+  async findOne(msv: string): Promise<SinhVien> {
+    const sinhVien = await this.sinhVienRepository.findOne({
+      where: {
+        MSV: msv,
+      },
+    });
+
+    if (!sinhVien) {
+      throw new NotFoundException(
+        `Không tìm thấy sinh viên có mã ${msv}`,
+      );
+    }
+
+    return sinhVien;
+  }
+
+  // POST /sinhvien
+  async create(data: Partial<SinhVien>): Promise<SinhVien> {
+    const sinhVien = this.sinhVienRepository.create(data);
+
+    return this.sinhVienRepository.save(sinhVien);
+  }
+
+  // PUT /sinhvien/:msv
+  async update(
+    msv: string,
+    data: Partial<SinhVien>,
+  ): Promise<SinhVien> {
+    const sinhVien = await this.findOne(msv);
+
+    Object.assign(sinhVien, data);
+
+    return this.sinhVienRepository.save(sinhVien);
+  }
+
+  // DELETE /sinhvien/:msv
+  async remove(msv: string): Promise<{ message: string }> {
+    const sinhVien = await this.findOne(msv);
+
+    await this.sinhVienRepository.remove(sinhVien);
+
+    return {
+      message: `Đã xóa sinh viên có mã ${msv}`,
+    };
+  }
+}
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\sinhvien-service\src\types\express.d.ts ====================
+import type { Request } from 'express';
+
+declare global {
+  namespace Express {
+    interface User {
+      MSV?: string;
+      msv?: string;
+      VAITRO?: string;
+      role?: string;
+    }
+  }
+}
+
+export {};
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\sinhvien-service\src\app.controller.ts ====================
+import { Controller, Get } from '@nestjs/common';
+import { AppService } from './app.service.js';
+
+@Controller()
+export class AppController {
+  constructor(private readonly appService: AppService) {}
+
+  @Get()
+  getHello(): string {
+    return this.appService.getHello();
+  }
+}
+
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\sinhvien-service\src\app.module.ts ====================
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+import { AppController } from './app.controller.js';
+import { AppService } from './app.service.js';
+import { SinhvienModule } from './sinhvien/sinhvien.module.js';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: process.env.DB_HOST,
+      port: Number(process.env.DB_PORT),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE,
+      autoLoadEntities: true,
+      synchronize: false,
+    }),
+
+    SinhvienModule,
+  ],
+
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\sinhvien-service\src\app.service.ts ====================
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
+export class AppService {
+  getHello(): string {
+    return 'Hello World!';
+  }
+}
+
+
+
+==================== C:\Users\My Hoi\source\repos\SOA\demo\Midterm-SOA\backend\sinhvien-service\src\main.ts ====================
+import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
+
+import { AppModule } from './app.module.js';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  app.enableCors();
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
+
+  await app.listen(process.env.PORT ?? 3000);
+}
+
+bootstrap();
+
+

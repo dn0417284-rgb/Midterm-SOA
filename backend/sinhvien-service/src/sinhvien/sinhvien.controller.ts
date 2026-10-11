@@ -46,10 +46,11 @@ export class SinhvienController {
 
   // ADMIN - LẤY THÔNG TIN SINH VIÊN
   @Get(':msv')
-  @Roles('ADMIN')
-  findOne(
-    @Param('msv') msv: string,
-  ) {
+  @Roles('ADMIN', 'SINHVIEN')
+  findOne(@Param('msv') msv: string, @Req() req: AuthenticatedRequest) {
+    if (req.user.role === 'SINHVIEN' && req.user.sub !== msv) {
+      throw new ForbiddenException('Bạn chỉ được xem thông tin của mình');
+    }
     return this.sinhvienService.findOne(msv);
   }
 
