@@ -52,8 +52,12 @@
           },
           "defaultConfiguration": "production"
         },
+        
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "proxyConfig": "proxy.conf.json"
+          },
           "configurations": {
             "production": {
               "buildTarget": "quanly-do-an:build:production"
@@ -64,6 +68,7 @@
           },
           "defaultConfiguration": "development"
         },
+
         "test": {
           "builder": "@angular/build:unit-test"
         }

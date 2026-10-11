@@ -1,88 +1,87 @@
+
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import {
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+} from '@angular/core';
 
 import { Auth } from '../../../core/services/auth';
+
+interface SinhVien {
+  MSV: string;
+  TENSV: string;
+  EMAIL?: string | null;
+  LOP?: string | null;
+  KHOA?: string | null;
+}
 
 @Component({
   selector: 'app-student-profile',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-  ],
+  imports: [CommonModule],
   templateUrl: './student-profile.html',
   styleUrl: './student-profile.css',
 })
-export class StudentProfile {
+export class StudentProfile implements OnInit {
 
-  user: any = null;
+  user: SinhVien | null = null;
 
   isEditing = false;
   isSaving = false;
+  hasChangesNow = false;
 
   errorMessage = '';
   successMessage = '';
 
-  editEmail = '';
   editClass = '';
   editFaculty = '';
 
   constructor(
     private readonly auth: Auth,
+    private readonly cdr: ChangeDetectorRef,
   ) {}
 
-  // ============================
-  // KHỞI TẠO
-  // ============================
-
   ngOnInit(): void {
-    this.user = this.auth.getUser();
+    this.user = this.auth.getUser() as SinhVien | null;
     this.syncEditData();
   }
 
-  // ============================
-  // THÔNG TIN SINH VIÊN
-  // ============================
+  private displayValue(
+    value: string | null | undefined,
+  ): string {
+    return value?.trim() || 'Chưa cập nhật';
+  }
 
   get studentName(): string {
-    return this.user?.TENSV || '';
+    return this.displayValue(this.user?.TENSV);
   }
 
   get studentCode(): string {
-    return this.user?.MSV || '';
+    return this.displayValue(this.user?.MSV);
   }
 
   get studentEmail(): string {
-    return this.user?.EMAIL || '';
+    return this.displayValue(this.user?.EMAIL);
   }
 
   get studentClass(): string {
-    return this.user?.LOP || '';
+    return this.displayValue(this.user?.LOP);
   }
 
   get studentFaculty(): string {
-    return this.user?.KHOA || '';
+    return this.displayValue(this.user?.KHOA);
   }
 
-  // ============================
-  // AVATAR
-  // ============================
-
   get studentAvatar(): string {
+    const name = this.user?.TENSV?.trim() || '';
 
-    const name = this.studentName.trim();
-
-    if (!name) {
-      return '';
-    }
+    if (!name) return 'SV';
 
     const words = name.split(/\s+/);
 
     if (words.length === 1) {
-      return words[0]
-        .substring(0, 2)
-        .toUpperCase();
+      return words[0].substring(0, 2).toUpperCase();
     }
 
     return (
@@ -91,190 +90,128 @@ export class StudentProfile {
     ).toUpperCase();
   }
 
-  // ============================
-  // ĐỒNG BỘ FORM
-  // ============================
-
   private syncEditData(): void {
-
-    this.editEmail = this.studentEmail;
-    this.editClass = this.studentClass;
-    this.editFaculty = this.studentFaculty;
+    this.editClass = this.user?.LOP || '';
+    this.editFaculty = this.user?.KHOA || '';
+    this.hasChangesNow = false;
   }
-
-  // ============================
-  // CHỈNH SỬA
-  // ============================
 
   startEditing(): void {
-
-    this.isEditing = true;
-
-    this.errorMessage = '';
-    this.successMessage = '';
+    if (this.isSaving) return;
 
     this.syncEditData();
+    this.isEditing = true;
+    this.clearMessages();
+
+    this.cdr.detectChanges();
   }
 
-  // ============================
-  // KIỂM TRA THAY ĐỔI
-  // ============================
-
-  get hasChanges(): boolean {
-
-    return (
-      this.editEmail.trim() !== this.studentEmail.trim() ||
-      this.editClass.trim() !== this.studentClass.trim() ||
-      this.editFaculty.trim() !== this.studentFaculty.trim()
-    );
+  private clearMessages(): void {
+    this.errorMessage = '';
+    this.successMessage = '';
   }
 
-  // ============================
-  // HỦY
-  // ============================
+  private checkChanges(): void {
+    const oldClass = (this.user?.LOP || '').trim();
+    const oldFaculty = (this.user?.KHOA || '').trim();
+
+    this.hasChangesNow =
+      this.editClass.trim() !== oldClass ||
+      this.editFaculty.trim() !== oldFaculty;
+
+    this.clearMessages();
+    this.cdr.detectChanges();
+  }
+
+  onClassInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.editClass = input.value;
+    this.checkChanges();
+  }
+
+  onFacultyInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.editFaculty = input.value;
+    this.checkChanges();
+  }
 
   cancelEditing(): void {
-
-    this.isEditing = false;
-
-    this.errorMessage = '';
-    this.successMessage = '';
+    if (this.isSaving) return;
 
     this.syncEditData();
+    this.isEditing = false;
+    this.clearMessages();
+
+    this.cdr.detectChanges();
   }
 
-  // ============================
-  // LƯU THÔNG TIN
-  // ============================
+  closeMessage(): void {
+    this.clearMessages();
+    this.cdr.detectChanges();
+  }
 
   saveChanges(): void {
-
-    if (this.isSaving) {
+    if (this.isSaving || !this.hasChangesNow) {
       return;
     }
 
-    if (!this.hasChanges) {
+    const msv = this.user?.MSV?.trim();
+
+    if (!msv) {
+      this.errorMessage = 'Không xác định được mã sinh viên.';
+      this.cdr.detectChanges();
       return;
     }
-
-    if (!this.studentCode) {
-      this.errorMessage =
-        'Không xác định được mã sinh viên.';
-      return;
-    }
-
-    if (!this.editEmail.trim()) {
-      this.errorMessage =
-        'Email không được để trống.';
-      return;
-    }
-
-    // ============================
-    // DỮ LIỆU MỚI
-    // ============================
 
     const newData = {
-      EMAIL: this.editEmail.trim(),
-      KHOA: this.editFaculty.trim(),
       LOP: this.editClass.trim(),
+      KHOA: this.editFaculty.trim(),
     };
 
-    // ============================
-    // LƯU DỮ LIỆU CŨ
-    // ĐỂ ROLLBACK NẾU API LỖI
-    // ============================
-
-    const oldUser = {
-      ...this.user,
-    };
-
-    // ============================
-    // CẬP NHẬT GIAO DIỆN NGAY
-    // ============================
-
-    this.user = {
-      ...this.user,
-
-      EMAIL: newData.EMAIL,
-      KHOA: newData.KHOA,
-      LOP: newData.LOP,
-    };
-
-    // Cập nhật localStorage ngay
-    localStorage.setItem(
-      'user',
-      JSON.stringify(this.user),
-    );
-
-    // Đồng bộ form
-    this.syncEditData();
-
-    // Thoát chế độ chỉnh sửa ngay
-    this.isEditing = false;
-
-    // Hiện trạng thái lưu
     this.isSaving = true;
+    this.clearMessages();
+    this.cdr.detectChanges();
 
-    this.errorMessage = '';
-    this.successMessage = '';
+    this.auth.updateProfile(msv, newData).subscribe({
+      next: () => {
+        this.user = {
+          ...this.user!,
+          LOP: newData.LOP,
+          KHOA: newData.KHOA,
+        };
 
-    // ============================
-    // GỌI BACKEND
-    // ============================
+        localStorage.setItem(
+          'user',
+          JSON.stringify(this.user),
+        );
 
-    this.auth
-      .updateProfile(
-        this.studentCode,
-        newData,
-      )
-      .subscribe({
+        this.syncEditData();
 
-        // ============================
-        // BACKEND LƯU THÀNH CÔNG
-        // ============================
+        this.isEditing = false;
+        this.isSaving = false;
 
-        next: () => {
+        this.successMessage =
+          'Cập nhật thông tin thành công!';
 
-          this.isSaving = false;
+        this.cdr.detectChanges();
+      },
 
-          this.successMessage =
-            'Cập nhật thông tin thành công.';
+      error: (error) => {
+        console.error('Lỗi cập nhật hồ sơ:', error);
 
-          console.log(
-            'Cập nhật thành công:',
-            newData,
-          );
-        },
+        this.isSaving = false;
 
-        // ============================
-        // BACKEND LỖI
-        // ============================
+        const message = error?.error?.message;
 
-        error: (error) => {
+        this.errorMessage =
+          Array.isArray(message)
+            ? message.join(', ')
+            : typeof message === 'string'
+              ? message
+              : 'Không thể cập nhật thông tin. Vui lòng thử lại.';
 
-          console.error(
-            'Lỗi cập nhật:',
-            error,
-          );
-
-          // Khôi phục dữ liệu cũ
-          this.user = oldUser;
-
-          localStorage.setItem(
-            'user',
-            JSON.stringify(this.user),
-          );
-
-          this.syncEditData();
-
-          this.isEditing = true;
-          this.isSaving = false;
-
-          this.errorMessage =
-            error?.error?.message ||
-            error?.message ||
-            'Không thể cập nhật thông tin.';
-        },
-      });
+        this.cdr.detectChanges();
+      },
+    });
   }
 }

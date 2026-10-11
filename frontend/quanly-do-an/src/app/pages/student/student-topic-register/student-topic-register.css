@@ -271,3 +271,148 @@ tr:hover td {
 .btn-close-modal:hover {
     background: #0f766e;
 }
+
+/* Phân trang đề tài */
+.topic-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 18px 4px 4px;
+  border-top: 1px solid #e2e8f0;
+  margin-top: 12px;
+}
+
+.pagination-info {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  color: #475569;
+  font-size: 14px;
+}
+
+.pagination-controls select {
+  padding: 7px 10px;
+  border: 1px solid #dce4ed;
+  border-radius: 8px;
+  background: #fff;
+  color: #334155;
+}
+
+.pagination-controls button {
+  min-width: 34px;
+  height: 34px;
+  border: 1px solid #dce4ed;
+  border-radius: 8px;
+  background: #fff;
+  color: #334155;
+  cursor: pointer;
+}
+
+.pagination-controls button:hover:not(:disabled) {
+  background: #f1f5f9;
+}
+
+.pagination-controls button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .topic-pagination {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* ================================
+   POPUP ĐĂNG KÝ THẤT BẠI
+================================ */
+
+.register-error-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0.5);
+  padding: 16px;
+}
+
+.register-error-modal {
+  width: 100%;
+  max-width: 420px;
+
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 30px 24px;
+
+  text-align: center;
+
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+}
+
+.register-error-icon {
+  width: 60px;
+  height: 60px;
+
+  margin: 0 auto 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #fee2e2;
+  color: #dc2626;
+
+  font-size: 36px;
+  font-weight: bold;
+}
+
+.register-error-modal h3 {
+  margin: 0 0 12px;
+
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.register-error-modal p {
+  margin: 0 0 24px;
+
+  color: #4b5563;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.register-error-modal button {
+  padding: 11px 28px;
+
+  background: #2563eb;
+  color: #ffffff;
+
+  border: none;
+  border-radius: 8px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.register-error-modal button:hover {
+  background: #1d4ed8;
+}

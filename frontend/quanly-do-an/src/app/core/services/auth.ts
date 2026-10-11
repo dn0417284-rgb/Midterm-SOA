@@ -1,6 +1,14 @@
+
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpHeaders,
+} from '@angular/common/http';
 import { Observable } from 'rxjs';
+
+// ============================
+// REGISTER
+// ============================
 
 export interface RegisterRequest {
   MSV: string;
@@ -18,6 +26,10 @@ export interface RegisterResponse {
     VAITRO: string;
   };
 }
+
+// ============================
+// LOGIN
+// ============================
 
 export interface LoginRequest {
   EMAIL: string;
@@ -40,10 +52,15 @@ export interface LoginResponse {
   user: LoginUser;
 }
 
+// ============================
+// UPDATE PROFILE
+// ============================
+
+// Sinh viên chỉ được cập nhật Lớp và Khoa.
+// Không cho phép chỉnh sửa Email.
 export interface UpdateProfileRequest {
-  EMAIL: string;
-  KHOA: string;
   LOP: string;
+  KHOA: string;
 }
 
 @Injectable({
@@ -51,11 +68,15 @@ export interface UpdateProfileRequest {
 })
 export class Auth {
 
+  // ============================
+  // API URL
+  // ============================
+
   private readonly apiUrl =
-    'api/auth';
+    '/api/auth';
 
   private readonly sinhvienApiUrl =
-    'api/sinhvien';
+    '/api/sinhvien';
 
   constructor(
     private readonly http: HttpClient,
@@ -120,13 +141,19 @@ export class Auth {
     const token = this.getToken();
 
     const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${token ?? ''}`,
       'Content-Type': 'application/json',
     });
 
+    // Chỉ gửi hai trường được phép cập nhật
+    const updateData: UpdateProfileRequest = {
+      LOP: data.LOP,
+      KHOA: data.KHOA,
+    };
+
     return this.http.put<LoginUser>(
-      `${this.sinhvienApiUrl}/${msv}`,
-      data,
+      `${this.sinhvienApiUrl}/${encodeURIComponent(msv)}`,
+      updateData,
       {
         headers,
       },
@@ -150,8 +177,7 @@ export class Auth {
 
   getUser(): LoginUser | null {
 
-    const user =
-      localStorage.getItem('user');
+    const user = localStorage.getItem('user');
 
     if (!user) {
       return null;

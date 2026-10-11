@@ -263,3 +263,66 @@ tr:hover td {
 .modal-body-detail p span {
     width: 75%;
 }
+
+/* ==========================
+   PHÂN TRANG QUẢN LÝ ĐỀ TÀI
+   ========================== */
+
+.topic-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 18px 4px 4px;
+  margin-top: 12px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.pagination-info {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 14px;
+  color: #475569;
+}
+
+.pagination-controls select {
+  padding: 7px 10px;
+  border: 1px solid #dce4ed;
+  border-radius: 8px;
+  background: #fff;
+  color: #334155;
+}
+
+.pagination-controls button {
+  min-width: 34px;
+  height: 34px;
+  border: 1px solid #dce4ed;
+  border-radius: 8px;
+  background: #fff;
+  color: #334155;
+  cursor: pointer;
+}
+
+.pagination-controls button:hover:not(:disabled) {
+  background: #f1f5f9;
+}
+
+.pagination-controls button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .topic-pagination {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

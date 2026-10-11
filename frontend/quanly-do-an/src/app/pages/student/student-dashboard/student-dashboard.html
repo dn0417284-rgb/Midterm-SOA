@@ -1,88 +1,198 @@
-<div class="welcome-banner">
-    <h3>
-        Xin chào, {{ studentName }}!
-    </h3>
 
-    <p>
-        Chào mừng bạn đến với hệ thống quản lý đồ án tốt nghiệp.
-        Hãy kiểm tra mục đăng ký đề tài để chọn hướng nghiên cứu phù hợp.
-    </p>
+<!-- ================================ -->
+<!-- LỜI CHÀO SINH VIÊN -->
+<!-- ================================ -->
+
+<div class="welcome-banner">
+  <h3>
+    Xin chào, {{ studentName }}!
+  </h3>
+
+  <p>
+    Chào mừng bạn đến với hệ thống quản lý đồ án tốt nghiệp.
+    Hãy kiểm tra mục đăng ký đề tài để chọn hướng nghiên cứu phù hợp.
+  </p>
 </div>
 
+<!-- ================================ -->
+<!-- THÔNG BÁO LỖI -->
+<!-- ================================ -->
 
-<!-- Thống kê nhanh -->
+<div
+  *ngIf="errorMessage"
+  class="dashboard-error"
+>
+  <p>{{ errorMessage }}</p>
+
+  <button
+    type="button"
+    (click)="loadRegistration()"
+  >
+    Thử lại
+  </button>
+</div>
+
+<!-- ================================ -->
+<!-- THỐNG KÊ NHANH -->
+<!-- ================================ -->
+
 <div class="stats-grid">
 
-    <!-- Trạng thái đăng ký -->
-    <div class="stat-card">
-        <h4>Trạng thái đăng ký</h4>
+  <!-- TRẠNG THÁI ĐĂNG KÝ -->
+  <div class="stat-card">
+    <h4>Trạng thái đăng ký</h4>
 
-        <p
-            class="number"
-            style="font-size: 18px; color: #d97706;"
-        >
-            Đang chờ duyệt
-        </p>
-    </div>
+    <p
+      class="number"
+      [style.font-size]="'18px'"
+      [style.color]="
+        currentRegistration
+          ? '#16a34a'
+          : '#d97706'
+      "
+    >
+      {{
+        isLoading
+          ? 'Đang tải...'
+          : errorMessage
+            ? '—'
+            : registrationStatus
+      }}
+    </p>
+  </div>
 
+  <!-- ĐỀ TÀI ĐÃ CHỌN -->
+  <div class="stat-card">
+    <h4>Đề tài đã chọn</h4>
 
-    <!-- Đề tài đã chọn -->
-    <div class="stat-card">
-        <h4>Đề tài đã chọn</h4>
+    <p
+      class="number"
+      style="font-size: 16px;"
+    >
+      {{
+        isLoading
+          ? 'Đang tải...'
+          : currentTopic
+            ? topicName
+            : currentRegistration
+              ? 'Chưa tải được đề tài'
+              : 'Chưa chọn đề tài'
+      }}
+    </p>
+  </div>
 
-        <p
-            class="number"
-            style="font-size: 16px;"
-        >
-            Ứng dụng AI trong giáo dục
-        </p>
-    </div>
+  <!-- GIẢNG VIÊN HƯỚNG DẪN -->
+  <div class="stat-card">
+    <h4>Giảng viên hướng dẫn</h4>
 
-
-    <!-- Giảng viên hướng dẫn -->
-    <div class="stat-card">
-        <h4>Giảng viên hướng dẫn</h4>
-
-        <p
-            class="number"
-            style="font-size: 16px;"
-        >
-            TS. Trần Văn B
-        </p>
-    </div>
+    <p
+      class="number"
+      style="font-size: 16px;"
+    >
+      {{
+        isLoading
+          ? 'Đang tải...'
+          : topicTeacher
+      }}
+    </p>
+  </div>
 
 </div>
 
+<!-- ================================ -->
+<!-- THÔNG TIN ĐỀ TÀI HIỆN TẠI -->
+<!-- ================================ -->
 
-<!-- Thông tin tóm tắt đề tài hiện tại -->
 <div class="card-section">
 
-    <h3>
-        Tiến độ & Đề tài hiện tại
-    </h3>
+  <h3>Tiến độ &amp; Đề tài hiện tại</h3>
+
+  <!-- ĐANG TẢI -->
+  <div *ngIf="isLoading">
+    <p class="dashboard-description">
+      Đang tải thông tin đăng ký đề tài...
+    </p>
+  </div>
+
+  <!-- ĐÃ ĐĂNG KÝ -->
+  <div
+    *ngIf="
+      !isLoading &&
+      currentRegistration &&
+      currentTopic
+    "
+  >
+    <p class="dashboard-description">
+      Bạn đã đăng ký đề tài
+      <strong>{{ topicName }}</strong>
+      vào ngày
+      <strong>
+        {{
+          registrationDate
+            | date:'dd/MM/yyyy'
+        }}
+      </strong>.
+    </p>
+
+    <p class="dashboard-description">
+      <strong>Giảng viên hướng dẫn:</strong>
+      {{ topicTeacher }}
+    </p>
 
     <p
-        style="
-            font-size: 14px;
-            color: #4b5563;
-            line-height: 1.6;
-        "
+      class="dashboard-description"
+      *ngIf="topicDescription"
     >
-        Bạn đã gửi đơn đăng ký đề tài
-        <strong>
-            Ứng dụng AI trong giáo dục thông minh
-        </strong>
-        vào ngày 28/05/2026.
-
-        Hồ sơ hiện đang được Khoa và Giảng viên hướng dẫn
-        xem xét phê duyệt.
+      <strong>Mô tả đề tài:</strong>
+      {{ topicDescription }}
     </p>
 
     <div style="margin-top: 15px;">
-        <span class="badge badge-warning">
-            Trạng thái: Chờ duyệt
-        </span>
+      <span
+        class="badge"
+        [ngClass]="registrationStatusClass"
+      >
+        Trạng thái: {{ registrationStatus }}
+      </span>
     </div>
+  </div>
+
+  <!-- CHƯA ĐĂNG KÝ -->
+  <div
+    *ngIf="
+      !isLoading &&
+      !errorMessage &&
+      !currentRegistration
+    "
+  >
+    <p class="dashboard-description">
+      Bạn chưa đăng ký đề tài nào.
+      Hãy vào mục <strong>Đăng ký đề tài</strong>
+      để lựa chọn đề tài phù hợp.
+    </p>
+
+    <div style="margin-top: 15px;">
+      <span class="badge badge-warning">
+        Trạng thái: Chưa đăng ký
+      </span>
+    </div>
+  </div>
+
+  <!-- ĐÃ CÓ ĐĂNG KÝ NHƯNG KHÔNG TẢI ĐƯỢC ĐỀ TÀI -->
+  <div
+    *ngIf="
+      !isLoading &&
+      currentRegistration &&
+      !currentTopic
+    "
+  >
+    <p class="dashboard-description">
+      Bạn đã đăng ký đề tài mã
+      <strong>
+        {{ currentRegistration.DETAI_ID }}
+      </strong>,
+      nhưng chưa tải được thông tin chi tiết.
+    </p>
+  </div>
 
 </div>
-

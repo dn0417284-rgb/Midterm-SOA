@@ -1,179 +1,421 @@
+
 <div class="topics-container">
-    <!-- Thanh công cụ: Tìm kiếm, Bộ lọc và Nút Thêm mới -->
-    <div class="action-bar">
-        <div class="search-filter-group">
-            <div class="search-box">
-                <input type="text" placeholder="Tìm kiếm theo tên đề tài, mã đề tài...">
-            </div>
-            <select class="filter-select">
-                <option value="">Tất cả trạng thái</option>
-                <option value="registered">Đã đăng ký</option>
-                <option value="unregistered">Chưa đăng ký</option>
-            </select>
-            <select class="filter-select">
-                <option value="">Tất cả giảng viên</option>
-                <option value="gv1">TS. Trần Văn B</option>
-                <option value="gv2">ThS. Phạm Văn D</option>
-                <option value="gv3">TS. Hoàng Văn F</option>
-            </select>
-        </div>
-        <button class="btn-add" (click)="openTopicModal()">Thêm đề tài mới</button>
+  <!-- Thanh tìm kiếm và bộ lọc -->
+  <div class="action-bar">
+    <div class="search-filter-group">
+      <div class="search-box">
+        <input
+          type="text"
+          placeholder="Tìm kiếm theo tên đề tài, mã đề tài..."
+          [(ngModel)]="searchText"
+          (ngModelChange)="onFilterChange()"
+        />
+      </div>
+
+      <select
+        class="filter-select"
+        [(ngModel)]="filterStatus"
+        (ngModelChange)="onFilterChange()"
+      >
+        <option value="">Tất cả trạng thái</option>
+        <option value="0">Chưa đăng ký</option>
+        <option value="1">Đã đăng ký</option>
+      </select>
+
+      <select
+        class="filter-select"
+        [(ngModel)]="filterLecturer"
+        (ngModelChange)="onFilterChange()"
+      >
+        <option value="">Tất cả giảng viên</option>
+        <option
+          *ngFor="let lecturer of lecturers"
+          [value]="lecturer"
+        >
+          {{ lecturer }}
+        </option>
+      </select>
     </div>
 
-    <!-- Bảng danh sách đề tài -->
-    <div class="card-table">
-        <table>
-            <thead>
-                <tr>
-                    <th>Mã ĐT</th>
-                    <th>Tên đề tài</th>
-                    <th>Giảng viên hướng dẫn</th>
-                    <th>Trạng thái</th>
-                    <th>Thao tác</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Đề tài 1: Đã đăng ký -> KHÔNG cho phép sửa -->
-                <tr>
-                    <td>DT001</td>
-                    <td class="topic-name-cell">Ứng dụng AI trong giáo dục thông minh và phân tích dữ liệu học tập nâng cao</td>
-                    <td>TS. Trần Văn B</td>
-                    <td><span class="badge badge-registered">Đã đăng ký</span></td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn-icon btn-view" (click)="openDetailModal('DT001', 'Ứng dụng AI trong giáo dục thông minh và phân tích dữ liệu học tập nâng cao', 'Nghiên cứu và phát triển hệ thống hỗ trợ học tập thông minh sử dụng trí tuệ nhân tạo.', 'TS. Trần Văn B', 'Đã đăng ký')">Chi tiết</button>
-                            <button class="btn-icon btn-disabled" title="Chỉ được phép chỉnh sửa những đề tài chưa đăng ký">Sửa</button>
-                            <button class="btn-icon btn-delete" (click)="openDeleteModal('DT001')">Xóa</button>
-                        </div>
-                    </td>
-                </tr>
-                <!-- Đề tài 2: Chưa đăng ký -> CHO PHÉP sửa -->
-                <tr>
-                    <td>DT002</td>
-                    <td class="topic-name-cell">Website thương mại điện tử tích hợp thanh toán trực tuyến qua ví điện tử</td>
-                    <td>ThS. Phạm Văn D</td>
-                    <td><span class="badge badge-unregistered">Chưa đăng ký</span></td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn-icon btn-view" (click)="openDetailModal('DT002', 'Website thương mại điện tử tích hợp thanh toán trực tuyến qua ví điện tử', 'Xây dựng nền tảng bán hàng trực tuyến tích hợp các cổng thanh toán.', 'ThS. Phạm Văn D', 'Chưa đăng ký')">Chi tiết</button>
-                            <button class="btn-icon btn-edit" (click)="openEditModal('DT002', 'Website thương mại điện tử tích hợp thanh toán trực tuyến qua ví điện tử', 'Xây dựng nền tảng bán hàng trực tuyến tích hợp các cổng thanh toán.', 'ThS. Phạm Văn D')">Sửa</button>
-                            <button class="btn-icon btn-delete" (click)="openDeleteModal('DT002')">Xóa</button>
-                        </div>
-                    </td>
-                </tr>
-                <!-- Đề tài 3: Chưa đăng ký -> CHO PHÉP sửa -->
-                <tr>
-                    <td>DT003</td>
-                    <td class="topic-name-cell">Ứng dụng di động quản lý sức khỏe cá nhân tích hợp cảm biến thông minh</td>
-                    <td>TS. Hoàng Văn F</td>
-                    <td><span class="badge badge-unregistered">Chưa đăng ký</span></td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn-icon btn-view" (click)="openDetailModal('DT003', 'Ứng dụng di động quản lý sức khỏe cá nhân tích hợp cảm biến thông minh', 'Giúp người dùng theo dõi chế độ ăn uống và tập luyện hàng ngày.', 'TS. Hoàng Văn F', 'Chưa đăng ký')">Chi tiết</button>
-                            <button class="btn-icon btn-edit" (click)="openEditModal('DT003', 'Ứng dụng di động quản lý sức khỏe cá nhân tích hợp cảm biến thông minh', 'Giúp người dùng theo dõi chế độ ăn uống và tập luyện hàng ngày.', 'TS. Hoàng Văn F')">Sửa</button>
-                            <button class="btn-icon btn-delete" (click)="openDeleteModal('DT003')">Xóa</button>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <button
+      type="button"
+      class="btn-add"
+      (click)="openTopicModal()"
+    >
+      Thêm đề tài mới
+    </button>
+  </div>
+
+  <!-- Bảng danh sách đề tài -->
+  <div class="card-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Mã ĐT</th>
+          <th>Tên đề tài</th>
+          <th>Giảng viên hướng dẫn</th>
+          <th>Trạng thái</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let topic of paginatedTopics">
+          <td>{{ topic.MDT }}</td>
+
+          <td class="topic-name-cell">
+            {{ topic.name }}
+          </td>
+
+          <td>{{ topic.lecturer }}</td>
+
+          <td>
+            <span
+              class="badge"
+              [ngClass]="{
+                'badge-registered': topic.status === 1,
+                'badge-unregistered': topic.status === 0
+              }"
+            >
+              {{ getStatusText(topic.status) }}
+            </span>
+          </td>
+
+          <td>
+            <div class="action-buttons">
+              <button
+                type="button"
+                class="btn-icon btn-view"
+                (click)="openDetailModal(
+                  topic.MDT,
+                  topic.name,
+                  topic.desc,
+                  topic.lecturer,
+                  topic.status
+                )"
+              >
+                Chi tiết
+              </button>
+
+              <button
+                type="button"
+                class="btn-icon"
+                title="Chỉ được phép chỉnh sửa những đề tài chưa đăng ký"
+                [disabled]="topic.status === 1"
+                (click)="openEditModal(
+                  topic.MDT,
+                  topic.name,
+                  topic.desc,
+                  topic.lecturer
+                )"
+              >
+                Sửa
+              </button>
+
+              <button
+                type="button"
+                class="btn-icon btn-delete"
+                (click)="openDeleteModal(topic.MDT)"
+              >
+                Xóa
+              </button>
+            </div>
+          </td>
+        </tr>
+
+        <tr *ngIf="filteredTopics.length === 0">
+          <td colspan="5" style="text-align: center">
+            Không có đề tài nào
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Phân trang -->
+    <div class="topic-pagination">
+      <div class="pagination-info">
+        Hiển thị {{ startItem }}–{{ endItem }}
+        trong tổng số {{ totalItems }} đề tài
+      </div>
+
+      <div class="pagination-controls">
+        <label for="admin-topic-page-size">
+          Số dòng:
+        </label>
+
+        <select
+          id="admin-topic-page-size"
+          [(ngModel)]="pageSize"
+          (ngModelChange)="onPageSizeChange()"
+        >
+          <option
+            *ngFor="let size of pageSizeOptions"
+            [ngValue]="size"
+          >
+            {{ size }}
+          </option>
+        </select>
+
+        <button
+          type="button"
+          [disabled]="currentPage <= 1"
+          (click)="changePage(currentPage - 1)"
+        >
+          ‹
+        </button>
+
+        <span>
+          Trang {{ currentPage }} / {{ totalPages }}
+        </span>
+
+        <button
+          type="button"
+          [disabled]="currentPage >= totalPages"
+          (click)="changePage(currentPage + 1)"
+        >
+          ›
+        </button>
+      </div>
     </div>
+  </div>
 </div>
 
-<!-- Form Thêm đề tài mới (Modal) -->
-<div class="modal-overlay" [class.active]="isAddModalOpen">
-    <div class="modal-card">
-        <div class="modal-header">
-            <h3>Thêm đề tài mới</h3>
-            <button class="close-btn" (click)="closeTopicModal()">✕</button>
-        </div>
-        <form (submit)="onSubmitAddTopic($event)">
-            <div class="form-group">
-                <label>Mã đề tài</label>
-                <input type="text" name="topic_code" placeholder="Ví dụ: DT004" required>
-            </div>
-            <div class="form-group">
-                <label>Tên đề tài</label>
-                <input type="text" name="topic_name" placeholder="Nhập tên đề tài..." required>
-            </div>
-            <div class="form-group">
-                <label>Mô tả đề tài</label>
-                <textarea name="description" rows="3" placeholder="Nhập nội dung mô tả..."></textarea>
-            </div>
-            <div class="form-group">
-                <label>Giảng viên hướng dẫn</label>
-                <input type="text" name="lecturer" placeholder="Ví dụ: TS. Nguyễn Văn X" required>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn-cancel" (click)="closeTopicModal()">Hủy</button>
-                <button type="submit" class="btn-submit">Lưu đề tài</button>
-            </div>
-        </form>
+<!-- Modal thêm đề tài -->
+<div
+  class="modal-overlay"
+  [class.active]="isAddModalOpen"
+  (click)="closeTopicModal()"
+>
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Thêm đề tài mới</h3>
+      <button
+        type="button"
+        class="close-btn"
+        (click)="closeTopicModal()"
+      >
+        ✕
+      </button>
     </div>
+
+    <form (submit)="onSubmitAddTopic($event)">
+      <div class="form-group">
+        <label>Tên đề tài</label>
+        <input
+          type="text"
+          [(ngModel)]="editTopicData.name"
+          name="name"
+          placeholder="Nhập tên đề tài..."
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Mô tả đề tài</label>
+        <textarea
+          [(ngModel)]="editTopicData.desc"
+          name="desc"
+          rows="3"
+          placeholder="Nhập nội dung mô tả..."
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Giảng viên hướng dẫn</label>
+        <input
+          type="text"
+          [(ngModel)]="editTopicData.lecturer"
+          name="lecturer"
+          placeholder="Ví dụ: TS. Nguyễn Văn X"
+          required
+        />
+      </div>
+
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn-cancel"
+          (click)="closeTopicModal()"
+        >
+          Hủy
+        </button>
+
+        <button type="submit" class="btn-submit">
+          Lưu đề tài
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
 
-<!-- Form Sửa đề tài (Modal) -->
-<div class="modal-overlay" [class.active]="isEditModalOpen">
-    <div class="modal-card">
-        <div class="modal-header">
-            <h3>Chỉnh sửa đề tài</h3>
-            <button class="close-btn" (click)="closeEditModal()">✕</button>
-        </div>
-        <form (submit)="onSubmitEditTopic($event)">
-            <div class="form-group">
-                <label>Mã đề tài</label>
-                <input type="text" name="topic_code" [value]="editTopicData.code" disabled>
-            </div>
-            <div class="form-group">
-                <label>Tên đề tài</label>
-                <input type="text" name="topic_name" [(ngModel)]="editTopicData.name" required>
-            </div>
-            <div class="form-group">
-                <label>Mô tả đề tài</label>
-                <textarea name="description" rows="3" [(ngModel)]="editTopicData.desc"></textarea>
-            </div>
-            <div class="form-group">
-                <label>Giảng viên hướng dẫn</label>
-                <input type="text" name="lecturer" [(ngModel)]="editTopicData.lecturer" required>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn-cancel" (click)="closeEditModal()">Hủy</button>
-                <button type="submit" class="btn-submit">Cập nhật</button>
-            </div>
-        </form>
+<!-- Modal sửa đề tài -->
+<div
+  class="modal-overlay"
+  [class.active]="isEditModalOpen"
+  (click)="closeEditModal()"
+>
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Chỉnh sửa đề tài</h3>
+      <button
+        type="button"
+        class="close-btn"
+        (click)="closeEditModal()"
+      >
+        ✕
+      </button>
     </div>
+
+    <form (submit)="onSubmitEditTopic($event)">
+      <div class="form-group">
+        <label>Mã đề tài</label>
+        <input
+          type="text"
+          name="topic_code"
+          [value]="editTopicData.MDT"
+          disabled
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Tên đề tài</label>
+        <input
+          type="text"
+          name="topic_name"
+          [(ngModel)]="editTopicData.name"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Mô tả đề tài</label>
+        <textarea
+          name="description"
+          rows="3"
+          [(ngModel)]="editTopicData.desc"
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Giảng viên hướng dẫn</label>
+        <input
+          type="text"
+          name="lecturer"
+          [(ngModel)]="editTopicData.lecturer"
+          required
+        />
+      </div>
+
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn-cancel"
+          (click)="closeEditModal()"
+        >
+          Hủy
+        </button>
+
+        <button type="submit" class="btn-submit">
+          Cập nhật
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
 
-<!-- Popup Modal Xác nhận Xóa -->
-<div class="modal-overlay" [class.active]="isDeleteModalOpen">
-    <div class="modal-card">
-        <div class="modal-header delete-header">
-            <h3>Xác nhận xóa đề tài</h3>
-            <button class="close-btn" (click)="closeDeleteModal()">✕</button>
-        </div>
-        <div class="modal-body-detail">
-            <p>Bạn có chắc chắn muốn xóa đề tài này không? Hành động này không thể hoàn tác.</p>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn-cancel" (click)="closeDeleteModal()">Quay lại</button>
-            <button type="button" class="btn-confirm-delete" (click)="confirmDelete()">Xác nhận xóa</button>
-        </div>
+<!-- Modal xác nhận xóa -->
+<div
+  class="modal-overlay"
+  [class.active]="isDeleteModalOpen"
+>
+  <div class="modal-card">
+    <div class="modal-header delete-header">
+      <h3>Xác nhận xóa đề tài</h3>
+
+      <button
+        type="button"
+        class="close-btn"
+        (click)="closeDeleteModal()"
+      >
+        ✕
+      </button>
     </div>
+
+    <div class="modal-body-detail">
+      <p>
+        Bạn có chắc chắn muốn xóa đề tài này không?
+        Hành động này không thể hoàn tác.
+      </p>
+    </div>
+
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn-cancel"
+        (click)="closeDeleteModal()"
+      >
+        Quay lại
+      </button>
+
+      <button
+        type="button"
+        class="btn-confirm-delete"
+        (click)="confirmDelete()"
+      >
+        Xác nhận xóa
+      </button>
+    </div>
+  </div>
 </div>
 
-<!-- Popup Modal Xem Chi Tiết Đề Tài -->
-<div class="modal-overlay" [class.active]="isDetailModalOpen">
-    <div class="modal-card">
-        <div class="modal-header">
-            <h3>Chi tiết đề tài</h3>
-            <button class="close-btn" (click)="closeDetailModal()">✕</button>
-        </div>
-        <div class="modal-body-detail">
-            <p><strong>Mã đề tài:</strong> <span>{{ selectedTopic.code }}</span></p>
-            <p><strong>Tên đề tài:</strong> <span>{{ selectedTopic.name }}</span></p>
-            <p><strong>Mô tả:</strong> <span>{{ selectedTopic.desc }}</span></p>
-            <p><strong>Giảng viên:</strong> <span>{{ selectedTopic.lecturer }}</span></p>
-            <p><strong>Trạng thái:</strong> <span>{{ selectedTopic.status }}</span></p>
-        </div>
+<!-- Modal xem chi tiết -->
+<div
+  class="modal-overlay"
+  [class.active]="isDetailModalOpen"
+  (click)="closeDetailModal()"
+>
+  <div
+    class="modal-card"
+    *ngIf="selectedTopic"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="modal-header">
+      <h3>Chi tiết đề tài</h3>
+
+      <button
+        type="button"
+        class="close-btn"
+        (click)="closeDetailModal()"
+      >
+        ✕
+      </button>
     </div>
+
+    <div class="modal-body-detail">
+      <p>
+        <strong>Mã đề tài:</strong>
+        <span>{{ selectedTopic.MDT }}</span>
+      </p>
+
+      <p>
+        <strong>Tên đề tài:</strong>
+        <span>{{ selectedTopic.name }}</span>
+      </p>
+
+      <p>
+        <strong>Mô tả:</strong>
+        <span>{{ selectedTopic.desc }}</span>
+      </p>
+
+      <p>
+        <strong>Giảng viên:</strong>
+        <span>{{ selectedTopic.lecturer }}</span>
+      </p>
+
+      <p>
+        <strong>Trạng thái:</strong>
+        <span>{{ getStatusText(selectedTopic.status) }}</span>
+      </p>
+    </div>
+  </div>
 </div>

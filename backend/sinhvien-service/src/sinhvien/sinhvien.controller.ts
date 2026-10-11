@@ -1,5 +1,6 @@
 
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -10,7 +11,6 @@ import {
   Put,
   Req,
   UseGuards,
-  BadRequestException,
 } from '@nestjs/common';
 
 import type { Request } from 'express';
@@ -40,23 +40,46 @@ export class SinhvienController {
     private readonly sinhvienService: SinhvienService,
   ) {}
 
+  // ====================================
   // ADMIN - LẤY DANH SÁCH SINH VIÊN
+  // ====================================
+
   @Get()
   @Roles('ADMIN')
   findAll() {
     return this.sinhvienService.findAll();
   }
 
-  // ADMIN - LẤY THÔNG TIN SINH VIÊN
+  // ====================================
+  // ADMIN / SINHVIEN - XEM THÔNG TIN
+  // ====================================
+
   @Get(':msv')
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'SINHVIEN')
   findOne(
     @Param('msv') msv: string,
+    @Req() req: AuthenticatedRequest,
   ) {
+    const currentMsv = String(req.user.sub);
+    const currentRole = req.user.role;
+
+    // Sinh viên chỉ được xem thông tin của mình
+    if (
+      currentRole === 'SINHVIEN' &&
+      currentMsv !== msv
+    ) {
+      throw new ForbiddenException(
+        'Bạn chỉ được xem thông tin của chính mình.',
+      );
+    }
+
     return this.sinhvienService.findOne(msv);
   }
 
+  // ====================================
   // ADMIN - TẠO SINH VIÊN
+  // ====================================
+
   @Post()
   @Roles('ADMIN')
   create(
@@ -65,7 +88,10 @@ export class SinhvienController {
     return this.sinhvienService.create(data);
   }
 
-  // ADMIN / SINHVIEN - CẬP NHẬT THÔNG TIN
+  // ====================================
+  // ADMIN / SINHVIEN - CẬP NHẬT
+  // ====================================
+
   @Put(':msv')
   @Roles('ADMIN', 'SINHVIEN')
   update(
@@ -73,12 +99,10 @@ export class SinhvienController {
     @Body() data: UpdateSinhVienDto,
     @Req() req: AuthenticatedRequest,
   ) {
-    const user = req.user;
+    const currentMsv = String(req.user.sub);
+    const currentRole = req.user.role;
 
-    const currentMsv = String(user.sub);
-    const currentRole = user.role;
-
-    // SINHVIEN chỉ được cập nhật chính mình
+    // Sinh viên chỉ được cập nhật chính mình
     if (
       currentRole === 'SINHVIEN' &&
       currentMsv !== msv
@@ -101,7 +125,6 @@ export class SinhvienController {
       );
     }
 
-    // Phải gửi ít nhất một trường
     if (
       data.KHOA === undefined &&
       data.LOP === undefined
@@ -111,12 +134,13 @@ export class SinhvienController {
       );
     }
 
-    // Gửi nguyên dữ liệu sang service.
-    // Service chỉ cập nhật trường được cung cấp.
     return this.sinhvienService.update(msv, data);
   }
 
+  // ====================================
   // ADMIN - XÓA SINH VIÊN
+  // ====================================
+
   @Delete(':msv')
   @Roles('ADMIN')
   remove(

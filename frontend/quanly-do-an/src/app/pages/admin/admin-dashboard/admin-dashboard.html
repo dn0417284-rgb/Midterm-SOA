@@ -1,7 +1,10 @@
 
 <div class="dashboard-container">
 
+  <!-- ========================== -->
   <!-- THỐNG KÊ NHANH -->
+  <!-- ========================== -->
+
   <div class="stats-grid">
 
     <!-- TỔNG SỐ SINH VIÊN -->
@@ -17,7 +20,10 @@
         }}
       </p>
 
-      <small *ngIf="studentError" style="color: #dc2626;">
+      <small
+        *ngIf="studentError"
+        class="stat-error"
+      >
         {{ studentError }}
       </small>
 
@@ -26,11 +32,22 @@
     <!-- TỔNG GIẢNG VIÊN -->
     <div class="stat-card">
 
-      <h4>Tổng giảng viên</h4>
+      <h4>Tổng giảng viên hướng dẫn</h4>
 
       <p class="number">
-        {{ totalTeachers ?? '—' }}
+        {{
+          isLoadingTopics
+            ? 'Đang tải...'
+            : (totalTeachers ?? '—')
+        }}
       </p>
+
+      <small
+        *ngIf="topicError"
+        class="stat-error"
+      >
+        {{ topicError }}
+      </small>
 
     </div>
 
@@ -40,7 +57,11 @@
       <h4>Đề tài đã đăng ký</h4>
 
       <p class="number">
-        {{ registeredTopics ?? '—' }}
+        {{
+          isLoadingTopics
+            ? 'Đang tải...'
+            : (registeredTopics ?? '—')
+        }}
       </p>
 
     </div>
@@ -51,14 +72,21 @@
       <h4>Đề tài chưa đăng ký</h4>
 
       <p class="number">
-        {{ unregisteredTopics ?? '—' }}
+        {{
+          isLoadingTopics
+            ? 'Đang tải...'
+            : (unregisteredTopics ?? '—')
+        }}
       </p>
 
     </div>
 
   </div>
 
+  <!-- ========================== -->
   <!-- DANH SÁCH ĐỀ TÀI MỚI -->
+  <!-- ========================== -->
+
   <div class="card-table">
 
     <div class="table-header">
@@ -78,8 +106,35 @@
 
       <tbody>
 
-        <tr *ngFor="let topic of recentTopics">
+        <!-- ĐANG TẢI -->
+        <tr *ngIf="isLoadingTopics">
+          <td
+            colspan="4"
+            class="empty-state"
+          >
+            Đang tải danh sách đề tài...
+          </td>
+        </tr>
 
+        <!-- LỖI TẢI DỮ LIỆU -->
+        <tr
+          *ngIf="
+            !isLoadingTopics &&
+            topicError
+          "
+        >
+          <td
+            colspan="4"
+            class="empty-state"
+          >
+            {{ topicError }}
+          </td>
+        </tr>
+
+        <!-- DANH SÁCH ĐỀ TÀI THẬT -->
+        <tr
+          *ngFor="let topic of recentTopics"
+        >
           <td>
             <strong>{{ topic.name }}</strong>
           </td>
@@ -88,18 +143,32 @@
             {{ topic.description }}
           </td>
 
-          <td>{{ topic.teacher }}</td>
+          <td>
+            {{ topic.teacher }}
+          </td>
 
           <td>
-            <span class="badge badge-success">
+            <span
+              class="badge"
+              [ngClass]="topic.statusClass"
+            >
               {{ topic.status }}
             </span>
           </td>
-
         </tr>
 
-        <tr *ngIf="recentTopics.length === 0">
-          <td colspan="4" class="empty-state">
+        <!-- KHÔNG CÓ ĐỀ TÀI -->
+        <tr
+          *ngIf="
+            !isLoadingTopics &&
+            !topicError &&
+            recentTopics.length === 0
+          "
+        >
+          <td
+            colspan="4"
+            class="empty-state"
+          >
             Chưa có dữ liệu đề tài từ hệ thống.
           </td>
         </tr>

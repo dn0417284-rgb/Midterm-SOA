@@ -64,3 +64,67 @@
     background: #fef3c7;
     color: #92400e;
 }
+/* ================================
+   TRẠNG THÁI ĐĂNG KÝ
+================================ */
+
+.badge-success {
+  display: inline-block;
+  background: #dcfce7;
+  color: #15803d;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.badge-warning {
+  display: inline-block;
+  background: #fef3c7;
+  color: #b45309;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ================================
+   THÔNG TIN ĐỀ TÀI
+================================ */
+
+.dashboard-description {
+  font-size: 14px;
+  color: #4b5563;
+  line-height: 1.8;
+  margin-bottom: 12px;
+}
+
+/* ================================
+   THÔNG BÁO LỖI
+================================ */
+
+.dashboard-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  color: #b91c1c;
+}
+
+.dashboard-error p {
+  margin: 0 0 10px;
+}
+
+.dashboard-error button {
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.dashboard-error button:hover {
+  background: #b91c1c;
+}
