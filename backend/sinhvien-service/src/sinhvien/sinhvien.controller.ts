@@ -1,3 +1,4 @@
+
 import {
   Body,
   Controller,
@@ -9,12 +10,14 @@ import {
   Put,
   Req,
   UseGuards,
+  BadRequestException,
 } from '@nestjs/common';
 
 import type { Request } from 'express';
 
 import { SinhvienService } from './sinhvien.service.js';
 import { CreateSinhVienDto } from './dto/create-sinhvien.dto.js';
+import { UpdateSinhVienDto } from './dto/update-sinhvien.dto.js';
 
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
 import { RolesGuard } from './guards/roles.guard.js';
@@ -67,22 +70,15 @@ export class SinhvienController {
   @Roles('ADMIN', 'SINHVIEN')
   update(
     @Param('msv') msv: string,
-
-    @Body()
-    data: {
-      EMAIL?: string;
-      KHOA?: string;
-      LOP?: string;
-    },
-
+    @Body() data: UpdateSinhVienDto,
     @Req() req: AuthenticatedRequest,
   ) {
     const user = req.user;
 
-    const currentMsv = user.sub;
+    const currentMsv = String(user.sub);
     const currentRole = user.role;
 
-    // SINHVIEN chỉ được sửa thông tin của chính mình
+    // SINHVIEN chỉ được cập nhật chính mình
     if (
       currentRole === 'SINHVIEN' &&
       currentMsv !== msv
@@ -92,29 +88,32 @@ export class SinhvienController {
       );
     }
 
-    // Chỉ cho phép cập nhật 3 trường:
-    // EMAIL, KHOA, LOP
-    const updateData = {
-      EMAIL:
-        data.EMAIL !== undefined
-          ? data.EMAIL.trim()
-          : undefined,
+    // Chỉ cho phép cập nhật KHOA và LOP
+    const allowedFields = ['KHOA', 'LOP'];
 
-      KHOA:
-        data.KHOA !== undefined
-          ? data.KHOA.trim() || null
-          : undefined,
-
-      LOP:
-        data.LOP !== undefined
-          ? data.LOP.trim() || null
-          : undefined,
-    };
-
-    return this.sinhvienService.update(
-      msv,
-      updateData,
+    const invalidFields = Object.keys(data).filter(
+      (field) => !allowedFields.includes(field),
     );
+
+    if (invalidFields.length > 0) {
+      throw new BadRequestException(
+        `Không được phép cập nhật các trường: ${invalidFields.join(', ')}`,
+      );
+    }
+
+    // Phải gửi ít nhất một trường
+    if (
+      data.KHOA === undefined &&
+      data.LOP === undefined
+    ) {
+      throw new BadRequestException(
+        'Vui lòng cung cấp Khoa hoặc Lớp cần cập nhật.',
+      );
+    }
+
+    // Gửi nguyên dữ liệu sang service.
+    // Service chỉ cập nhật trường được cung cấp.
+    return this.sinhvienService.update(msv, data);
   }
 
   // ADMIN - XÓA SINH VIÊN

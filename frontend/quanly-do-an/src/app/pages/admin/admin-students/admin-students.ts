@@ -72,6 +72,7 @@ export class AdminStudents implements OnInit {
   formMode: 'add' | 'edit' = 'add';
 
   selectedStudent: Student | null = null;
+  originalStudent: Student | null = null;
 
   studentToDelete = {
     code: '',
@@ -334,6 +335,8 @@ searchStudents(): void {
   openEditModal(student: Student): void {
     this.formMode = 'edit';
 
+    this.originalStudent = { ...student };
+
     this.studentForm = {
       MSV: student.MSV,
       TENSV: student.TENSV,
@@ -375,11 +378,10 @@ searchStudents(): void {
         !form.MSV.trim() ||
         !form.TENSV.trim() ||
         !form.EMAIL.trim() ||
-        !form.MATKHAU.trim() ||
-        !form.KHOA.trim() ||
-        !form.LOP.trim()
+        !form.MATKHAU.trim()
       ) {
-        this.formError = 'Vui lòng nhập đầy đủ các trường bắt buộc.';
+        this.formError =
+          'Vui lòng nhập Mã sinh viên, Họ tên, Email và Mật khẩu.';
         return false;
       }
 
@@ -460,6 +462,7 @@ searchStudents(): void {
         this.isSuccessModalOpen = true;
 
         this.loadStudents();
+
         this.cdr.detectChanges();
       },
 
@@ -467,14 +470,19 @@ searchStudents(): void {
         console.error('Lỗi thêm sinh viên:', error);
 
         this.isSaving = false;
-        this.formError = Array.isArray(error?.error?.message)
-          ? error.error.message.join(', ')
-          : error?.error?.message || 'Không thể thêm sinh viên.';
 
-        this.cdr.detectChanges();
+        const message = error?.error?.message;
+
+        this.formError = Array.isArray(message)
+          ? message.join(', ')
+            : typeof message === 'string'
+              ? message
+              : 'Không thể thêm sinh viên.';
+
+          this.cdr.detectChanges();
       },
-    });
-  }
+      });
+    }
 
 
   // =====================================
@@ -483,20 +491,42 @@ searchStudents(): void {
 
   updateStudent(): void {
     const form = this.studentForm;
+    const original = this.originalStudent;
 
-    // Chỉ sửa các trường được API PUT cho phép
-    const body = {
-      EMAIL: form.EMAIL.trim(),
-      KHOA: form.KHOA.trim() || null,
-      LOP: form.LOP.trim() || null,
-    };
+    if (!original) {
+      this.formError = 'Không tìm thấy thông tin sinh viên cần sửa.';
+      this.isSaving = false;
+      return;
+    }
+
+    const body: {
+      KHOA?: string | null;
+      LOP?: string | null;
+    } = {};
+
+    const newKhoa = form.KHOA.trim();
+    const newLop = form.LOP.trim();
+
+    if (newKhoa !== (original.KHOA || '').trim()) {
+      body.KHOA = newKhoa || null;
+    }
+
+    if (newLop !== (original.LOP || '').trim()) {
+      body.LOP = newLop || null;
+    }
+
+    if (Object.keys(body).length === 0) {
+      this.formError = 'Bạn chưa thay đổi thông tin nào.';
+      this.isSaving = false;
+      return;
+    }
 
     const msv = encodeURIComponent(form.MSV);
 
     this.http.put(
       `${this.apiUrl}/${msv}`,
       body,
-      { headers: this.getHeaders() },
+      { headers: this.getHeaders() }
     ).subscribe({
       next: () => {
         this.isSaving = false;
@@ -506,19 +536,39 @@ searchStudents(): void {
         this.isSuccessModalOpen = true;
 
         this.loadStudents();
+
         this.cdr.detectChanges();
       },
 
       error: (error) => {
-        console.error('Lỗi sửa sinh viên:', error);
+        console.error('Lỗi cập nhật sinh viên:', error);
 
         this.isSaving = false;
-        this.formError =
-          error?.error?.message ||
-          'Không thể cập nhật sinh viên.';
+
+        const message = error?.error?.message;
+
+        if (Array.isArray(message)) {
+          this.formError = message.join(', ');
+        } else if (
+          typeof message === 'string' &&
+          message !== 'Internal server error'
+        ) {
+          this.formError = message;
+        } else if (error.status === 500) {
+          this.formError =
+            'Máy chủ gặp lỗi khi lưu dữ liệu. Vui lòng kiểm tra log Sinhvien Service.';
+        } else if (error.status === 403) {
+          this.formError = 'Bạn không có quyền cập nhật sinh viên.';
+        } else if (error.status === 401) {
+          this.formError = 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.';
+        } else if (error.status === 0) {
+          this.formError = 'Không thể kết nối đến máy chủ.';
+        } else {
+          this.formError = 'Không thể cập nhật sinh viên.';
+        }
 
         this.cdr.detectChanges();
-      },
+      }
     });
   }
 

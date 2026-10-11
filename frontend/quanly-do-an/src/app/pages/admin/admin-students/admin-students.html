@@ -5,7 +5,23 @@
   <div class="action-bar">
     <div class="search-filter-group">
       <div class="search-box">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon">
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+            >
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+            </svg>
+        </span>
 
         <input
           type="text"
@@ -385,6 +401,7 @@
                 type="email"
                 name="studentContactEmail"
                 [(ngModel)]="studentForm.EMAIL"
+                [readonly]="formMode === 'edit'"
                 [disabled]="isSaving"
                 autocomplete="off"
                 autocapitalize="off"
@@ -421,40 +438,37 @@
                 
         <!-- KHOA: HIỂN THỊ KHI THÊM VÀ SỬA -->
         <div class="form-group">
-        <label for="student-khoa">
-            Khoa <span *ngIf="formMode === 'add'">*</span>
-        </label>
+            <label for="student-khoa">
+                Khoa
+            </label>
 
-        <input
-            id="student-khoa"
-            type="text"
-            name="KHOA"
-            [(ngModel)]="studentForm.KHOA"
-            [disabled]="isSaving"
-            maxlength="100"
-            placeholder="Nhập khoa"
-            [required]="formMode === 'add'"
-        />
+            <input
+                id="student-khoa"
+                type="text"
+                name="KHOA"
+                [(ngModel)]="studentForm.KHOA"
+                [disabled]="isSaving"
+                maxlength="100"
+                placeholder="Nhập khoa (không bắt buộc)"
+            />
         </div>
 
         <!-- LỚP: HIỂN THỊ KHI THÊM VÀ SỬA -->
         <div class="form-group">
-        <label for="student-lop">
-            Lớp <span *ngIf="formMode === 'add'">*</span>
-        </label>
+            <label for="student-lop">
+                Lớp
+            </label>
 
-        <input
-            id="student-lop"
-            type="text"
-            name="LOP"
-            [(ngModel)]="studentForm.LOP"
-            [disabled]="isSaving"
-            maxlength="50"
-            placeholder="Nhập lớp"
-            [required]="formMode === 'add'"
-        />
+            <input
+                id="student-lop"
+                type="text"
+                name="LOP"
+                [(ngModel)]="studentForm.LOP"
+                [disabled]="isSaving"
+                maxlength="50"
+                placeholder="Nhập lớp (không bắt buộc)"
+            />
         </div>
-
 
           <!-- ĐIỂM TRUNG BÌNH: CHỈ XEM -->
           <div
@@ -476,8 +490,9 @@
           class="form-note"
           *ngIf="formMode === 'edit'"
         >
-          Chỉ được chỉnh sửa Email, Khoa và Lớp.
-          Mã sinh viên, họ tên và điểm trung bình
+          Quản trị viên chỉ được chỉnh sửa Khoa và Lớp.
+          Có thể sửa riêng từng trường hoặc cả hai.
+          Mã sinh viên, họ tên, Email và điểm trung bình
           không được thay đổi.
         </p>
 
