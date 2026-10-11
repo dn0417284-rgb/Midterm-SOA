@@ -1,0 +1,56 @@
+<div class="my-topic-container">
+    <!-- Thẻ hiển thị đề tài đã đăng ký -->
+    <div class="topic-card" *ngIf="hasTopic">
+        <div class="topic-card-header">
+            <div>
+                <span class="topic-code">DT002</span>
+                <h3 class="topic-title">Website thương mại điện tử tích hợp thanh toán trực tuyến</h3>
+            </div>
+            <!-- <span class="badge badge-warning">Chờ duyệt</span> -->
+        </div>
+        <div class="topic-details-grid">
+            <div>
+                <span>Giảng viên hướng dẫn</span>
+                <strong>ThS. Phạm Văn D</strong>
+            </div>
+            <div>
+                <span>Ngày đăng ký</span>
+                <strong>02/06/2026</strong>
+            </div>
+            <div>
+                <span>Lĩnh vực</span>
+                <strong>Phát triển Web / E-Commerce</strong>
+            </div>
+        </div>
+        <div class="topic-card-footer">
+            <button class="btn-action btn-cancel-reg" (click)="openCancelModal()">Hủy đăng ký</button>
+        </div>
+    </div>
+</div>
+
+<!-- Popup Modal Xác nhận Hủy Đăng Ký -->
+<div class="modal-overlay" [class.active]="isCancelModalOpen">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>Xác nhận hủy đăng ký</h3>
+            <button class="close-btn" (click)="closeCancelModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <p>Bạn có chắc chắn muốn hủy đăng ký đề tài này không?</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-close-modal" (click)="closeCancelModal()">Quay lại</button>
+            <button type="button" class="btn-confirm-cancel" (click)="confirmCancel()">Xác nhận hủy</button>
+        </div>
+    </div>
+</div>
+
+<!-- Popup Modal Thông Báo Hủy Thành Công -->
+<div class="modal-overlay" [class.active]="isSuccessModalOpen">
+    <div class="modal-card-success">
+        <div class="success-icon">✕</div>
+        <h3>Đã hủy đăng ký</h3>
+        <p>Hệ thống đã ghi nhận việc hủy đề tài thành công.</p>
+        <button type="button" class="btn-success-close" (click)="closeSuccessModal()">Đóng</button>
+    </div>
+</div>
