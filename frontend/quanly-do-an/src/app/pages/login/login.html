@@ -1,40 +1,64 @@
+
 <div class="container">
   <form
-    (submit)="onLogin($event)"
     id="form-login"
+    (submit)="onLogin($event)"
+    novalidate
   >
     <h1>Đăng nhập</h1>
+    <p class="auth-subtitle">
+      Chào mừng bạn quay trở lại!
+    </p>
 
     <div class="input-box">
       <label for="email">Email</label>
 
-      <input
-        type="email"
-        id="email"
-        name="email"
-        [(ngModel)]="email"
-        placeholder="vidu@edu.vn"
-        autocomplete="email"
-        required
-      />
-
-      <i class="bx bx-envelope"></i>
+      <div class="input-field">
+        <input
+          type="email"
+          id="email"
+          name="email"
+          [(ngModel)]="email"
+          (input)="clearError()"
+          placeholder="vidu@edu.vn"
+          autocomplete="email"
+          [disabled]="isLoading"
+          required
+        />
+        <i class="bx bx-envelope field-icon"></i>
+      </div>
     </div>
 
     <div class="input-box">
       <label for="password">Mật khẩu</label>
 
-      <input
-        type="password"
-        id="password"
-        name="password"
-        [(ngModel)]="password"
-        placeholder="••••••••"
-        autocomplete="current-password"
-        required
-      />
+      <div class="input-field">
+        <input
+          [type]="showPassword ? 'text' : 'password'"
+          id="password"
+          name="password"
+          [(ngModel)]="password"
+          (input)="clearError()"
+          placeholder="Nhập mật khẩu"
+          autocomplete="current-password"
+          [disabled]="isLoading"
+          required
+        />
 
-      <i class="bx bx-lock-alt"></i>
+        <button
+          type="button"
+          class="password-toggle"
+          (click)="togglePassword()"
+          [attr.aria-label]="showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'"
+          [attr.aria-pressed]="showPassword"
+          [disabled]="isLoading"
+        >
+          <i
+            class="bx"
+            [ngClass]="showPassword ? 'bx-show' : 'bx-hide'"
+          ></i>
+        </button>
+      </div>
     </div>
 
     <div class="remember-forgot">
@@ -47,32 +71,36 @@
         Nhớ tài khoản
       </label>
 
-      <a>Quên mật khẩu?</a>
+      <span class="forgot-text">
+        Quên mật khẩu?
+      </span>
     </div>
 
-    <!-- Thông báo lỗi -->
     @if (errorMessage) {
-      <div class="error-message">
-        {{ errorMessage }}
+      <div class="auth-alert error-message" role="alert">
+        <i class="bx bx-error-circle"></i>
+        <span>{{ errorMessage }}</span>
       </div>
     }
 
     <button
       type="submit"
       class="btn"
-      name="btn_login"
-      value="login"
       [disabled]="isLoading"
     >
-      {{ isLoading ? 'Đang đăng nhập...' : 'Đăng nhập' }}
+      @if (isLoading) {
+        <span class="btn-spinner"></span>
+        Đang đăng nhập...
+      } @else {
+        Đăng nhập
+        <i class="bx bx-right-arrow-alt"></i>
+      }
     </button>
 
     <div class="register-link">
       <p>
         Chưa có tài khoản?
-        <a routerLink="/register">
-          Đăng ký ngay
-        </a>
+        <a routerLink="/register">Đăng ký ngay</a>
       </p>
     </div>
 
@@ -86,29 +114,24 @@
       <a
         href="javascript:void(0)"
         class="gmail"
+        aria-label="Google"
       >
-        <img
-          src="google.png"
-          alt="Google"
-        />
+        <img src="google.png" alt="Google" />
       </a>
 
       <a
         href="javascript:void(0)"
         class="mezon"
+        aria-label="Discord"
       >
-        <img
-          src="discord.png"
-          alt="Discord"
-        />
+        <img src="discord.png" alt="Discord" />
       </a>
     </div>
 
     <div class="notice">
       <p>
         Bằng việc tiếp tục, bạn đồng ý với
-        <a>Chính sách bảo mật</a>
-        của chúng tôi
+        Chính sách bảo mật của hệ thống.
       </p>
     </div>
   </form>

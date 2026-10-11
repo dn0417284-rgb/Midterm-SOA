@@ -1,171 +1,113 @@
+
 <div class="dashboard-container">
 
-    <!-- ============================ -->
-    <!-- THỐNG KÊ NHANH -->
-    <!-- ============================ -->
+  <!-- THỐNG KÊ NHANH -->
+  <div class="stats-grid">
 
-    <div class="stats-grid">
+    <!-- TỔNG SỐ SINH VIÊN -->
+    <div class="stat-card">
 
-        <!-- Sinh viên -->
+      <h4>Tổng số sinh viên</h4>
 
-        <div class="stat-card">
+      <p class="number">
+        {{
+          isLoadingStudents
+            ? 'Đang tải...'
+            : (totalStudents ?? '—')
+        }}
+      </p>
 
-            <h4>
-                Tổng số sinh viên
-            </h4>
-
-            <p class="number">
-                {{ totalStudents }}
-            </p>
-
-        </div>
-
-
-        <!-- Giảng viên -->
-
-        <div class="stat-card">
-
-            <h4>
-                Tổng giảng viên
-            </h4>
-
-            <p class="number">
-                {{ totalTeachers }}
-            </p>
-
-        </div>
-
-
-        <!-- Đề tài đã đăng ký -->
-
-        <div class="stat-card">
-
-            <h4>
-                Đề tài đã đăng ký
-            </h4>
-
-            <p class="number">
-                {{ registeredTopics }}
-            </p>
-
-        </div>
-
-
-        <!-- Đề tài chưa đăng ký -->
-
-        <div class="stat-card">
-
-            <h4>
-                Đề tài chưa đăng ký
-            </h4>
-
-            <p class="number">
-                {{ unregisteredTopics }}
-            </p>
-
-        </div>
+      <small *ngIf="studentError" style="color: #dc2626;">
+        {{ studentError }}
+      </small>
 
     </div>
 
+    <!-- TỔNG GIẢNG VIÊN -->
+    <div class="stat-card">
 
-    <!-- ============================ -->
-    <!-- DANH SÁCH ĐỀ TÀI MỚI -->
-    <!-- ============================ -->
+      <h4>Tổng giảng viên</h4>
 
-    <div class="card-table">
-
-        <div class="table-header">
-
-            <h3>
-                Danh sách đề tài mới
-            </h3>
-
-        </div>
-
-
-        <table>
-
-            <thead>
-
-                <tr>
-
-                    <th>
-                        Tên đề tài
-                    </th>
-
-                    <th>
-                        Mô tả đề tài
-                    </th>
-
-                    <th>
-                        Giảng viên hướng dẫn
-                    </th>
-
-                    <th>
-                        Trạng thái
-                    </th>
-
-                </tr>
-
-            </thead>
-
-
-            <tbody>
-
-                <tr
-                    *ngFor="let topic of recentTopics"
-                >
-
-                    <td>
-                        <strong>
-                            {{ topic.name }}
-                        </strong>
-                    </td>
-
-                    <td class="description">
-
-                        {{ topic.description }}
-
-                    </td>
-
-                    <td>
-
-                        {{ topic.teacher }}
-
-                    </td>
-
-                    <td>
-
-                        <span
-                            class="badge badge-success"
-                        >
-                            {{ topic.status }}
-                        </span>
-
-                    </td>
-
-                </tr>
-
-
-                <!-- Không có dữ liệu -->
-
-                <tr
-                    *ngIf="recentTopics.length === 0"
-                >
-
-                    <td
-                        colspan="4"
-                        class="empty-state"
-                    >
-                        Chưa có đề tài mới.
-                    </td>
-
-                </tr>
-
-            </tbody>
-
-        </table>
+      <p class="number">
+        {{ totalTeachers ?? '—' }}
+      </p>
 
     </div>
+
+    <!-- ĐỀ TÀI ĐÃ ĐĂNG KÝ -->
+    <div class="stat-card">
+
+      <h4>Đề tài đã đăng ký</h4>
+
+      <p class="number">
+        {{ registeredTopics ?? '—' }}
+      </p>
+
+    </div>
+
+    <!-- ĐỀ TÀI CHƯA ĐĂNG KÝ -->
+    <div class="stat-card">
+
+      <h4>Đề tài chưa đăng ký</h4>
+
+      <p class="number">
+        {{ unregisteredTopics ?? '—' }}
+      </p>
+
+    </div>
+
+  </div>
+
+  <!-- DANH SÁCH ĐỀ TÀI MỚI -->
+  <div class="card-table">
+
+    <div class="table-header">
+      <h3>Danh sách đề tài mới</h3>
+    </div>
+
+    <table>
+
+      <thead>
+        <tr>
+          <th>Tên đề tài</th>
+          <th>Mô tả đề tài</th>
+          <th>Giảng viên hướng dẫn</th>
+          <th>Trạng thái</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        <tr *ngFor="let topic of recentTopics">
+
+          <td>
+            <strong>{{ topic.name }}</strong>
+          </td>
+
+          <td class="description">
+            {{ topic.description }}
+          </td>
+
+          <td>{{ topic.teacher }}</td>
+
+          <td>
+            <span class="badge badge-success">
+              {{ topic.status }}
+            </span>
+          </td>
+
+        </tr>
+
+        <tr *ngIf="recentTopics.length === 0">
+          <td colspan="4" class="empty-state">
+            Chưa có dữ liệu đề tài từ hệ thống.
+          </td>
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
 
 </div>

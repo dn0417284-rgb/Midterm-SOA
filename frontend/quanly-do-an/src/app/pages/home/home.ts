@@ -1,4 +1,10 @@
-import { AfterViewInit, Component, ElementRef } from '@angular/core';
+
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnDestroy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
@@ -9,36 +15,47 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
-export class Home implements AfterViewInit {
-  constructor(private elRef: ElementRef) { }
+export class Home implements AfterViewInit, OnDestroy {
+  private timers: ReturnType<typeof setTimeout>[] = [];
+  private destroyed = false;
 
-  ngAfterViewInit() {
-    const counters = this.elRef.nativeElement.querySelectorAll('.counter');
-    
-    counters.forEach((counter: HTMLElement) => {
-      const targetStr = counter.getAttribute('data-target') || '0';
-      const target = +targetStr;
-      
-      // Đặt giá trị bắt đầu luôn là 0 khi load trang
+  constructor(private readonly elRef: ElementRef) {}
+
+  ngAfterViewInit(): void {
+    const counters: NodeListOf<HTMLElement> =
+      this.elRef.nativeElement.querySelectorAll('.counter');
+
+    counters.forEach((counter) => {
+      const target = Number(counter.getAttribute('data-target') || 0);
       let currentCount = 0;
+
       counter.innerText = '0+';
 
-      const updateCount = () => {
-        const increment = target / 20;
-        
+      const updateCount = (): void => {
+        if (this.destroyed) return;
+
+        const increment = Math.max(1, Math.ceil(target / 20));
+
         if (currentCount < target) {
-          currentCount = Math.ceil(currentCount + increment);
-          if (currentCount > target) currentCount = target;
-          
+          currentCount = Math.min(currentCount + increment, target);
           counter.innerText = currentCount + '+';
-          setTimeout(updateCount, 30);
+
+          const timer = setTimeout(updateCount, 30);
+          this.timers.push(timer);
         } else {
           counter.innerText = target + '+';
         }
       };
 
-      // Đợi một nhịp nhỏ để DOM render ổn định rồi chạy hiệu ứng
-      setTimeout(updateCount, 50);
+      const timer = setTimeout(updateCount, 50);
+      this.timers.push(timer);
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroyed = true;
+
+    this.timers.forEach((timer) => clearTimeout(timer));
+    this.timers = [];
   }
 }

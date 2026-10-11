@@ -1,53 +1,335 @@
-<header>
-    <h1>EduProject</h1>
-    <nav>
-        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Trang chủ</a>
-        <a routerLink="/login">Đăng nhập</a>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+
+    <!-- Logo bên trái -->
+    <a routerLink="/" class="brand" aria-label="EduProject - Trang chủ">
+      <span class="brand-icon">
+        <i class="bx bxs-graduation"></i>
+      </span>
+      <span>EduProject</span>
+    </a>
+
+    <!-- Menu chính -->
+    <nav class="main-nav" aria-label="Điều hướng chính">
+      <a
+        routerLink="/"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        Trang chủ
+      </a>
+
+      <a href="#gioi-thieu">Giới thiệu</a>
+      <a href="#de-tai">Đề tài nổi bật</a>
+      <a href="#huong-dan">Hướng dẫn</a>
     </nav>
-</header>
-<section class="hero">
-    <div class="hero-text">
-        <h2>Quản lý Đồ án Tốt nghiệp Thông minh</h2>
-        <p>Giải pháp toàn diện giúp sinh viên dễ dàng tìm kiếm đề tài, kết nối giảng viên hướng dẫn và theo dõi tiến độ đồ án trực tuyến.</p>
-        <a routerLink="/login" class="btn btn-primary">Bắt đầu ngay</a>
-        <a href="#" class="btn btn-outline">Tìm hiểu thêm</a>
+
+    <!-- Góc phải -->
+    <div class="header-actions">
+      <a routerLink="/login" class="btn-login">
+        Đăng nhập
+      </a>
+
+      <a routerLink="/register" class="btn-register">
+        Đăng ký
+        <i class="bx bx-right-arrow-alt"></i>
+      </a>
     </div>
-</section>
-<section class="stats">
-    <div class="stat">
+
+  </div>
+</header>
+
+<main>
+
+  <!-- BANNER -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-text">
+
+        <span class="hero-tag">
+          <i class="bx bx-graduation"></i>
+          Nền tảng quản lý đồ án tốt nghiệp
+        </span>
+
+        <h1>
+          Quản lý Đồ án Tốt nghiệp
+          <span>Thông minh & Hiệu quả</span>
+        </h1>
+
+        <p>
+          Giải pháp giúp sinh viên tìm kiếm đề tài,
+          kết nối giảng viên hướng dẫn và theo dõi
+          tiến độ thực hiện đồ án trên một nền tảng thống nhất.
+        </p>
+
+        <div class="hero-actions">
+          <a routerLink="/register" class="btn btn-primary">
+            Bắt đầu ngay
+            <i class="bx bx-right-arrow-alt"></i>
+          </a>
+
+          <a href="#gioi-thieu" class="btn btn-outline">
+            Tìm hiểu thêm
+          </a>
+        </div>
+
+      </div>
+
+      <!-- Khối minh họa -->
+      <div class="hero-visual" aria-hidden="true">
+        <div class="visual-card">
+          <div class="visual-icon">
+            <i class="bx bx-book-open"></i>
+          </div>
+
+          <div class="visual-content">
+            <span>Quản lý đề tài</span>
+            <strong>Đơn giản và thuận tiện</strong>
+          </div>
+
+          <i class="bx bx-check-circle visual-check"></i>
+        </div>
+
+        <div class="visual-card">
+          <div class="visual-icon">
+            <i class="bx bx-group"></i>
+          </div>
+
+          <div class="visual-content">
+            <span>Kết nối giảng viên</span>
+            <strong>Trao đổi và hướng dẫn</strong>
+          </div>
+
+          <i class="bx bx-check-circle visual-check"></i>
+        </div>
+
+        <div class="visual-card">
+          <div class="visual-icon">
+            <i class="bx bx-line-chart"></i>
+          </div>
+
+          <div class="visual-content">
+            <span>Theo dõi tiến độ</span>
+            <strong>Cập nhật thường xuyên</strong>
+          </div>
+
+          <i class="bx bx-check-circle visual-check"></i>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- THỐNG KÊ MINH HỌA -->
+  <section class="stats" aria-label="Thống kê giới thiệu">
+    <div class="stats-inner">
+
+      <div class="stat">
         <h3 class="counter" data-target="120">120+</h3>
         <p>Đề tài đang mở</p>
-    </div>
-    <div class="stat">
+      </div>
+
+      <div class="stat">
         <h3 class="counter" data-target="500">500+</h3>
         <p>Sinh viên tham gia</p>
-    </div>
-    <div class="stat">
+      </div>
+
+      <div class="stat">
         <h3 class="counter" data-target="80">80+</h3>
         <p>Giảng viên hướng dẫn</p>
+      </div>
+
     </div>
-</section>
-<section id="featured" class="section">
-    <h3 class="section-title">Đề tài nổi bật trong năm</h3>
-    <div class="grid">
-        <div class="card">
-            <h4>Ứng dụng AI trong giáo dục</h4>
-            <p>Nghiên cứu và phát triển hệ thống trợ lý học tập thông minh dựa trên mô hình ngôn ngữ lớn.</p>
-        </div>
-        <div class="card">
-            <h4>Website thương mại điện tử</h4>
-            <p>Xây dựng nền tảng nền tảng tối ưu hiệu suất cao tích hợp thanh toán trực tuyến bảo mật.</p>
-        </div>
-        <div class="card">
-            <h4>Ứng dụng di động quản lý sức khỏe</h4>
-            <p>Giải pháp theo dõi chế độ dinh dưỡng, lịch tập luyện và nhắc nhở sinh hoạt cá nhân.</p>
-        </div>
-        <div class="card">
-            <h4>Hệ thống quản lý thư viện số</h4>
-            <p>Tự động hóa toàn bộ quy trình mượn trả sách, tra cứu tài liệu và quản lý kho sách trực tuyến.</p>
-        </div>
+
+    <p class="stats-note">
+      Số liệu minh họa cho giao diện giới thiệu hệ thống
+    </p>
+  </section>
+
+  <!-- GIỚI THIỆU -->
+  <section id="gioi-thieu" class="section about-section">
+    <div class="section-heading">
+      <span class="section-label">VỀ EDUPROJECT</span>
+      <h2 class="section-title">Một nền tảng, nhiều tiện ích</h2>
+      <p class="section-description">
+        EduProject hỗ trợ quản lý thông tin đồ án tốt nghiệp,
+        giúp các hoạt động đăng ký và theo dõi đề tài
+        trở nên rõ ràng, thuận tiện hơn.
+      </p>
     </div>
-</section>
-<footer>
-    © 2026 EduProject - Hệ thống quản lý đồ án tốt nghiệp hiện đại.
+
+    <div class="features-grid">
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="bx bx-search-alt-2"></i>
+        </div>
+        <h3>Tra cứu đề tài</h3>
+        <p>
+          Tìm hiểu thông tin đề tài và lựa chọn
+          hướng nghiên cứu phù hợp.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="bx bx-user-check"></i>
+        </div>
+        <h3>Đăng ký thuận tiện</h3>
+        <p>
+          Thực hiện đăng ký đề tài và theo dõi
+          thông tin đăng ký trên hệ thống.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="bx bx-task"></i>
+        </div>
+        <h3>Quản lý tập trung</h3>
+        <p>
+          Hỗ trợ quản lý sinh viên, đề tài
+          và các thông tin liên quan.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ĐỀ TÀI NỔI BẬT -->
+  <section id="de-tai" class="section featured-section">
+    <div class="section-heading">
+      <span class="section-label">KHÁM PHÁ</span>
+      <h2 class="section-title">Đề tài nổi bật trong năm</h2>
+      <p class="section-description">
+        Một số hướng nghiên cứu và phát triển ứng dụng
+        dành cho sinh viên tham khảo.
+      </p>
+    </div>
+
+    <div class="project-grid">
+
+      <article class="project-card">
+        <div class="project-icon">
+          <i class="bx bx-brain"></i>
+        </div>
+        <h3>Ứng dụng AI trong giáo dục</h3>
+        <p>
+          Nghiên cứu và phát triển hệ thống trợ lý
+          học tập thông minh dựa trên mô hình ngôn ngữ lớn.
+        </p>
+        <span class="project-tag">Trí tuệ nhân tạo</span>
+      </article>
+
+      <article class="project-card">
+        <div class="project-icon">
+          <i class="bx bx-cart-alt"></i>
+        </div>
+        <h3>Website thương mại điện tử</h3>
+        <p>
+          Xây dựng nền tảng bán hàng trực tuyến,
+          tối ưu hiệu suất và tích hợp thanh toán bảo mật.
+        </p>
+        <span class="project-tag">Ứng dụng Web</span>
+      </article>
+
+      <article class="project-card">
+        <div class="project-icon">
+          <i class="bx bx-mobile-alt"></i>
+        </div>
+        <h3>Ứng dụng di động quản lý sức khỏe</h3>
+        <p>
+          Giải pháp theo dõi chế độ dinh dưỡng,
+          lịch tập luyện và nhắc nhở sinh hoạt cá nhân.
+        </p>
+        <span class="project-tag">Ứng dụng di động</span>
+      </article>
+
+      <article class="project-card">
+        <div class="project-icon">
+          <i class="bx bx-library"></i>
+        </div>
+        <h3>Hệ thống quản lý thư viện số</h3>
+        <p>
+          Tự động hóa quy trình mượn trả sách,
+          tra cứu tài liệu và quản lý kho sách trực tuyến.
+        </p>
+        <span class="project-tag">Hệ thống quản lý</span>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- HƯỚNG DẪN -->
+  <section id="huong-dan" class="section guide-section">
+    <div class="section-heading">
+      <span class="section-label">BẮT ĐẦU SỬ DỤNG</span>
+      <h2 class="section-title">Quy trình đơn giản</h2>
+      <p class="section-description">
+        Chỉ với vài bước, sinh viên có thể bắt đầu
+        sử dụng hệ thống EduProject.
+      </p>
+    </div>
+
+    <div class="steps-grid">
+
+      <div class="step-card">
+        <div class="step-number">01</div>
+        <h3>Tạo tài khoản</h3>
+        <p>
+          Đăng ký tài khoản bằng mã sinh viên,
+          họ tên, email và mật khẩu.
+        </p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number">02</div>
+        <h3>Đăng nhập</h3>
+        <p>
+          Sử dụng tài khoản đã đăng ký
+          để truy cập vào hệ thống.
+        </p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number">03</div>
+        <h3>Khám phá hệ thống</h3>
+        <p>
+          Xem thông tin đề tài và sử dụng
+          các chức năng được cấp quyền.
+        </p>
+      </div>
+
+    </div>
+
+    <div class="guide-action">
+      <a routerLink="/register" class="btn btn-primary">
+        Đăng ký tài khoản
+        <i class="bx bx-right-arrow-alt"></i>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <strong>EduProject</strong>
+      <p>Hệ thống quản lý đồ án tốt nghiệp.</p>
+    </div>
+
+    <div class="footer-links">
+      <a href="#gioi-thieu">Giới thiệu</a>
+      <a href="#de-tai">Đề tài</a>
+      <a href="#huong-dan">Hướng dẫn</a>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    © 2026 EduProject. Hệ thống quản lý đồ án tốt nghiệp.
+  </div>
 </footer>

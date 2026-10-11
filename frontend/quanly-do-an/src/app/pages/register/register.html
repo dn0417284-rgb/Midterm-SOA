@@ -1,168 +1,269 @@
+
 <div class="container">
   <form
+    id="form-register"
     (submit)="onRegister($event)"
-    id="form-login"
+    novalidate
   >
     <h1>Đăng ký</h1>
 
+    <p class="auth-subtitle">
+      Tạo tài khoản để sử dụng hệ thống
+    </p>
+
+    <!-- MÃ SINH VIÊN -->
     <div class="input-box">
       <label for="msv">Mã sinh viên</label>
 
-      <input
-        type="text"
-        id="msv"
-        name="msv"
-        [(ngModel)]="MSV"
-        placeholder="4651050332"
-        inputmode="numeric"
-        required
-      />
+      <div class="input-field">
+        <input
+          id="msv"
+          type="text"
+          name="msv"
+          [(ngModel)]="MSV"
+          (input)="clearError()"
+          placeholder="Ví dụ: SV001"
+          autocomplete="off"
+          [disabled]="isLoading || !!successMessage"
+          required
+        />
 
-      <i class="bx bx-id-card"></i>
+        <i class="bx bx-id-card field-icon"></i>
+      </div>
     </div>
 
+    <!-- HỌ VÀ TÊN -->
     <div class="input-box">
-      <label for="fullname">
-        Họ và tên
-      </label>
+      <label for="fullname">Họ và tên</label>
 
-      <input
-        type="text"
-        id="fullname"
-        name="fullname"
-        [(ngModel)]="TENSV"
-        placeholder="Nguyễn Văn A"
-        required
-      />
+      <div class="input-field">
+        <input
+          id="fullname"
+          type="text"
+          name="fullname"
+          [(ngModel)]="TENSV"
+          (input)="clearError()"
+          placeholder="Nhập họ và tên"
+          autocomplete="name"
+          [disabled]="isLoading || !!successMessage"
+          required
+        />
 
-      <i class="bx bx-user"></i>
+        <i class="bx bx-user field-icon"></i>
+      </div>
     </div>
 
+    <!-- EMAIL -->
     <div class="input-box">
       <label for="email">Email</label>
 
-      <input
-        type="email"
-        id="email"
-        name="email"
-        [(ngModel)]="EMAIL"
-        placeholder="vidu@gmail.com"
-        autocomplete="email"
-        required
-      />
+      <div class="input-field">
+        <input
+          id="email"
+          type="email"
+          name="email"
+          [(ngModel)]="EMAIL"
+          (input)="clearError()"
+          placeholder="vidu@edu.vn"
+          autocomplete="email"
+          [disabled]="isLoading || !!successMessage"
+          required
+        />
 
-      <i class="bx bx-envelope"></i>
+        <i class="bx bx-envelope field-icon"></i>
+      </div>
     </div>
 
+    <!-- MẬT KHẨU -->
     <div class="input-box">
-      <label for="password">
-        Mật khẩu
-      </label>
+      <div class="password-label-row">
+        <label for="password">Mật khẩu</label>
 
-      <input
-        type="password"
-        id="password"
-        name="password"
-        [(ngModel)]="MATKHAU"
-        placeholder="••••••••"
-        autocomplete="new-password"
-        required
-      />
+        <button
+          type="button"
+          class="password-help-btn"
+          (click)="togglePasswordGuide()"
+          [attr.aria-expanded]="showPasswordGuide"
+          aria-controls="password-guide"
+          aria-label="Xem yêu cầu mật khẩu"
+          title="Xem yêu cầu mật khẩu"
+        >
+          <i class="bx bx-help-circle"></i>
+          <span>Yêu cầu mật khẩu</span>
+        </button>
+      </div>
 
-      <i class="bx bx-lock-alt"></i>
+      <div class="input-field">
+        <input
+          id="password"
+          [type]="showPassword ? 'text' : 'password'"
+          name="password"
+          [(ngModel)]="MATKHAU"
+          (input)="clearError()"
+          placeholder="Ví dụ: Vidu123@"
+          autocomplete="new-password"
+          [disabled]="isLoading || !!successMessage"
+          required
+        />
+
+        <button
+          type="button"
+          class="password-toggle"
+          (click)="togglePassword()"
+          [attr.aria-label]="showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'"
+          [attr.aria-pressed]="showPassword"
+        >
+          <i
+            class="bx"
+            [ngClass]="showPassword ? 'bx-show' : 'bx-hide'"
+          ></i>
+        </button>
+      </div>
+
+      <!-- Chỉ mở khi người dùng nhấn hướng dẫn -->
+      @if (showPasswordGuide) {
+        <div
+          id="password-guide"
+          class="password-requirements"
+        >
+          <div [class.valid]="passwordHasMinLength">
+            <i
+              class="bx"
+              [ngClass]="passwordHasMinLength ? 'bx-check-circle' : 'bx-circle'"
+            ></i>
+            <span>Ít nhất 8 ký tự</span>
+          </div>
+
+          <div [class.valid]="passwordHasLowercase">
+            <i
+              class="bx"
+              [ngClass]="passwordHasLowercase ? 'bx-check-circle' : 'bx-circle'"
+            ></i>
+            <span>1 chữ cái viết thường</span>
+          </div>
+
+          <div [class.valid]="passwordHasUppercase">
+            <i
+              class="bx"
+              [ngClass]="passwordHasUppercase ? 'bx-check-circle' : 'bx-circle'"
+            ></i>
+            <span>1 chữ cái viết hoa</span>
+          </div>
+
+          <div [class.valid]="passwordHasNumber">
+            <i
+              class="bx"
+              [ngClass]="passwordHasNumber ? 'bx-check-circle' : 'bx-circle'"
+            ></i>
+            <span>1 chữ số</span>
+          </div>
+
+          <div [class.valid]="passwordHasSpecialChar">
+            <i
+              class="bx"
+              [ngClass]="passwordHasSpecialChar ? 'bx-check-circle' : 'bx-circle'"
+            ></i>
+            <span>1 ký tự đặc biệt</span>
+          </div>
+        </div>
+      }
     </div>
 
+    <!-- XÁC NHẬN MẬT KHẨU -->
     <div class="input-box">
-      <label for="confirm-password">
-        Xác nhận mật khẩu
-      </label>
+      <label for="confirm-password">Xác nhận mật khẩu</label>
 
-      <input
-        type="password"
-        id="confirm-password"
-        name="confirm-password"
-        [(ngModel)]="XAC_NHAN_MAT_KHAU"
-        placeholder="••••••••"
-        autocomplete="new-password"
-        required
-      />
+      <div class="input-field">
+        <input
+          id="confirm-password"
+          [type]="showConfirmPassword ? 'text' : 'password'"
+          name="confirm-password"
+          [(ngModel)]="XAC_NHAN_MAT_KHAU"
+          (input)="clearError()"
+          placeholder="Nhập lại mật khẩu"
+          autocomplete="new-password"
+          [disabled]="isLoading || !!successMessage"
+          required
+        />
 
-      <i class="bx bx-lock-alt"></i>
+        <button
+          type="button"
+          class="password-toggle"
+          (click)="toggleConfirmPassword()"
+          [attr.aria-label]="showConfirmPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'"
+          [attr.aria-pressed]="showConfirmPassword"
+        >
+          <i
+            class="bx"
+            [ngClass]="showConfirmPassword ? 'bx-show' : 'bx-hide'"
+          ></i>
+        </button>
+      </div>
+
+      <!-- Chỉ báo khi mật khẩu không khớp -->
+      @if (
+        XAC_NHAN_MAT_KHAU.length > 0 &&
+        !isConfirmPasswordValid
+      ) {
+        <div class="password-match invalid">
+          <i class="bx bx-error-circle"></i>
+          <span>Mật khẩu xác nhận chưa khớp</span>
+        </div>
+      }
     </div>
 
+    <!-- ĐIỀU KHOẢN -->
     <div class="terms-agreement">
       <label>
         <input
           type="checkbox"
           name="terms"
-          required
+          [(ngModel)]="agreedToTerms"
+          [disabled]="isLoading || !!successMessage"
         />
-
-        Tôi đồng ý với
-        <a>Điều khoản dịch vụ</a>
+        Tôi đồng ý với điều khoản dịch vụ
       </label>
     </div>
 
+    <!-- THÔNG BÁO LỖI -->
     @if (errorMessage) {
-      <div class="error-message">
-        {{ errorMessage }}
+      <div class="auth-alert error-message" role="alert">
+        <i class="bx bx-error-circle"></i>
+        <span>{{ errorMessage }}</span>
       </div>
     }
 
+    <!-- THÔNG BÁO THÀNH CÔNG -->
     @if (successMessage) {
-      <div class="success-message">
-        {{ successMessage }}
+      <div class="auth-alert success-message" role="status">
+        <i class="bx bx-check-circle"></i>
+        <span>{{ successMessage }}</span>
       </div>
     }
 
+    <!-- NÚT ĐĂNG KÝ -->
     <button
       type="submit"
       class="btn"
-      name="btn_register"
-      value="register"
-      [disabled]="isLoading"
+      [disabled]="isLoading || !!successMessage"
     >
-      {{
-        isLoading
-          ? 'Đang tạo tài khoản...'
-          : 'Tạo tài khoản'
-      }}
+      @if (isLoading) {
+        <span class="btn-spinner"></span>
+        Đang tạo tài khoản...
+      } @else if (successMessage) {
+        <i class="bx bx-check-circle"></i>
+        Đăng ký thành công
+      } @else {
+        Tạo tài khoản
+        <i class="bx bx-right-arrow-alt"></i>
+      }
     </button>
 
-    <div class="divider">
-      <div class="line-left"></div>
-      <span>hoặc</span>
-      <div class="line-right"></div>
-    </div>
-
-    <div class="social-login">
-      <a
-        href="javascript:void(0)"
-        class="gmail"
-      >
-        <img
-          src="google.png"
-          alt="Google"
-        />
-      </a>
-
-      <a
-        href="javascript:void(0)"
-        class="mezon"
-      >
-        <img
-          src="discord.png"
-          alt="Discord"
-        />
-      </a>
-    </div>
-
+    <!-- CHUYỂN SANG ĐĂNG NHẬP -->
     <div class="login-redirect">
       <p>
         Đã có tài khoản?
-        <a routerLink="/login">
-          Đăng nhập
-        </a>
+        <a routerLink="/login">Đăng nhập</a>
       </p>
     </div>
   </form>

@@ -1,205 +1,473 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+/* ===== GIAO DIỆN CHUNG ===== */
 
 :host {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background: radial-gradient(circle at top, #f8fafc, #9fa6a0);
-    position: relative;
-    overflow-x: hidden;
-    margin: 0;
-    font-family: 'Poppins', sans-serif;
-    width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  padding: 20px 14px;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+  background:
+    radial-gradient(
+      circle at 12% 15%,
+      rgba(20, 184, 166, 0.12),
+      transparent 38%
+    ),
+    radial-gradient(
+      circle at 90% 85%,
+      rgba(13, 148, 136, 0.09),
+      transparent 38%
+    ),
+    linear-gradient(135deg, #f8fafc, #eef7f5);
 }
+
+/* ===== KHUNG ĐĂNG KÝ ===== */
 
 .container {
-    width: 420px;
-    padding: 35px 40px;
-    box-shadow: 0 20px 40px -10px rgba(13, 148, 136, 0.15), 0 10px 20px -5px rgba(0, 0, 0, 0.05);
-    border-radius: 16px;
-    background: #fff;
-    /* border: 1px solid #ccfbf1; */
-    position: relative;
-    z-index: 10;
+  width: 100%;
+  max-width: 400px;
+  padding: 25px 30px 23px;
+  box-sizing: border-box;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  box-shadow:
+    0 20px 50px rgba(15, 118, 110, 0.08),
+    0 5px 16px rgba(15, 23, 42, 0.04);
 }
+
+.container * {
+  box-sizing: border-box;
+}
+
+/* ===== TIÊU ĐỀ ===== */
 
 .container h1 {
-    margin-bottom: 25px;
-    font-size: 26px;
-    font-weight: 700;
-    text-align: center;
-    color: #0f766e;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
+  margin: 0 0 4px;
+  text-align: center;
+  color: #0f766e;
+  font-size: 25px;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -0.5px;
 }
 
-.container .input-box {
-    position: relative;
-    width: 100%;
-    margin: 10px 0;
+.auth-subtitle {
+  margin: 0 0 17px;
+  text-align: center;
+  color: #64748b;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+/* ===== Ô NHẬP ===== */
+
+.input-box {
+  width: 100%;
+  margin-bottom: 12px;
 }
 
 .input-box label {
-    font-family: 'Poppins', sans-serif;
-    display: block;
-    font-size: 13px;
-    font-weight: 600;
-    color: #4b5563;
-    margin-bottom: 8px;
+  display: block;
+  margin-bottom: 5px;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 600;
 }
 
-.input-box input {
-    font-family: 'Poppins', sans-serif;
-    width: 100%;
-    padding: 12px 16px 12px 42px;
-    height: 48px;
-    background: #f8fafc;
-    color: #1f2937;
-    border: 2px solid #e2e8f0;
-    outline: none;
-    border-radius: 10px;
-    font-size: 14px;
-    transition: all 0.2s;
+.input-field {
+  position: relative;
+  width: 100%;
 }
 
-.input-box input::placeholder {
-    color: #9ca3af;
+.input-field input {
+  display: block;
+  width: 100%;
+  height: 42px;
+  padding: 0 44px 0 13px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 9px;
+  outline: none;
+  background: #f8fafc;
+  color: #0f172a;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
 }
 
-.input-box input:focus {
-    background: #fff;
-    border-color: #0d9488;
+.input-field input::placeholder {
+  color: #94a3b8;
 }
 
-.input-box i {
-    position: absolute;
-    left: 14px;
-    top: 40px;
-    font-size: 18px;
-    color: #9ca3af;
+.input-field input:hover:not(:disabled) {
+  border-color: #cbd5e1;
 }
 
-.input-box input:focus~i,
-.input-box input:valid~i {
-    color: #0d9488;
+.input-field input:focus {
+  border-color: #0d9488;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
 }
+
+.input-field input:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ===== ICON TRONG Ô NHẬP ===== */
+
+.input-field .field-icon {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 18px;
+  pointer-events: none;
+}
+
+.input-field:focus-within .field-icon {
+  color: #0d9488;
+}
+
+/* ===== CON MẮT ẨN / HIỆN ===== */
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.password-toggle i {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.password-toggle:hover {
+  color: #0f766e;
+  background: #f0fdfa;
+}
+
+.password-toggle:focus-visible {
+  outline: 2px solid #14b8a6;
+  outline-offset: 2px;
+}
+
+/* ===== NÚT HƯỚNG DẪN MẬT KHẨU ===== */
+
+.password-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.password-label-row label {
+  margin-bottom: 0;
+}
+
+.password-help-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 0;
+  border: none;
+  background: transparent;
+  color: #0d9488;
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.password-help-btn i {
+  font-size: 15px;
+}
+
+.password-help-btn:hover {
+  color: #0f766e;
+  text-decoration: underline;
+}
+
+.password-help-btn:focus-visible {
+  outline: 2px solid #14b8a6;
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+/* ===== ĐIỀU KIỆN MẬT KHẨU ===== */
+
+.password-requirements {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px 8px;
+  margin-top: 8px;
+  padding: 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 9px;
+  background: #f8fafc;
+  animation: guideAppear 0.2s ease-out;
+}
+
+.password-requirements > div {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  color: #94a3b8;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.password-requirements > div.valid {
+  color: #0d9488;
+}
+
+.password-requirements i {
+  flex-shrink: 0;
+  margin-top: 1px;
+  font-size: 14px;
+}
+
+@keyframes guideAppear {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== MẬT KHẨU XÁC NHẬN ===== */
+
+.password-match {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 7px;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.password-match i {
+  font-size: 15px;
+}
+
+.password-match.invalid {
+  color: #e11d48;
+}
+
+/* ===== ĐIỀU KHOẢN ===== */
 
 .terms-agreement {
-    margin: 15px 0 25px 0;
-    display: flex;
-    font-size: 14px;
+  display: flex;
+  align-items: center;
+  margin: 10px 0 14px;
 }
 
 .terms-agreement label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    color: #4b5563;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #475569;
+  font-size: 11px;
+  line-height: 1.5;
+  cursor: pointer;
 }
 
-.terms-agreement label input {
-    margin-right: 8px;
-    cursor: pointer;
-    accent-color: #0d9488;
+.terms-agreement input[type='checkbox'] {
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  accent-color: #0d9488;
+  cursor: pointer;
 }
 
-.terms-agreement a {
-    color: #0d9488;
-    text-decoration: none;
-    font-weight: 500;
-    margin-left: 4px;
+/* ===== THÔNG BÁO LỖI / THÀNH CÔNG ===== */
+
+.auth-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  width: 100%;
+  padding: 11px 12px;
+  margin-bottom: 13px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.6;
+  animation: guideAppear 0.2s ease-out;
 }
 
-.terms-agreement a:hover {
-    text-decoration: underline;
+.auth-alert i {
+  flex-shrink: 0;
+  margin-top: 1px;
+  font-size: 18px;
 }
+
+.auth-alert span {
+  flex: 1;
+}
+
+.auth-alert.error-message {
+  color: #be123c;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+}
+
+.auth-alert.success-message {
+  color: #047857;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+}
+
+/* ===== NÚT TẠO TÀI KHOẢN ===== */
 
 .container .btn {
-    font-family: 'Poppins', sans-serif;
-    width: 100%;
-    height: 48px;
-    border: none;
-    outline: none;
-    border-radius: 10px;
-    background: #0d9488;
-    color: #fff;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 43px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #0d9488, #0f766e);
+  color: #ffffff;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 5px 14px rgba(13, 148, 136, 0.16);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
 }
 
-.container .btn:hover {
-    background: #0f766e;
-    transform: translateY(-1px);
+.container .btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(13, 148, 136, 0.22);
 }
 
-.container .login-redirect {
-    text-align: center;
-    font-size: 14px;
-    color: #4b5563;
+.container .btn:active:not(:disabled) {
+  transform: translateY(0);
 }
 
-.login-redirect p a {
-    color: #0d9488;
-    text-decoration: none;
-    font-weight: 600;
+.container .btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
-.login-redirect p a:hover {
-    text-decoration: underline;
+.container .btn i {
+  font-size: 18px;
 }
 
-.container .divider {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    text-align: center;
-    color: #9ca3af;
-    margin: 20px 0;
-    font-size: 13px;
+/* ===== HIỆU ỨNG ĐANG XỬ LÝ ===== */
+
+.btn-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
 }
 
-.divider .line-left,
-.divider .line-right {
-    width: 42%;
-    border: 0.5px solid #e2e8f0;
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.container .social-login {
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: center;
-    gap: 15px;
+/* ===== CHUYỂN SANG ĐĂNG NHẬP ===== */
+
+.login-redirect {
+  margin-top: 16px;
+  text-align: center;
 }
 
-.social-login a {
-    width: 48px;
-    height: 48px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
-    border: 1px solid #e2e8f0;
-    background: #fff;
-    transition: all 0.2s;
+.login-redirect p {
+  color: #64748b;
+  font-size: 11px;
+  line-height: 1.7;
 }
 
-.social-login a:hover {
-    background: #f8fafc;
-    border-color: #0d9488;
-    transform: scale(1.05);
+.login-redirect a {
+  color: #0d9488;
+  font-weight: 600;
+  text-decoration: none;
 }
 
-.social-login a img {
-    width: 22px;
+.login-redirect a:hover {
+  color: #0f766e;
+  text-decoration: underline;
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 480px) {
+  :host {
+    padding: 16px 12px;
+  }
+
+  .container {
+    padding: 23px 20px;
+    border-radius: 15px;
+  }
+
+  .container h1 {
+    font-size: 24px;
+  }
+
+  .auth-subtitle {
+    margin-bottom: 15px;
+  }
+}
+
+@media (max-width: 360px) {
+  .password-requirements {
+    grid-template-columns: 1fr;
+  }
+
+  .password-help-btn span {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .container *,
+  .container *::before,
+  .container *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

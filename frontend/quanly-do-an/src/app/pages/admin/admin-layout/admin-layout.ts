@@ -1,3 +1,4 @@
+
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
@@ -9,6 +10,7 @@ import {
 } from '@angular/router';
 
 import { AdminSidebar } from '../../../components/admin-sidebar/admin-sidebar';
+import { Auth, LoginUser } from '../../../core/services/auth';
 
 import {
   Subject,
@@ -28,40 +30,35 @@ import {
   templateUrl: './admin-layout.html',
   styleUrl: './admin-layout.css',
 })
-export class AdminLayout
-  implements OnInit, OnDestroy {
+export class AdminLayout implements OnInit, OnDestroy {
 
   pageTitle = 'Tổng quan hệ thống';
 
-  private readonly destroy$ =
-    new Subject<void>();
+  currentUser: LoginUser | null = null;
+
+  private readonly destroy$ = new Subject<void>();
 
   constructor(
     private readonly router: Router,
     private readonly activatedRoute: ActivatedRoute,
+    private readonly auth: Auth,
   ) {}
-
-  // ============================
-  // KHỞI TẠO
-  // ============================
 
   ngOnInit(): void {
 
-    this.updateTitleFromRoute(
-      this.activatedRoute,
-    );
+    // Lấy thông tin tài khoản đã đăng nhập
+    this.currentUser = this.auth.getUser();
+
+    // Lấy tiêu đề trang hiện tại
+    this.updateTitleFromRoute(this.activatedRoute);
 
     this.router.events
       .pipe(
         filter(
-          (event) =>
-            event instanceof NavigationEnd,
+          (event) => event instanceof NavigationEnd,
         ),
-
         map(() => {
-
-          let route =
-            this.activatedRoute;
+          let route = this.activatedRoute;
 
           while (route.firstChild) {
             route = route.firstChild;
@@ -72,19 +69,47 @@ export class AdminLayout
             'Quản lý Đồ án Tốt nghiệp'
           );
         }),
-
         takeUntil(this.destroy$),
       )
       .subscribe((title) => {
-
         this.pageTitle = title;
-
       });
   }
 
-  // ============================
-  // LẤY TITLE BAN ĐẦU
-  // ============================
+  get userName(): string {
+    return this.currentUser?.TENSV || 'Người dùng';
+  }
+
+  get userRole(): string {
+    if (this.currentUser?.VAITRO === 'ADMIN') {
+      return 'Quản trị viên';
+    }
+
+    if (this.currentUser?.VAITRO === 'SINHVIEN') {
+      return 'Sinh viên';
+    }
+
+    return 'Chưa xác định';
+  }
+
+  get userAvatar(): string {
+    const name = this.userName.trim();
+
+    if (!name || name === 'Người dùng') {
+      return 'ND';
+    }
+
+    const words = name.split(/\s+/);
+
+    if (words.length === 1) {
+      return words[0].substring(0, 2).toUpperCase();
+    }
+
+    return (
+      words[0].charAt(0) +
+      words[words.length - 1].charAt(0)
+    ).toUpperCase();
+  }
 
   private updateTitleFromRoute(
     route: ActivatedRoute,
@@ -93,26 +118,17 @@ export class AdminLayout
     let activeRoute = route;
 
     while (activeRoute.firstChild) {
-      activeRoute =
-        activeRoute.firstChild;
+      activeRoute = activeRoute.firstChild;
     }
 
-    const title =
-      activeRoute.snapshot.data['title'];
+    const title = activeRoute.snapshot.data['title'];
 
     if (title) {
-
       this.pageTitle = title;
-
     }
   }
 
-  // ============================
-  // HỦY SUBSCRIPTION
-  // ============================
-
   ngOnDestroy(): void {
-
     this.destroy$.next();
     this.destroy$.complete();
   }

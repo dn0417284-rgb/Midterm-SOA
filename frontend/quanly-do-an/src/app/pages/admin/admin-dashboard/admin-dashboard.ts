@@ -1,6 +1,23 @@
 
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+} from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+
+import { Auth } from '../../../core/services/auth';
+
+interface SinhVien {
+  MSV: string;
+  TENSV: string;
+  KHOA: string | null;
+  DIEMTB: string | number | null;
+  LOP: string | null;
+  EMAIL: string | null;
+  VAITRO: string;
+}
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -9,42 +26,90 @@ import { Component } from '@angular/core';
   templateUrl: './admin-dashboard.html',
   styleUrl: './admin-dashboard.css',
 })
-export class AdminDashboard {
+export class AdminDashboard implements OnInit {
 
-  // ============================
-  // THỐNG KÊ
-  // ============================
+  totalStudents: number | null = null;
 
-  totalStudents = 524;
-  totalTeachers = 84;
-  registeredTopics = 95;
-  unregisteredTopics = 33;
+  isLoadingStudents = true;
+  studentError = '';
 
-  // ============================
-  // DANH SÁCH ĐỀ TÀI MỚI
-  // ============================
+  totalTeachers: number | null = null;
+  registeredTopics: number | null = null;
+  unregisteredTopics: number | null = null;
 
-  recentTopics = [
-    {
-      name: 'Ứng dụng AI trong giáo dục',
-      description:
-        'Nghiên cứu và phát triển hệ thống hỗ trợ học tập thông minh.',
-      teacher: 'TS. Trần Văn B',
-      status: 'Mới cập nhật',
-    },
-    {
-      name: 'Website thương mại điện tử',
-      description:
-        'Xây dựng nền tảng bán hàng trực tuyến với tích hợp thanh toán.',
-      teacher: 'ThS. Phạm Văn D',
-      status: 'Mới cập nhật',
-    },
-    {
-      name: 'Ứng dụng di động quản lý sức khỏe',
-      description:
-        'Giúp người dùng theo dõi chế độ ăn uống và tập luyện.',
-      teacher: 'TS. Hoàng Văn F',
-      status: 'Mới cập nhật',
-    },
-  ];
+  recentTopics: {
+    name: string;
+    description: string;
+    teacher: string;
+    status: string;
+  }[] = [];
+
+  constructor(
+    private readonly http: HttpClient,
+    private readonly auth: Auth,
+    private readonly cdr: ChangeDetectorRef,
+  ) {}
+
+  ngOnInit(): void {
+    this.loadStudents();
+  }
+
+  loadStudents(): void {
+
+    const token = this.auth.getToken();
+
+    if (!token) {
+      this.studentError = 'Chưa đăng nhập.';
+      this.isLoadingStudents = false;
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.isLoadingStudents = true;
+    this.studentError = '';
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+
+    this.http.get<SinhVien[]>(
+      '/api/sinhvien',
+      { headers },
+    ).subscribe({
+
+      next: (students) => {
+
+        console.log('Danh sách sinh viên:', students);
+
+        if (Array.isArray(students)) {
+
+          this.totalStudents = students.filter(
+            (student) => student.VAITRO === 'SINHVIEN',
+          ).length;
+
+        } else {
+
+          this.studentError = 'Dữ liệu API không hợp lệ.';
+          this.totalStudents = null;
+
+        }
+
+        this.isLoadingStudents = false;
+
+        // Cập nhật giao diện sau khi nhận dữ liệu
+        this.cdr.detectChanges();
+      },
+
+      error: (error) => {
+
+        console.error('Lỗi API sinh viên:', error);
+
+        this.studentError = 'Không thể tải sinh viên.';
+        this.totalStudents = null;
+        this.isLoadingStudents = false;
+
+        this.cdr.detectChanges();
+      },
+    });
+  }
 }
