@@ -1,0 +1,45 @@
+<!-- Gọi Sidebar sinh viên -->
+<app-student-sidebar></app-student-sidebar>
+
+<!-- Khu vực nội dung chính bên phải -->
+<div class="main-container">
+
+    <!-- Topbar -->
+    <header class="topbar">
+
+        <h2 class="topbar-title">
+            {{ pageTitle }}
+        </h2>
+
+        <div class="student-profile">
+
+            <!-- Avatar lấy từ TENSV -->
+            <div class="student-avatar">
+                {{ studentAvatar }}
+            </div>
+
+            <!-- Thông tin lấy từ API -->
+            <div class="student-info">
+
+                <!-- TENSV -->
+                <span class="student-name">
+                    {{ studentName }}
+                </span>
+
+                <!-- MSV -->
+                <span class="student-role">
+                    {{ studentCode }}
+                </span>
+
+            </div>
+
+        </div>
+
+    </header>
+
+    <!-- Nơi hiển thị động các trang con -->
+    <div class="content">
+        <router-outlet></router-outlet>
+    </div>
+
+</div>

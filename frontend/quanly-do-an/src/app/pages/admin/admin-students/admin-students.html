@@ -1,0 +1,627 @@
+<div class="students-container">
+
+    <!-- ========================================= -->
+    <!-- THANH CÔNG CỤ -->
+    <!-- ========================================= -->
+
+    <div class="action-bar">
+
+        <div class="search-filter-group">
+
+            <div class="search-box">
+
+                <span class="search-icon">
+                    🔍
+                </span>
+
+                <input
+                    type="text"
+                    [(ngModel)]="searchKeyword"
+                    (input)="searchStudents()"
+                    placeholder="Tìm kiếm theo mã SV, họ tên, email..."
+                />
+
+                <button
+                    *ngIf="searchKeyword"
+                    type="button"
+                    class="clear-search"
+                    (click)="searchKeyword = ''; searchStudents()"
+                    aria-label="Xóa tìm kiếm"
+                >
+                    ✕
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================= -->
+    <!-- THÔNG BÁO LỖI -->
+    <!-- ========================================= -->
+
+    <div
+        *ngIf="errorMessage"
+        class="alert alert-error"
+    >
+        {{ errorMessage }}
+    </div>
+
+
+    <!-- ========================================= -->
+    <!-- CARD BẢNG -->
+    <!-- ========================================= -->
+
+    <div class="card-table">
+
+        <table>
+
+            <!-- ================================= -->
+            <!-- HEADER -->
+            <!-- ================================= -->
+
+            <thead>
+
+                <tr>
+
+                    <th>Mã SV</th>
+
+                    <th>Họ và tên</th>
+
+                    <th>Email</th>
+
+                    <th class="action-column">
+                        Thao tác
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <!-- ================================= -->
+            <!-- BODY -->
+            <!-- ================================= -->
+
+            <tbody>
+
+                <!-- ================================= -->
+                <!-- LOADING -->
+                <!-- ================================= -->
+
+                <tr *ngIf="isLoading">
+
+                    <td
+                        colspan="4"
+                        class="loading-cell"
+                    >
+
+                        <div class="loading-state">
+
+                            <div class="loading-spinner"></div>
+
+                            <span>
+                                Đang tải danh sách sinh viên...
+                            </span>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+
+                <!-- ================================= -->
+                <!-- DỮ LIỆU -->
+                <!-- Chỉ render sau khi API xong -->
+                <!-- ================================= -->
+
+                <ng-container *ngIf="!isLoading">
+
+                    <tr
+                        *ngFor="
+                            let student of paginatedStudents
+                        "
+                    >
+
+                        <td>
+                            <span class="student-code">
+                                {{ student.MSV }}
+                            </span>
+                        </td>
+
+                        <td>
+
+                            <div class="student-name">
+                                {{ student.TENSV }}
+                            </div>
+
+                        </td>
+
+                        <td>
+
+                            <span class="student-email">
+                                {{ student.EMAIL }}
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            <div class="action-buttons">
+
+                                <button
+                                    type="button"
+                                    class="btn-icon btn-view"
+                                    (click)="openModal(student)"
+                                >
+                                    Chi tiết
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="btn-icon btn-delete"
+                                    (click)="openDeleteModal(student)"
+                                >
+                                    Xóa
+                                </button>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+
+                    <!-- ================================= -->
+                    <!-- KHÔNG CÓ KẾT QUẢ -->
+                    <!-- ================================= -->
+
+                    <tr
+                        *ngIf="
+                            filteredStudents.length === 0
+                        "
+                    >
+
+                        <td
+                            colspan="4"
+                            class="empty-cell"
+                        >
+
+                            <div class="empty-state">
+
+                                <div class="empty-icon">
+                                    🔍
+                                </div>
+
+                                <h4>
+                                    Không tìm thấy sinh viên
+                                </h4>
+
+                                <p>
+                                    Không có sinh viên nào
+                                    phù hợp với từ khóa tìm kiếm.
+                                </p>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                </ng-container>
+
+            </tbody>
+
+        </table>
+
+
+        <!-- ========================================= -->
+        <!-- FOOTER + PHÂN TRANG -->
+        <!-- Chỉ hiện khi có dữ liệu -->
+        <!-- ========================================= -->
+
+        <div
+            class="table-footer"
+            *ngIf="
+                !isLoading &&
+                filteredStudents.length > 0
+            "
+        >
+
+            <!-- THÔNG TIN -->
+
+            <div class="table-info">
+
+                Hiển thị
+
+                <strong>
+                    {{ startItem }}
+                </strong>
+
+                –
+
+                <strong>
+                    {{ endItem }}
+                </strong>
+
+                trong tổng số
+
+                <strong>
+                    {{ filteredStudents.length }}
+                </strong>
+
+                sinh viên
+
+            </div>
+
+
+            <!-- PHÂN TRANG -->
+
+            <div class="pagination">
+
+                <!-- TRƯỚC -->
+
+                <button
+                    type="button"
+                    class="page-btn page-prev"
+                    [disabled]="currentPage === 1"
+                    (click)="previousPage()"
+                >
+
+                    <span class="pagination-arrow">
+                        ‹
+                    </span>
+
+                    <span>
+                        Trước
+                    </span>
+
+                </button>
+
+
+                <!-- SỐ TRANG -->
+
+                <ng-container
+                    *ngFor="
+                        let page of pageNumbers
+                    "
+                >
+
+                    <!-- SỐ -->
+
+                    <button
+                        *ngIf="
+                            page !== '...'
+                        "
+                        type="button"
+                        class="page-btn page-number"
+                        [class.active]="
+                            page === currentPage
+                        "
+                        (click)="goToPage(page)"
+                    >
+                        {{ page }}
+                    </button>
+
+
+                    <!-- DẤU ... -->
+
+                    <span
+                        *ngIf="
+                            page === '...'
+                        "
+                        class="pagination-dots"
+                    >
+                        ...
+                    </span>
+
+                </ng-container>
+
+
+                <!-- SAU -->
+
+                <button
+                    type="button"
+                    class="page-btn page-next"
+                    [disabled]="
+                        currentPage === totalPages
+                    "
+                    (click)="nextPage()"
+                >
+
+                    <span>
+                        Sau
+                    </span>
+
+                    <span class="pagination-arrow">
+                        ›
+                    </span>
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================================================= -->
+<!-- POPUP CHI TIẾT SINH VIÊN -->
+<!-- ================================================= -->
+
+<div
+    class="modal-overlay"
+    [class.active]="isModalOpen"
+    *ngIf="isModalOpen"
+>
+
+    <div class="modal-card">
+
+        <div class="modal-header">
+
+            <div>
+
+                <span class="modal-label">
+                    SINH VIÊN
+                </span>
+
+                <h3>
+                    Thông tin chi tiết
+                </h3>
+
+            </div>
+
+            <button
+                type="button"
+                class="close-btn"
+                (click)="closeModal()"
+            >
+                ✕
+            </button>
+
+        </div>
+
+
+        <div
+            class="modal-body"
+            *ngIf="selectedStudent"
+        >
+
+            <div class="detail-row">
+
+                <span class="detail-label">
+                    Họ và tên
+                </span>
+
+                <span class="detail-value">
+                    {{ selectedStudent.TENSV }}
+                </span>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <span class="detail-label">
+                    Mã sinh viên
+                </span>
+
+                <span class="detail-value">
+                    {{ selectedStudent.MSV }}
+                </span>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <span class="detail-label">
+                    Email
+                </span>
+
+                <span class="detail-value">
+                    {{ selectedStudent.EMAIL }}
+                </span>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <span class="detail-label">
+                    Lớp hành chính
+                </span>
+
+                <span class="detail-value">
+                    {{ selectedStudent.LOP || 'Chưa cập nhật' }}
+                </span>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <span class="detail-label">
+                    Khoa
+                </span>
+
+                <span class="detail-value">
+                    {{ selectedStudent.KHOA || 'Chưa cập nhật' }}
+                </span>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <span class="detail-label">
+                    Điểm trung bình
+                </span>
+
+                <span class="detail-value">
+                    {{
+                        selectedStudent.DIEMTB ??
+                        'Chưa cập nhật'
+                    }}
+                </span>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <span class="detail-label">
+                    Vai trò
+                </span>
+
+                <span class="role-badge">
+                    {{ selectedStudent.VAITRO }}
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================================================= -->
+<!-- POPUP XÁC NHẬN XÓA -->
+<!-- ================================================= -->
+
+<div
+    class="modal-overlay"
+    [class.active]="isDeleteModalOpen"
+    *ngIf="isDeleteModalOpen"
+>
+
+    <div class="modal-card delete-modal">
+
+        <div class="modal-header">
+
+            <div>
+
+                <span class="modal-label delete-label">
+                    XÁC NHẬN
+                </span>
+
+                <h3>
+                    Xóa sinh viên
+                </h3>
+
+            </div>
+
+            <button
+                type="button"
+                class="close-btn"
+                (click)="closeDeleteModal()"
+            >
+                ✕
+            </button>
+
+        </div>
+
+
+        <div class="modal-body">
+
+            <div class="delete-warning">
+
+                <div class="warning-icon">
+                    !
+                </div>
+
+                <div>
+
+                    <p class="delete-title">
+                        Bạn có chắc chắn muốn xóa?
+                    </p>
+
+                    <p class="delete-description">
+
+                        Sinh viên
+
+                        <strong>
+                            {{ studentToDelete.name }}
+                        </strong>
+
+                        ({{ studentToDelete.code }})
+
+                        sẽ bị xóa khỏi hệ thống.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="modal-footer">
+
+            <button
+                type="button"
+                class="btn-cancel"
+                (click)="closeDeleteModal()"
+            >
+                Quay lại
+            </button>
+
+            <button
+                type="button"
+                class="btn-confirm-delete"
+                (click)="confirmDelete()"
+            >
+                Xác nhận xóa
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================================================= -->
+<!-- POPUP XÓA THÀNH CÔNG -->
+<!-- ================================================= -->
+
+<div
+    class="modal-overlay"
+    [class.active]="isSuccessModalOpen"
+    *ngIf="isSuccessModalOpen"
+>
+
+    <div class="modal-card-success">
+
+        <div class="success-icon">
+            ✓
+        </div>
+
+        <h3>
+            Xóa thành công!
+        </h3>
+
+        <p>
+            Sinh viên đã được xóa khỏi cơ sở dữ liệu.
+        </p>
+
+        <button
+            type="button"
+            class="btn-success-close"
+            (click)="closeSuccessModal()"
+        >
+            Đóng
+        </button>
+
+    </div>
+
+</div>
