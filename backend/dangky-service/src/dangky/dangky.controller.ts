@@ -1,4 +1,3 @@
-
 import {
   Body,
   Controller,
@@ -34,31 +33,15 @@ type AuthRequest = Request & {
 @Controller('dangky')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class DangkyController {
-  constructor(
-    private readonly dangkyService: DangkyService,
-  ) {}
+  constructor(private readonly dangkyService: DangkyService) {}
 
-  // =====================================
-  // KIỂM TRA QUYỀN SỞ HỮU ĐĂNG KÝ
-  // =====================================
-
-  private assertOwner(
-    req: AuthRequest,
-    msv: string,
-  ) {
-    if (
-      req.user.role === 'SINHVIEN' &&
-      req.user.sub !== msv
-    ) {
+  private assertOwner(req: AuthRequest, msv: string) {
+    if (req.user.role === 'SINHVIEN' && req.user.sub !== msv) {
       throw new ForbiddenException(
         'Bạn chỉ được thao tác trên đăng ký của mình',
       );
     }
   }
-
-  // =====================================
-  // ADMIN - LẤY TẤT CẢ ĐĂNG KÝ
-  // =====================================
 
   @Get()
   @Roles('ADMIN')
@@ -66,41 +49,22 @@ export class DangkyController {
     return this.dangkyService.findAll();
   }
 
-  // =====================================
-  // ADMIN - ĐĂNG KÝ THEO ĐỀ TÀI
-  // =====================================
-
   @Get('detai/:detaiId')
   @Roles('ADMIN')
   findByDetai(
     @Param('detaiId', ParseIntPipe)
     detaiId: number,
   ) {
-    return this.dangkyService.findByDetai(
-      detaiId,
-    );
+    return this.dangkyService.findByDetai(detaiId);
   }
-
-  // =====================================
-  // ADMIN / SINHVIEN - ĐĂNG KÝ THEO MSV
-  // =====================================
 
   @Get('sinhvien/:msv')
   @Roles('ADMIN', 'SINHVIEN')
-  findBySinhVien(
-    @Param('msv') msv: string,
-    @Req() req: AuthRequest,
-  ) {
+  findBySinhVien(@Param('msv') msv: string, @Req() req: AuthRequest) {
     this.assertOwner(req, msv);
 
-    return this.dangkyService.findBySinhVien(
-      msv,
-    );
+    return this.dangkyService.findBySinhVien(msv);
   }
-
-  // =====================================
-  // ADMIN / SINHVIEN - CHI TIẾT ĐĂNG KÝ
-  // =====================================
 
   @Get(':detaiId/:msv')
   @Roles('ADMIN', 'SINHVIEN')
@@ -116,32 +80,18 @@ export class DangkyController {
   ) {
     this.assertOwner(req, msv);
 
-    return this.dangkyService.findOne(
-      detaiId,
-      msv,
-    );
+    return this.dangkyService.findOne(detaiId, msv);
   }
-
-  // =====================================
-  // SINHVIEN - ĐĂNG KÝ ĐỀ TÀI
-  // =====================================
 
   @Post()
   @Roles('SINHVIEN')
-  create(
-    @Body() dto: CreateDangKyDto,
-    @Req() req: AuthRequest,
-  ) {
+  create(@Body() dto: CreateDangKyDto, @Req() req: AuthRequest) {
     return this.dangkyService.create(
       req.user.sub,
       dto.detaiId,
       req.headers.authorization as string,
     );
   }
-
-  // =====================================
-  // ADMIN / SINHVIEN - HỦY ĐĂNG KÝ
-  // =====================================
 
   @Delete(':detaiId/:msv')
   @Roles('ADMIN', 'SINHVIEN')
@@ -155,7 +105,6 @@ export class DangkyController {
     @Req()
     req: AuthRequest,
   ) {
-    // Sinh viên chỉ được hủy đăng ký của mình
     this.assertOwner(req, msv);
 
     return this.dangkyService.remove(

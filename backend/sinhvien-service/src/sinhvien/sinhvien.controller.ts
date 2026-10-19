@@ -1,4 +1,3 @@
-
 import {
   BadRequestException,
   Body,
@@ -36,13 +35,7 @@ type AuthenticatedRequest = Request & {
 @Controller('sinhvien')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class SinhvienController {
-  constructor(
-    private readonly sinhvienService: SinhvienService,
-  ) {}
-
-  // ====================================
-  // ADMIN - LẤY DANH SÁCH SINH VIÊN
-  // ====================================
+  constructor(private readonly sinhvienService: SinhvienService) {}
 
   @Get()
   @Roles('ADMIN')
@@ -50,24 +43,13 @@ export class SinhvienController {
     return this.sinhvienService.findAll();
   }
 
-  // ====================================
-  // ADMIN / SINHVIEN - XEM THÔNG TIN
-  // ====================================
-
   @Get(':msv')
   @Roles('ADMIN', 'SINHVIEN')
-  findOne(
-    @Param('msv') msv: string,
-    @Req() req: AuthenticatedRequest,
-  ) {
+  findOne(@Param('msv') msv: string, @Req() req: AuthenticatedRequest) {
     const currentMsv = String(req.user.sub);
     const currentRole = req.user.role;
 
-    // Sinh viên chỉ được xem thông tin của mình
-    if (
-      currentRole === 'SINHVIEN' &&
-      currentMsv !== msv
-    ) {
+    if (currentRole === 'SINHVIEN' && currentMsv !== msv) {
       throw new ForbiddenException(
         'Bạn chỉ được xem thông tin của chính mình.',
       );
@@ -76,21 +58,11 @@ export class SinhvienController {
     return this.sinhvienService.findOne(msv);
   }
 
-  // ====================================
-  // ADMIN - TẠO SINH VIÊN
-  // ====================================
-
   @Post()
   @Roles('ADMIN')
-  create(
-    @Body() data: CreateSinhVienDto,
-  ) {
+  create(@Body() data: CreateSinhVienDto) {
     return this.sinhvienService.create(data);
   }
-
-  // ====================================
-  // ADMIN / SINHVIEN - CẬP NHẬT
-  // ====================================
 
   @Put(':msv')
   @Roles('ADMIN', 'SINHVIEN')
@@ -102,17 +74,12 @@ export class SinhvienController {
     const currentMsv = String(req.user.sub);
     const currentRole = req.user.role;
 
-    // Sinh viên chỉ được cập nhật chính mình
-    if (
-      currentRole === 'SINHVIEN' &&
-      currentMsv !== msv
-    ) {
+    if (currentRole === 'SINHVIEN' && currentMsv !== msv) {
       throw new ForbiddenException(
         'Bạn không có quyền cập nhật thông tin của sinh viên khác.',
       );
     }
 
-    // Chỉ cho phép cập nhật KHOA và LOP
     const allowedFields = ['KHOA', 'LOP'];
 
     const invalidFields = Object.keys(data).filter(
@@ -125,10 +92,7 @@ export class SinhvienController {
       );
     }
 
-    if (
-      data.KHOA === undefined &&
-      data.LOP === undefined
-    ) {
+    if (data.KHOA === undefined && data.LOP === undefined) {
       throw new BadRequestException(
         'Vui lòng cung cấp Khoa hoặc Lớp cần cập nhật.',
       );
@@ -137,15 +101,9 @@ export class SinhvienController {
     return this.sinhvienService.update(msv, data);
   }
 
-  // ====================================
-  // ADMIN - XÓA SINH VIÊN
-  // ====================================
-
   @Delete(':msv')
   @Roles('ADMIN')
-  remove(
-    @Param('msv') msv: string,
-  ) {
+  remove(@Param('msv') msv: string) {
     return this.sinhvienService.remove(msv);
   }
 }

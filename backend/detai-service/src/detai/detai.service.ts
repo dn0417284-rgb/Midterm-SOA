@@ -18,7 +18,6 @@ export class DetaiService {
     private readonly detaiRepo: Repository<Detai>,
   ) {}
 
-  // Thêm đề tài
   async create(dto: CreateDetaiDto): Promise<Detai> {
     const existingDetai = await this.detaiRepo.findOne({
       where: {
@@ -36,12 +35,10 @@ export class DetaiService {
     return await this.detaiRepo.save(detai);
   }
 
-  // Lấy danh sách đề tài
   async findAll(): Promise<Detai[]> {
     return await this.detaiRepo.find();
   }
 
-  // Tìm kiếm đề tài theo từ khóa
   async search(keyword: string): Promise<Detai[]> {
     return await this.detaiRepo.find({
       where: [
@@ -51,7 +48,6 @@ export class DetaiService {
     });
   }
 
-  // Lấy chi tiết đề tài theo ID
   async findOne(MDT: number): Promise<Detai> {
     const detai = await this.detaiRepo.findOneBy({ MDT });
 
@@ -62,7 +58,6 @@ export class DetaiService {
     return detai;
   }
 
-  // Cập nhật thông tin đề tài
   async update(id: number, dto: UpdateDetaiDto): Promise<Detai> {
     const detai = await this.findOne(id);
 
@@ -79,7 +74,6 @@ export class DetaiService {
     return await this.detaiRepo.save(detai);
   }
 
-  // Thay đổi trạng thái đề tài
   async updateStatus(id: number, trangThai: number): Promise<Detai> {
     const detai = await this.findOne(id);
 
@@ -92,7 +86,6 @@ export class DetaiService {
     return await this.detaiRepo.save(detai);
   }
 
-  // Xóa đề tài
   async remove(id: number): Promise<{ deleted: boolean }> {
     const result = await this.detaiRepo.delete(id);
 

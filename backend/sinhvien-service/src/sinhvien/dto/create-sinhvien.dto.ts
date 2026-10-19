@@ -1,4 +1,3 @@
-
 import {
   IsEmail,
   IsNotEmpty,
@@ -13,7 +12,6 @@ import {
 } from 'class-validator';
 
 export class CreateSinhVienDto {
-  // Mã sinh viên - bắt buộc
   @IsString()
   @IsNotEmpty({ message: 'Vui lòng nhập mã sinh viên.' })
   @MaxLength(20, {
@@ -24,7 +22,6 @@ export class CreateSinhVienDto {
   })
   MSV: string;
 
-  // Họ và tên - bắt buộc
   @IsString()
   @IsNotEmpty({ message: 'Vui lòng nhập họ và tên.' })
   @MaxLength(100, {
@@ -32,7 +29,6 @@ export class CreateSinhVienDto {
   })
   TENSV: string;
 
-  // Khoa - không bắt buộc
   @IsOptional()
   @IsString({
     message: 'Khoa phải là chuỗi ký tự.',
@@ -42,11 +38,13 @@ export class CreateSinhVienDto {
   })
   KHOA?: string | null;
 
-  // Điểm trung bình - không bắt buộc
   @IsOptional()
-  @IsNumber({}, {
-    message: 'Điểm trung bình phải là số.',
-  })
+  @IsNumber(
+    {},
+    {
+      message: 'Điểm trung bình phải là số.',
+    },
+  )
   @Min(0, {
     message: 'Điểm trung bình không được nhỏ hơn 0.',
   })
@@ -55,7 +53,6 @@ export class CreateSinhVienDto {
   })
   DIEMTB?: number | null;
 
-  // Lớp - không bắt buộc
   @IsOptional()
   @IsString({
     message: 'Lớp phải là chuỗi ký tự.',
@@ -65,17 +62,18 @@ export class CreateSinhVienDto {
   })
   LOP?: string | null;
 
-  // Email - không bắt buộc theo DTO hiện tại
   @IsOptional()
-  @IsEmail({}, {
-    message: 'Email không đúng định dạng.',
-  })
+  @IsEmail(
+    {},
+    {
+      message: 'Email không đúng định dạng.',
+    },
+  )
   @MaxLength(100, {
     message: 'Email không được quá 100 ký tự.',
   })
   EMAIL?: string | null;
 
-  // Mật khẩu - không bắt buộc theo DTO hiện tại
   @IsOptional()
   @IsString()
   @MinLength(8, {

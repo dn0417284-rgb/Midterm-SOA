@@ -13,8 +13,6 @@ export class Detai {
 
   @Column({ type: 'text' })
   moTa: string;
-  // 0 = Chưa đăng ký
-  // 1 = Đã đăng ký
   @Column({ type: 'tinyint', default: 0 })
   trangThai: number;
 }

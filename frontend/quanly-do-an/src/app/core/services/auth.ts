@@ -1,14 +1,6 @@
-
 import { Injectable } from '@angular/core';
-import {
-  HttpClient,
-  HttpHeaders,
-} from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
-// ============================
-// REGISTER
-// ============================
 
 export interface RegisterRequest {
   MSV: string;
@@ -26,10 +18,6 @@ export interface RegisterResponse {
     VAITRO: string;
   };
 }
-
-// ============================
-// LOGIN
-// ============================
 
 export interface LoginRequest {
   EMAIL: string;
@@ -52,12 +40,6 @@ export interface LoginResponse {
   user: LoginUser;
 }
 
-// ============================
-// UPDATE PROFILE
-// ============================
-
-// Sinh viên chỉ được cập nhật Lớp và Khoa.
-// Không cho phép chỉnh sửa Email.
 export interface UpdateProfileRequest {
   LOP: string;
   KHOA: string;
@@ -67,77 +49,27 @@ export interface UpdateProfileRequest {
   providedIn: 'root',
 })
 export class Auth {
+  private readonly apiUrl = '/api/auth';
 
-  // ============================
-  // API URL
-  // ============================
+  private readonly sinhvienApiUrl = '/api/sinhvien';
 
-  private readonly apiUrl =
-    '/api/auth';
+  constructor(private readonly http: HttpClient) {}
 
-  private readonly sinhvienApiUrl =
-    '/api/sinhvien';
-
-  constructor(
-    private readonly http: HttpClient,
-  ) {}
-
-  // ============================
-  // REGISTER
-  // ============================
-
-  register(
-    data: RegisterRequest,
-  ): Observable<RegisterResponse> {
-
-    return this.http.post<RegisterResponse>(
-      `${this.apiUrl}/register`,
-      data,
-    );
+  register(data: RegisterRequest): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(`${this.apiUrl}/register`, data);
   }
 
-  // ============================
-  // LOGIN
-  // ============================
-
-  login(
-    data: LoginRequest,
-  ): Observable<LoginResponse> {
-
-    return this.http.post<LoginResponse>(
-      `${this.apiUrl}/login`,
-      data,
-    );
+  login(data: LoginRequest): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, data);
   }
 
-  // ============================
-  // LƯU SESSION
-  // ============================
+  saveSession(response: LoginResponse): void {
+    localStorage.setItem('access_token', response.access_token);
 
-  saveSession(
-    response: LoginResponse,
-  ): void {
-
-    localStorage.setItem(
-      'access_token',
-      response.access_token,
-    );
-
-    localStorage.setItem(
-      'user',
-      JSON.stringify(response.user),
-    );
+    localStorage.setItem('user', JSON.stringify(response.user));
   }
 
-  // ============================
-  // CẬP NHẬT PROFILE
-  // ============================
-
-  updateProfile(
-    msv: string,
-    data: UpdateProfileRequest,
-  ): Observable<LoginUser> {
-
+  updateProfile(msv: string, data: UpdateProfileRequest): Observable<LoginUser> {
     const token = this.getToken();
 
     const headers = new HttpHeaders({
@@ -145,7 +77,6 @@ export class Auth {
       'Content-Type': 'application/json',
     });
 
-    // Chỉ gửi hai trường được phép cập nhật
     const updateData: UpdateProfileRequest = {
       LOP: data.LOP,
       KHOA: data.KHOA,
@@ -160,23 +91,11 @@ export class Auth {
     );
   }
 
-  // ============================
-  // TOKEN
-  // ============================
-
   getToken(): string | null {
-
-    return localStorage.getItem(
-      'access_token',
-    );
+    return localStorage.getItem('access_token');
   }
 
-  // ============================
-  // USER
-  // ============================
-
   getUser(): LoginUser | null {
-
     const user = localStorage.getItem('user');
 
     if (!user) {
@@ -190,27 +109,13 @@ export class Auth {
     }
   }
 
-  // ============================
-  // LOGOUT
-  // ============================
-
   logout(): void {
+    localStorage.removeItem('access_token');
 
-    localStorage.removeItem(
-      'access_token',
-    );
-
-    localStorage.removeItem(
-      'user',
-    );
+    localStorage.removeItem('user');
   }
 
-  // ============================
-  // KIỂM TRA ĐĂNG NHẬP
-  // ============================
-
   isLoggedIn(): boolean {
-
     return !!this.getToken();
   }
 }

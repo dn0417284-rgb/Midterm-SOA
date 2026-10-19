@@ -1,4 +1,3 @@
-
 import {
   Injectable,
   NotFoundException,
@@ -19,37 +18,29 @@ export class SinhvienService {
     private readonly sinhVienRepository: Repository<SinhVien>,
   ) {}
 
-  // Không trả mật khẩu cho frontend
   private toPublicStudent(student: SinhVien) {
     const { MATKHAU: _password, ...publicStudent } = student;
     return publicStudent;
   }
 
-  // GET /sinhvien
   async findAll() {
     const students = await this.sinhVienRepository.find();
 
-    return students.map((student) =>
-      this.toPublicStudent(student),
-    );
+    return students.map((student) => this.toPublicStudent(student));
   }
 
-  // GET /sinhvien/:msv
   async findOne(msv: string) {
     const student = await this.sinhVienRepository.findOne({
       where: { MSV: msv },
     });
 
     if (!student) {
-      throw new NotFoundException(
-        `Không tìm thấy sinh viên có mã ${msv}`,
-      );
+      throw new NotFoundException(`Không tìm thấy sinh viên có mã ${msv}`);
     }
 
     return this.toPublicStudent(student);
   }
 
-  // POST /sinhvien
   async create(data: Partial<SinhVien>) {
     const msv = data.MSV?.trim();
     const name = data.TENSV?.trim();
@@ -61,18 +52,14 @@ export class SinhvienService {
       );
     }
 
-    // Kiểm tra trùng mã sinh viên
     const existingStudent = await this.sinhVienRepository.findOne({
       where: { MSV: msv },
     });
 
     if (existingStudent) {
-      throw new BadRequestException(
-        'Mã sinh viên đã tồn tại',
-      );
+      throw new BadRequestException('Mã sinh viên đã tồn tại');
     }
 
-    // Kiểm tra trùng email
     if (email) {
       const existingEmail = await this.sinhVienRepository
         .createQueryBuilder('sinhVien')
@@ -82,9 +69,7 @@ export class SinhvienService {
         .getOne();
 
       if (existingEmail) {
-        throw new BadRequestException(
-          'Email đã được sử dụng',
-        );
+        throw new BadRequestException('Email đã được sử dụng');
       }
     }
 
@@ -98,40 +83,28 @@ export class SinhvienService {
       VAITRO: 'SINHVIEN',
     };
 
-    // Mã hóa mật khẩu
     if (data.MATKHAU) {
-      studentData.MATKHAU = await bcrypt.hash(
-        data.MATKHAU,
-        10,
-      );
+      studentData.MATKHAU = await bcrypt.hash(data.MATKHAU, 10);
     } else {
       studentData.MATKHAU = null;
     }
 
-    const student = this.sinhVienRepository.create(
-      studentData,
-    );
+    const student = this.sinhVienRepository.create(studentData);
 
-    const savedStudent =
-      await this.sinhVienRepository.save(student);
+    const savedStudent = await this.sinhVienRepository.save(student);
 
     return this.toPublicStudent(savedStudent);
   }
 
-  // PUT /sinhvien/:msv
-  // Chỉ cập nhật KHOA và LOP
   async update(msv: string, data: UpdateSinhVienDto) {
     const student = await this.sinhVienRepository.findOne({
       where: { MSV: msv },
     });
 
     if (!student) {
-      throw new NotFoundException(
-        `Không tìm thấy sinh viên có mã ${msv}`,
-      );
+      throw new NotFoundException(`Không tìm thấy sinh viên có mã ${msv}`);
     }
 
-    // Không cho phép gửi các trường ngoài KHOA và LOP
     const allowedFields = ['KHOA', 'LOP'];
 
     const invalidFields = Object.keys(data).filter(
@@ -144,73 +117,48 @@ export class SinhvienService {
       );
     }
 
-    // Phải có ít nhất một trường được gửi lên
-    if (
-      data.KHOA === undefined &&
-      data.LOP === undefined
-    ) {
+    if (data.KHOA === undefined && data.LOP === undefined) {
       throw new BadRequestException(
         'Vui lòng cung cấp Khoa hoặc Lớp cần cập nhật',
       );
     }
 
-    // Chỉ cập nhật Khoa nếu được gửi lên
     if (data.KHOA !== undefined) {
-      if (
-        data.KHOA !== null &&
-        typeof data.KHOA !== 'string'
-      ) {
-        throw new BadRequestException(
-          'Khoa phải là chuỗi ký tự',
-        );
+      if (data.KHOA !== null && typeof data.KHOA !== 'string') {
+        throw new BadRequestException('Khoa phải là chuỗi ký tự');
       }
 
       if (data.KHOA && data.KHOA.trim().length > 100) {
-        throw new BadRequestException(
-          'Tên khoa không được quá 100 ký tự',
-        );
+        throw new BadRequestException('Tên khoa không được quá 100 ký tự');
       }
 
       student.KHOA = data.KHOA?.trim() || null;
     }
 
-    // Chỉ cập nhật Lớp nếu được gửi lên
     if (data.LOP !== undefined) {
-      if (
-        data.LOP !== null &&
-        typeof data.LOP !== 'string'
-      ) {
-        throw new BadRequestException(
-          'Lớp phải là chuỗi ký tự',
-        );
+      if (data.LOP !== null && typeof data.LOP !== 'string') {
+        throw new BadRequestException('Lớp phải là chuỗi ký tự');
       }
 
       if (data.LOP && data.LOP.trim().length > 50) {
-        throw new BadRequestException(
-          'Tên lớp không được quá 50 ký tự',
-        );
+        throw new BadRequestException('Tên lớp không được quá 50 ký tự');
       }
 
       student.LOP = data.LOP?.trim() || null;
     }
 
-    // Lưu dữ liệu đã cập nhật
-    const savedStudent =
-      await this.sinhVienRepository.save(student);
+    const savedStudent = await this.sinhVienRepository.save(student);
 
     return this.toPublicStudent(savedStudent);
   }
 
-  // DELETE /sinhvien/:msv
   async remove(msv: string): Promise<{ message: string }> {
     const student = await this.sinhVienRepository.findOne({
       where: { MSV: msv },
     });
 
     if (!student) {
-      throw new NotFoundException(
-        `Không tìm thấy sinh viên có mã ${msv}`,
-      );
+      throw new NotFoundException(`Không tìm thấy sinh viên có mã ${msv}`);
     }
 
     await this.sinhVienRepository.remove(student);

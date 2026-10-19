@@ -1,4 +1,3 @@
-
 import {
   IsEmail,
   IsNotEmpty,
@@ -8,34 +7,32 @@ import {
 } from 'class-validator';
 
 export class RegisterDto {
-  // Mã sinh viên: cho phép chữ cái và chữ số
   @IsString()
   @IsNotEmpty({
     message: 'Vui lòng nhập mã sinh viên.',
   })
   @Matches(/^[a-zA-Z0-9]+$/, {
-    message:
-      'Mã sinh viên chỉ được chứa chữ cái và chữ số.',
+    message: 'Mã sinh viên chỉ được chứa chữ cái và chữ số.',
   })
   MSV: string;
 
-  // Họ và tên
   @IsString()
   @IsNotEmpty({
     message: 'Vui lòng nhập họ và tên.',
   })
   TENSV: string;
 
-  // Email
-  @IsEmail({}, {
-    message: 'Email không đúng định dạng.',
-  })
+  @IsEmail(
+    {},
+    {
+      message: 'Email không đúng định dạng.',
+    },
+  )
   @IsNotEmpty({
     message: 'Vui lòng nhập email.',
   })
   EMAIL: string;
 
-  // Mật khẩu
   @IsString()
   @IsNotEmpty({
     message: 'Vui lòng nhập mật khẩu.',

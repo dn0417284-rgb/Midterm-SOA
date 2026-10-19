@@ -1,9 +1,5 @@
-
 import { Injectable } from '@angular/core';
-import {
-  HttpClient,
-  HttpHeaders,
-} from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 
 export interface Detai {
@@ -22,7 +18,6 @@ export class DetaiService {
 
   constructor(private http: HttpClient) {}
 
-  // Lấy token đăng nhập
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('access_token');
 
@@ -31,7 +26,6 @@ export class DetaiService {
     });
   }
 
-  // Chuyển dữ liệu Backend sang Frontend
   private mapDetai(item: any): Detai {
     return {
       MDT: item.MDT,
@@ -42,20 +36,14 @@ export class DetaiService {
     };
   }
 
-  // Lấy danh sách đề tài
   getAll(): Observable<Detai[]> {
     return this.http
       .get<any[]>(this.apiUrl, {
         headers: this.getHeaders(),
       })
-      .pipe(
-        map((data) =>
-          data.map((item) => this.mapDetai(item)),
-        ),
-      );
+      .pipe(map((data) => data.map((item) => this.mapDetai(item))));
   }
 
-  // Lấy chi tiết đề tài
   getByCode(MDT: number): Observable<Detai> {
     return this.http
       .get<any>(`${this.apiUrl}/${MDT}`, {
@@ -64,7 +52,6 @@ export class DetaiService {
       .pipe(map((data) => this.mapDetai(data)));
   }
 
-  // Thêm đề tài
   add(detai: Detai): Observable<Detai> {
     const body = {
       tenDetai: detai.name,
@@ -80,11 +67,7 @@ export class DetaiService {
       .pipe(map((data) => this.mapDetai(data)));
   }
 
-  // Cập nhật đề tài
-  update(
-    MDT: number,
-    detai: Partial<Detai>,
-  ): Observable<Detai> {
+  update(MDT: number, detai: Partial<Detai>): Observable<Detai> {
     const body = {
       ...(detai.name !== undefined && {
         tenDetai: detai.name,
@@ -107,13 +90,9 @@ export class DetaiService {
       .pipe(map((data) => this.mapDetai(data)));
   }
 
-  // Xóa đề tài
   delete(MDT: number): Observable<void> {
-    return this.http.delete<void>(
-      `${this.apiUrl}/${MDT}`,
-      {
-        headers: this.getHeaders(),
-      },
-    );
+    return this.http.delete<void>(`${this.apiUrl}/${MDT}`, {
+      headers: this.getHeaders(),
+    });
   }
 }

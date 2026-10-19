@@ -8,7 +8,6 @@ import { AppService } from './app.service.js';
 import { DangkyModule } from './dangky/dangky.module.js';
 
 export const {
-  //ObserveModule,
   ObserveInstrument,
 } = createObserveModule();
 

@@ -1,4 +1,3 @@
-
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -26,32 +25,19 @@ export class DangKyService {
     });
   }
 
-  // Lấy danh sách đăng ký của sinh viên
   getBySinhVien(msv: string): Observable<DangKy[]> {
-    return this.http.get<DangKy[]>(
-      `${this.apiUrl}/sinhvien/${encodeURIComponent(msv)}`,
-      { headers: this.getHeaders() },
-    );
+    return this.http.get<DangKy[]>(`${this.apiUrl}/sinhvien/${encodeURIComponent(msv)}`, {
+      headers: this.getHeaders(),
+    });
   }
 
-  // Hủy đăng ký theo mã đề tài và mã sinh viên
-  cancelRegistration(
-    detaiId: number,
-    msv: string,
-  ): Observable<unknown> {
-    return this.http.delete(
-      `${this.apiUrl}/${detaiId}/${encodeURIComponent(msv)}`,
-      { headers: this.getHeaders() },
-    );
+  cancelRegistration(detaiId: number, msv: string): Observable<unknown> {
+    return this.http.delete(`${this.apiUrl}/${detaiId}/${encodeURIComponent(msv)}`, {
+      headers: this.getHeaders(),
+    });
   }
 
-  
-registerTopic(detaiId: number): Observable<unknown> {
-  return this.http.post(
-    this.apiUrl,
-    { detaiId },
-    { headers: this.getHeaders() },
-  );
-}
-
+  registerTopic(detaiId: number): Observable<unknown> {
+    return this.http.post(this.apiUrl, { detaiId }, { headers: this.getHeaders() });
+  }
 }

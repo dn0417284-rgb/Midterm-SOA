@@ -23,98 +23,56 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  // =========================
-  // ĐĂNG KÝ
-  // =========================
-
   async register(data: RegisterDto) {
     const msv = data.MSV.trim();
     const tensv = data.TENSV.trim();
     const email = data.EMAIL.trim();
 
-    // =========================
-    // KIỂM TRA MSV
-    // =========================
-
-    const msvExists =
-      await this.sinhVienRepository.findOne({
-        where: {
-          MSV: msv,
-        },
-      });
+    const msvExists = await this.sinhVienRepository.findOne({
+      where: {
+        MSV: msv,
+      },
+    });
 
     if (msvExists) {
-      throw new BadRequestException(
-        'Mã sinh viên đã được sử dụng',
-      );
+      throw new BadRequestException('Mã sinh viên đã được sử dụng');
     }
 
-    // =========================
-    // KIỂM TRA EMAIL
-    // =========================
-
-    const emailExists =
-      await this.sinhVienRepository
-        .createQueryBuilder('sinhVien')
-        .where(
-          'LOWER(sinhVien.EMAIL) = LOWER(:email)',
-          {
-            email,
-          },
-        )
-        .getOne();
+    const emailExists = await this.sinhVienRepository
+      .createQueryBuilder('sinhVien')
+      .where('LOWER(sinhVien.EMAIL) = LOWER(:email)', {
+        email,
+      })
+      .getOne();
 
     if (emailExists) {
-      throw new BadRequestException(
-        'Email đã được sử dụng',
-      );
+      throw new BadRequestException('Email đã được sử dụng');
     }
 
-    // =========================
-    // HASH MẬT KHẨU
-    // =========================
+    const hashedPassword = await bcrypt.hash(data.MATKHAU, 10);
 
-    const hashedPassword =
-      await bcrypt.hash(
-        data.MATKHAU,
-        10,
-      );
+    const sinhVien = this.sinhVienRepository.create({
+      MSV: msv,
 
-    // =========================
-    // TẠO TÀI KHOẢN
-    // =========================
+      TENSV: tensv,
 
-    const sinhVien =
-      this.sinhVienRepository.create({
-        MSV: msv,
+      KHOA: null,
 
-        TENSV: tensv,
+      LOP: null,
 
-        KHOA: null,
+      DIEMTB: null,
 
-        LOP: null,
+      EMAIL: email,
 
-        DIEMTB: null,
+      MATKHAU: hashedPassword,
 
-        EMAIL: email,
+      VAITRO: 'SINHVIEN',
+    });
 
-        MATKHAU: hashedPassword,
-
-        VAITRO: 'SINHVIEN',
-      });
-
-    const savedSinhVien =
-      await this.sinhVienRepository.save(
-        sinhVien,
-      );
-
-    // =========================
-    // TRẢ KẾT QUẢ ĐĂNG KÝ
-    // =========================
+    const savedSinhVien = await this.sinhVienRepository.save(sinhVien);
 
     return {
-      message:
-        'Đăng ký tài khoản thành công',
+      message: 'Đăng ký tài khoản thành công',
 
       user: {
         MSV: savedSinhVien.MSV,
@@ -134,66 +92,29 @@ export class AuthService {
     };
   }
 
-  // =========================
-  // ĐĂNG NHẬP
-  // =========================
-
   async login(data: LoginDto) {
     const email = data.EMAIL.trim();
 
-    // =========================
-    // TÌM SINH VIÊN
-    // =========================
+    const sinhVien = await this.sinhVienRepository
+      .createQueryBuilder('sinhVien')
 
-    const sinhVien =
-      await this.sinhVienRepository
-        .createQueryBuilder('sinhVien')
+      .addSelect('sinhVien.MATKHAU')
 
-        .addSelect(
-          'sinhVien.MATKHAU',
-        )
+      .where('LOWER(sinhVien.EMAIL) = LOWER(:email)', {
+        email,
+      })
 
-        .where(
-          'LOWER(sinhVien.EMAIL) = LOWER(:email)',
-          {
-            email,
-          },
-        )
+      .getOne();
 
-        .getOne();
-
-    // =========================
-    // KHÔNG TÌM THẤY
-    // =========================
-
-    if (
-      !sinhVien ||
-      !sinhVien.MATKHAU
-    ) {
-      throw new UnauthorizedException(
-        'Email hoặc mật khẩu không đúng',
-      );
+    if (!sinhVien || !sinhVien.MATKHAU) {
+      throw new UnauthorizedException('Email hoặc mật khẩu không đúng');
     }
 
-    // =========================
-    // KIỂM TRA MẬT KHẨU
-    // =========================
-
-    const passwordValid =
-      await bcrypt.compare(
-        data.MATKHAU,
-        sinhVien.MATKHAU,
-      );
+    const passwordValid = await bcrypt.compare(data.MATKHAU, sinhVien.MATKHAU);
 
     if (!passwordValid) {
-      throw new UnauthorizedException(
-        'Email hoặc mật khẩu không đúng',
-      );
+      throw new UnauthorizedException('Email hoặc mật khẩu không đúng');
     }
-
-    // =========================
-    // TẠO JWT PAYLOAD
-    // =========================
 
     const payload = {
       sub: sinhVien.MSV,
@@ -203,22 +124,10 @@ export class AuthService {
       role: sinhVien.VAITRO,
     };
 
-    // =========================
-    // TẠO ACCESS TOKEN
-    // =========================
-
-    const accessToken =
-      await this.jwtService.signAsync(
-        payload,
-      );
-
-    // =========================
-    // TRẢ KẾT QUẢ
-    // =========================
+    const accessToken = await this.jwtService.signAsync(payload);
 
     return {
-      message:
-        'Đăng nhập thành công',
+      message: 'Đăng nhập thành công',
 
       access_token: accessToken,
 
