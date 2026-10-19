@@ -1,21 +1,9 @@
-
 import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectorRef,
-  Component,
-  OnInit,
-} from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 
-import {
-  HttpClient,
-  HttpHeaders,
-} from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { Auth } from '../../../core/services/auth';
-
-// ==========================
-// THÔNG TIN SINH VIÊN
-// ==========================
 
 interface SinhVien {
   MSV: string;
@@ -26,19 +14,11 @@ interface SinhVien {
   DIEMTB?: number | string | null;
 }
 
-// ==========================
-// THÔNG TIN ĐĂNG KÝ
-// ==========================
-
 interface DangKy {
   MSV: string;
   DETAI_ID: number;
   NGAY_DANG_KY: string;
 }
-
-// ==========================
-// THÔNG TIN ĐỀ TÀI
-// ==========================
 
 interface DeTai {
   MDT: number;
@@ -56,23 +36,10 @@ interface DeTai {
   styleUrl: './student-dashboard.css',
 })
 export class StudentDashboard implements OnInit {
-
-  // ==========================
-  // SINH VIÊN ĐANG ĐĂNG NHẬP
-  // ==========================
-
   user: SinhVien | null = null;
-
-  // ==========================
-  // THÔNG TIN ĐĂNG KÝ
-  // ==========================
 
   currentRegistration: DangKy | null = null;
   currentTopic: DeTai | null = null;
-
-  // ==========================
-  // TRẠNG THÁI TẢI DỮ LIỆU
-  // ==========================
 
   isLoading = true;
   errorMessage = '';
@@ -89,10 +56,6 @@ export class StudentDashboard implements OnInit {
     this.loadRegistration();
   }
 
-  // ==========================
-  // LẤY TOKEN
-  // ==========================
-
   private getHeaders(): HttpHeaders {
     const token = this.auth.getToken();
 
@@ -101,16 +64,11 @@ export class StudentDashboard implements OnInit {
     });
   }
 
-  // ==========================
-  // LẤY ĐĂNG KÝ CỦA SINH VIÊN
-  // ==========================
-
   loadRegistration(): void {
     const msv = this.studentCode;
 
     if (!msv) {
-      this.errorMessage =
-        'Không tìm thấy mã sinh viên. Vui lòng đăng nhập lại.';
+      this.errorMessage = 'Không tìm thấy mã sinh viên. Vui lòng đăng nhập lại.';
 
       this.isLoading = false;
       this.cdr.detectChanges();
@@ -118,8 +76,7 @@ export class StudentDashboard implements OnInit {
     }
 
     if (!this.auth.getToken()) {
-      this.errorMessage =
-        'Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.';
+      this.errorMessage = 'Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.';
 
       this.isLoading = false;
       this.cdr.detectChanges();
@@ -131,94 +88,66 @@ export class StudentDashboard implements OnInit {
 
     this.currentRegistration = null;
     this.currentTopic = null;
-
-    // Gọi API lấy đăng ký theo mã sinh viên
-    this.http.get<DangKy[]>(
-      `/api/dangky/sinhvien/${encodeURIComponent(msv)}`,
-      {
+    this.http
+      .get<DangKy[]>(`/api/dangky/sinhvien/${encodeURIComponent(msv)}`, {
         headers: this.getHeaders(),
-      },
-    ).subscribe({
-      next: (registrations) => {
+      })
+      .subscribe({
+        next: (registrations) => {
+          if (!Array.isArray(registrations)) {
+            this.errorMessage = 'Dữ liệu đăng ký không hợp lệ.';
 
-        if (!Array.isArray(registrations)) {
-          this.errorMessage =
-            'Dữ liệu đăng ký không hợp lệ.';
+            this.isLoading = false;
+            this.cdr.detectChanges();
+            return;
+          }
+          if (registrations.length === 0) {
+            this.currentRegistration = null;
+            this.currentTopic = null;
+
+            this.isLoading = false;
+            this.cdr.detectChanges();
+            return;
+          }
+          this.currentRegistration = registrations[0];
+
+          this.loadTopic(this.currentRegistration.DETAI_ID);
+        },
+
+        error: (error) => {
+          console.error('Lỗi lấy thông tin đăng ký:', error);
+
+          this.errorMessage = this.getErrorMessage(error);
 
           this.isLoading = false;
           this.cdr.detectChanges();
-          return;
-        }
-
-        // Sinh viên chưa đăng ký đề tài
-        if (registrations.length === 0) {
-          this.currentRegistration = null;
-          this.currentTopic = null;
-
-          this.isLoading = false;
-          this.cdr.detectChanges();
-          return;
-        }
-
-        // Mỗi sinh viên chỉ được đăng ký một đề tài
-        this.currentRegistration = registrations[0];
-
-        this.loadTopic(
-          this.currentRegistration.DETAI_ID,
-        );
-      },
-
-      error: (error) => {
-        console.error(
-          'Lỗi lấy thông tin đăng ký:',
-          error,
-        );
-
-        this.errorMessage =
-          this.getErrorMessage(error);
-
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      },
-    });
+        },
+      });
   }
-
-  // ==========================
-  // LẤY CHI TIẾT ĐỀ TÀI
-  // ==========================
 
   private loadTopic(detaiId: number): void {
-    this.http.get<DeTai>(
-      `/api/detai/${detaiId}`,
-      {
+    this.http
+      .get<DeTai>(`/api/detai/${detaiId}`, {
         headers: this.getHeaders(),
-      },
-    ).subscribe({
-      next: (topic) => {
-        this.currentTopic = topic;
+      })
+      .subscribe({
+        next: (topic) => {
+          this.currentTopic = topic;
 
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      },
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        },
 
-      error: (error) => {
-        console.error(
-          'Lỗi lấy thông tin đề tài:',
-          error,
-        );
+        error: (error) => {
+          console.error('Lỗi lấy thông tin đề tài:', error);
 
-        this.errorMessage =
-          'Đã tìm thấy đăng ký nhưng không thể tải thông tin đề tài.';
+          this.errorMessage = 'Đã tìm thấy đăng ký nhưng không thể tải thông tin đề tài.';
 
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      },
-    });
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        },
+      });
   }
-
-  // ==========================
-  // THÔNG BÁO LỖI
-  // ==========================
 
   private getErrorMessage(error: any): string {
     if (error.status === 401) {
@@ -242,10 +171,6 @@ export class StudentDashboard implements OnInit {
     return 'Không thể tải thông tin đăng ký. Vui lòng thử lại.';
   }
 
-  // ==========================
-  // TRẠNG THÁI ĐĂNG KÝ
-  // ==========================
-
   get registrationStatus(): string {
     if (!this.currentRegistration) {
       return 'Chưa đăng ký';
@@ -255,14 +180,8 @@ export class StudentDashboard implements OnInit {
   }
 
   get registrationStatusClass(): string {
-    return this.currentRegistration
-      ? 'badge-success'
-      : 'badge-warning';
+    return this.currentRegistration ? 'badge-success' : 'badge-warning';
   }
-
-  // ==========================
-  // THÔNG TIN SINH VIÊN
-  // ==========================
 
   get studentName(): string {
     return this.user?.TENSV || 'Sinh viên';
@@ -286,14 +205,8 @@ export class StudentDashboard implements OnInit {
 
   get studentGPA(): string {
     const gpa = this.user?.DIEMTB;
-    return gpa === null || gpa === undefined
-      ? ''
-      : String(gpa);
+    return gpa === null || gpa === undefined ? '' : String(gpa);
   }
-
-  // ==========================
-  // THÔNG TIN ĐỀ TÀI
-  // ==========================
 
   get topicName(): string {
     return this.currentTopic?.tenDetai || 'Chưa chọn đề tài';

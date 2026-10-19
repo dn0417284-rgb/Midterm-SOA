@@ -1,10 +1,4 @@
-
-import {
-  ChangeDetectorRef,
-  Component,
-  inject,
-  OnDestroy,
-} from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -40,7 +34,6 @@ export class Register implements OnDestroy {
   errorMessage = '';
   successMessage = '';
 
-  // Ẩn / hiện mật khẩu
   togglePassword(): void {
     this.showPassword = !this.showPassword;
   }
@@ -57,7 +50,6 @@ export class Register implements OnDestroy {
     this.errorMessage = '';
   }
 
-  // Kiểm tra các điều kiện mật khẩu
   get passwordHasMinLength(): boolean {
     return this.MATKHAU.length >= 8;
   }
@@ -89,13 +81,9 @@ export class Register implements OnDestroy {
   }
 
   get isConfirmPasswordValid(): boolean {
-    return (
-      this.XAC_NHAN_MAT_KHAU.length > 0 &&
-      this.MATKHAU === this.XAC_NHAN_MAT_KHAU
-    );
+    return this.XAC_NHAN_MAT_KHAU.length > 0 && this.MATKHAU === this.XAC_NHAN_MAT_KHAU;
   }
 
-  // Chuyển lỗi API thành thông báo dễ hiểu
   private getErrorMessage(error: any): string {
     const status = error?.status;
     const message = error?.error?.message;
@@ -124,10 +112,7 @@ export class Register implements OnDestroy {
       return 'Máy chủ yêu cầu mật khẩu có ít nhất 1 chữ thường. Vui lòng kiểm tra mật khẩu.';
     }
 
-    if (
-      /(email)/i.test(rawMessage) &&
-      /(exist|duplicate|used|tồn tại|sử dụng)/i.test(rawMessage)
-    ) {
+    if (/(email)/i.test(rawMessage) && /(exist|duplicate|used|tồn tại|sử dụng)/i.test(rawMessage)) {
       return 'Email đã được đăng ký. Vui lòng sử dụng email khác.';
     }
 
@@ -164,80 +149,65 @@ export class Register implements OnDestroy {
     const tenSV = this.TENSV.trim();
     const email = this.EMAIL.trim();
 
-    // Kiểm tra thông tin bắt buộc
-    if (
-      !msv ||
-      !tenSV ||
-      !email ||
-      !this.MATKHAU ||
-      !this.XAC_NHAN_MAT_KHAU
-    ) {
+    if (!msv || !tenSV || !email || !this.MATKHAU || !this.XAC_NHAN_MAT_KHAU) {
       this.errorMessage = 'Vui lòng nhập đầy đủ thông tin bắt buộc.';
       return;
     }
 
-    // MSV cho phép chữ cái và chữ số
     if (!/^[a-zA-Z0-9]+$/.test(msv)) {
-      this.errorMessage =
-        'Mã sinh viên chỉ được chứa chữ cái và chữ số.';
+      this.errorMessage = 'Mã sinh viên chỉ được chứa chữ cái và chữ số.';
       return;
     }
 
-    // Kiểm tra email
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       this.errorMessage = 'Email không đúng định dạng.';
       return;
     }
 
-    // Kiểm tra mật khẩu đủ 5 điều kiện
     if (!this.isPasswordValid) {
-      this.errorMessage =
-        'Mật khẩu chưa đáp ứng đủ các yêu cầu bảo mật.';
+      this.errorMessage = 'Mật khẩu chưa đáp ứng đủ các yêu cầu bảo mật.';
       this.showPasswordGuide = true;
       return;
     }
 
-    // Kiểm tra xác nhận mật khẩu
     if (!this.isConfirmPasswordValid) {
       this.errorMessage = 'Mật khẩu xác nhận không khớp.';
       return;
     }
 
-    // Kiểm tra điều khoản
     if (!this.agreedToTerms) {
-      this.errorMessage =
-        'Vui lòng đồng ý với điều khoản dịch vụ.';
+      this.errorMessage = 'Vui lòng đồng ý với điều khoản dịch vụ.';
       return;
     }
 
-    // Gửi API
     this.isLoading = true;
 
-    this.auth.register({
-      MSV: msv,
-      TENSV: tenSV,
-      EMAIL: email,
-      MATKHAU: this.MATKHAU,
-    }).subscribe({
-      next: () => {
-        this.isLoading = false;
+    this.auth
+      .register({
+        MSV: msv,
+        TENSV: tenSV,
+        EMAIL: email,
+        MATKHAU: this.MATKHAU,
+      })
+      .subscribe({
+        next: () => {
+          this.isLoading = false;
 
-        this.successMessage =
-          'Tạo tài khoản thành công! Đang chuyển đến trang đăng nhập...';
+          this.successMessage = 'Tạo tài khoản thành công! Đang chuyển đến trang đăng nhập...';
 
-        this.cdr.detectChanges();
+          this.cdr.detectChanges();
 
-        this.redirectTimer = setTimeout(() => {
-          this.router.navigate(['/login']);
-        }, 1500);
-      },
+          this.redirectTimer = setTimeout(() => {
+            this.router.navigate(['/login']);
+          }, 1500);
+        },
 
-      error: (error) => {
-        this.isLoading = false;
-        this.errorMessage = this.getErrorMessage(error);
-        this.cdr.detectChanges();
-      },
-    });
+        error: (error) => {
+          this.isLoading = false;
+          this.errorMessage = this.getErrorMessage(error);
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   ngOnDestroy(): void {

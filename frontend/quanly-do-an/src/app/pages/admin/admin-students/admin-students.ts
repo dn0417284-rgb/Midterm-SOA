@@ -1,15 +1,7 @@
-
 import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectorRef,
-  Component,
-  OnInit,
-} from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {
-  HttpClient,
-  HttpHeaders,
-} from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 interface Student {
   MSV: string;
@@ -39,18 +31,13 @@ interface StudentForm {
   styleUrl: './admin-students.css',
 })
 export class AdminStudents implements OnInit {
-
-  // Đường dẫn API qua Angular proxy
   private readonly apiUrl = '/api/sinhvien';
 
-  // Danh sách sinh viên
   students: Student[] = [];
   filteredStudents: Student[] = [];
 
-  // Tìm kiếm
   searchKeyword = '';
 
-  // Trạng thái
   isLoading = true;
   isSaving = false;
   isDeleting = false;
@@ -58,17 +45,14 @@ export class AdminStudents implements OnInit {
   formError = '';
   successMessage = '';
 
-  // Phân trang
   currentPage = 1;
   pageSize = 10;
 
-  // Popup
   isModalOpen = false;
   isDeleteModalOpen = false;
   isSuccessModalOpen = false;
   isFormModalOpen = false;
 
-  // Chế độ form: thêm hoặc sửa
   formMode: 'add' | 'edit' = 'add';
 
   selectedStudent: Student | null = null;
@@ -79,7 +63,6 @@ export class AdminStudents implements OnInit {
     name: '',
   };
 
-  // Dữ liệu form
   studentForm: StudentForm = this.emptyForm();
 
   constructor(
@@ -90,10 +73,6 @@ export class AdminStudents implements OnInit {
   ngOnInit(): void {
     this.loadStudents();
   }
-
-  // =====================================
-  // FORM RỖNG
-  // =====================================
 
   emptyForm(): StudentForm {
     return {
@@ -107,10 +86,6 @@ export class AdminStudents implements OnInit {
     };
   }
 
-  // =====================================
-  // HEADER JWT
-  // =====================================
-
   getHeaders(): HttpHeaders {
     const token = localStorage.getItem('access_token');
 
@@ -119,30 +94,19 @@ export class AdminStudents implements OnInit {
     });
   }
 
-  // =====================================
-  // LẤY DANH SÁCH SINH VIÊN
-  // =====================================
-
   loadStudents(): void {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.http.get<Student[]>(
-      this.apiUrl,
-      { headers: this.getHeaders() },
-    ).subscribe({
+    this.http.get<Student[]>(this.apiUrl, { headers: this.getHeaders() }).subscribe({
       next: (data) => {
-        // Chỉ hiển thị tài khoản sinh viên
         this.students = Array.isArray(data)
-          ? data.filter(
-              (student) => student.VAITRO === 'SINHVIEN'
-            )
+          ? data.filter((student) => student.VAITRO === 'SINHVIEN')
           : [];
 
         this.searchStudents();
         this.isLoading = false;
 
-        // Cập nhật giao diện ngay
         this.cdr.detectChanges();
       },
 
@@ -153,18 +117,13 @@ export class AdminStudents implements OnInit {
         this.filteredStudents = [];
         this.isLoading = false;
 
-        this.errorMessage =
-          error?.error?.message ||
-          'Không thể tải danh sách sinh viên.';
+        this.errorMessage = error?.error?.message || 'Không thể tải danh sách sinh viên.';
 
         this.cdr.detectChanges();
       },
     });
   }
 
-  // =====================================
-  // TÌM KIẾM
-  // =====================================
   normalizeText(value: string | null | undefined): string {
     return (value || '')
       .normalize('NFD')
@@ -175,43 +134,28 @@ export class AdminStudents implements OnInit {
       .trim();
   }
 
-  
-searchStudents(): void {
-  const keyword = this.normalizeText(this.searchKeyword);
+  searchStudents(): void {
+    const keyword = this.normalizeText(this.searchKeyword);
 
-  this.filteredStudents = this.students.filter((student) => {
-    const content = [
-      student.MSV,
-      student.TENSV,
-      student.EMAIL,
-      student.KHOA,
-      student.LOP,
-    ].map(value => this.normalizeText(value)).join(' ');
+    this.filteredStudents = this.students.filter((student) => {
+      const content = [student.MSV, student.TENSV, student.EMAIL, student.KHOA, student.LOP]
+        .map((value) => this.normalizeText(value))
+        .join(' ');
 
-    return content.includes(keyword);
-  });
+      return content.includes(keyword);
+    });
 
-  this.currentPage = 1;
-}
-
-
-  // =====================================
-  // PHÂN TRANG
-  // =====================================
+    this.currentPage = 1;
+  }
 
   get paginatedStudents(): Student[] {
     const start = (this.currentPage - 1) * this.pageSize;
 
-    return this.filteredStudents.slice(
-      start,
-      start + this.pageSize,
-    );
+    return this.filteredStudents.slice(start, start + this.pageSize);
   }
 
   get totalPages(): number {
-    return Math.ceil(
-      this.filteredStudents.length / this.pageSize,
-    );
+    return Math.ceil(this.filteredStudents.length / this.pageSize);
   }
 
   get pageNumbers(): (number | string)[] {
@@ -223,10 +167,7 @@ searchStudents(): void {
     }
 
     if (total <= 7) {
-      return Array.from(
-        { length: total },
-        (_, index) => index + 1,
-      );
+      return Array.from({ length: total }, (_, index) => index + 1);
     }
 
     const pages: (number | string)[] = [1];
@@ -236,25 +177,10 @@ searchStudents(): void {
     }
 
     if (current >= total - 3) {
-      return [
-        1,
-        '...',
-        total - 4,
-        total - 3,
-        total - 2,
-        total - 1,
-        total,
-      ];
+      return [1, '...', total - 4, total - 3, total - 2, total - 1, total];
     }
 
-    pages.push(
-      '...',
-      current - 1,
-      current,
-      current + 1,
-      '...',
-      total,
-    );
+    pages.push('...', current - 1, current, current + 1, '...', total);
 
     return pages;
   }
@@ -296,15 +222,10 @@ searchStudents(): void {
       return 0;
     }
 
-    return Math.min(
-      this.currentPage * this.pageSize,
-      this.filteredStudents.length,
-    );
+    return Math.min(this.currentPage * this.pageSize, this.filteredStudents.length);
   }
 
-  // =====================================
-  // XEM CHI TIẾT
-  // =====================================
+
 
   openModal(student: Student): void {
     this.selectedStudent = student;
@@ -316,9 +237,7 @@ searchStudents(): void {
     this.selectedStudent = null;
   }
 
-  // =====================================
-  // MỞ POPUP THÊM SINH VIÊN
-  // =====================================
+
 
   openAddModal(): void {
     this.formMode = 'add';
@@ -328,9 +247,7 @@ searchStudents(): void {
     this.isFormModalOpen = true;
   }
 
-  // =====================================
-  // MỞ POPUP SỬA SINH VIÊN
-  // =====================================
+  
 
   openEditModal(student: Student): void {
     this.formMode = 'edit';
@@ -352,9 +269,7 @@ searchStudents(): void {
     this.isFormModalOpen = true;
   }
 
-  // =====================================
-  // ĐÓNG POPUP THÊM / SỬA
-  // =====================================
+  
 
   closeFormModal(): void {
     if (this.isSaving) {
@@ -365,23 +280,12 @@ searchStudents(): void {
     this.formError = '';
   }
 
-  // =====================================
-  // KIỂM TRA DỮ LIỆU FORM
-  // =====================================
-
-  
   validateForm(): boolean {
     const form = this.studentForm;
 
     if (this.formMode === 'add') {
-      if (
-        !form.MSV.trim() ||
-        !form.TENSV.trim() ||
-        !form.EMAIL.trim() ||
-        !form.MATKHAU.trim()
-      ) {
-        this.formError =
-          'Vui lòng nhập Mã sinh viên, Họ tên, Email và Mật khẩu.';
+      if (!form.MSV.trim() || !form.TENSV.trim() || !form.EMAIL.trim() || !form.MATKHAU.trim()) {
+        this.formError = 'Vui lòng nhập Mã sinh viên, Họ tên, Email và Mật khẩu.';
         return false;
       }
 
@@ -412,11 +316,6 @@ searchStudents(): void {
     return true;
   }
 
-
-  // =====================================
-  // LƯU THÊM / SỬA
-  // =====================================
-
   saveStudent(): void {
     if (this.isSaving || !this.validateForm()) {
       return;
@@ -432,11 +331,6 @@ searchStudents(): void {
     }
   }
 
-  // =====================================
-  // THÊM SINH VIÊN
-  // =====================================
-
-  
   addStudent(): void {
     const form = this.studentForm;
 
@@ -449,11 +343,7 @@ searchStudents(): void {
       LOP: form.LOP.trim(),
     };
 
-    this.http.post<Student>(
-      this.apiUrl,
-      body,
-      { headers: this.getHeaders() }
-    ).subscribe({
+    this.http.post<Student>(this.apiUrl, body, { headers: this.getHeaders() }).subscribe({
       next: () => {
         this.isSaving = false;
         this.isFormModalOpen = false;
@@ -475,19 +365,14 @@ searchStudents(): void {
 
         this.formError = Array.isArray(message)
           ? message.join(', ')
-            : typeof message === 'string'
-              ? message
-              : 'Không thể thêm sinh viên.';
+          : typeof message === 'string'
+            ? message
+            : 'Không thể thêm sinh viên.';
 
-          this.cdr.detectChanges();
+        this.cdr.detectChanges();
       },
-      });
-    }
-
-
-  // =====================================
-  // CẬP NHẬT SINH VIÊN
-  // =====================================
+    });
+  }
 
   updateStudent(): void {
     const form = this.studentForm;
@@ -523,11 +408,7 @@ searchStudents(): void {
 
     const msv = encodeURIComponent(form.MSV);
 
-    this.http.put(
-      `${this.apiUrl}/${msv}`,
-      body,
-      { headers: this.getHeaders() }
-    ).subscribe({
+    this.http.put(`${this.apiUrl}/${msv}`, body, { headers: this.getHeaders() }).subscribe({
       next: () => {
         this.isSaving = false;
         this.isFormModalOpen = false;
@@ -549,10 +430,7 @@ searchStudents(): void {
 
         if (Array.isArray(message)) {
           this.formError = message.join(', ');
-        } else if (
-          typeof message === 'string' &&
-          message !== 'Internal server error'
-        ) {
+        } else if (typeof message === 'string' && message !== 'Internal server error') {
           this.formError = message;
         } else if (error.status === 500) {
           this.formError =
@@ -568,13 +446,9 @@ searchStudents(): void {
         }
 
         this.cdr.detectChanges();
-      }
+      },
     });
   }
-
-  // =====================================
-  // MỞ POPUP XÓA
-  // =====================================
 
   openDeleteModal(student: Student): void {
     this.studentToDelete = {
@@ -593,10 +467,6 @@ searchStudents(): void {
     this.isDeleteModalOpen = false;
   }
 
-  // =====================================
-  // XÓA SINH VIÊN
-  // =====================================
-
   confirmDelete(): void {
     const code = this.studentToDelete.code;
 
@@ -609,10 +479,7 @@ searchStudents(): void {
 
     const msv = encodeURIComponent(code);
 
-    this.http.delete(
-      `${this.apiUrl}/${msv}`,
-      { headers: this.getHeaders() },
-    ).subscribe({
+    this.http.delete(`${this.apiUrl}/${msv}`, { headers: this.getHeaders() }).subscribe({
       next: () => {
         this.isDeleting = false;
         this.isDeleteModalOpen = false;
@@ -630,51 +497,39 @@ searchStudents(): void {
         this.isDeleting = false;
         this.isDeleteModalOpen = false;
 
-        this.errorMessage =
-          error?.error?.message ||
-          'Không thể xóa sinh viên.';
+        this.errorMessage = error?.error?.message || 'Không thể xóa sinh viên.';
 
         this.cdr.detectChanges();
       },
     });
   }
 
-  // =====================================
-  // ĐÓNG POPUP THÀNH CÔNG
-  // =====================================
-
   closeSuccessModal(): void {
     this.isSuccessModalOpen = false;
     this.successMessage = '';
   }
 
-  
-  // Đóng popup chi tiết khi nhấn nền bên ngoài
   closeDetailOutside(event: MouseEvent): void {
     if (event.target === event.currentTarget) {
       this.closeModal();
     }
   }
 
-  // Đóng popup thêm / sửa khi nhấn nền bên ngoài
   closeFormOutside(event: MouseEvent): void {
     if (event.target === event.currentTarget && !this.isSaving) {
       this.closeFormModal();
     }
   }
 
-  // Đóng popup xóa khi nhấn nền bên ngoài
   closeDeleteOutside(event: MouseEvent): void {
     if (event.target === event.currentTarget && !this.isDeleting) {
       this.closeDeleteModal();
     }
   }
 
-  // Đóng thông báo thành công khi nhấn nền bên ngoài
   closeSuccessOutside(event: MouseEvent): void {
     if (event.target === event.currentTarget) {
       this.closeSuccessModal();
     }
   }
-
 }

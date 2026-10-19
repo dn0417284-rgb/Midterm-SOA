@@ -1,9 +1,4 @@
-
-import {
-  ChangeDetectorRef,
-  Component,
-  inject,
-} from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -85,28 +80,27 @@ export class Login {
 
     this.isLoading = true;
 
-    this.auth.login({
-      EMAIL: this.email.trim(),
-      MATKHAU: this.password,
-    }).subscribe({
-      next: (response) => {
-        this.isLoading = false;
-        this.auth.saveSession(response);
+    this.auth
+      .login({
+        EMAIL: this.email.trim(),
+        MATKHAU: this.password,
+      })
+      .subscribe({
+        next: (response) => {
+          this.isLoading = false;
+          this.auth.saveSession(response);
 
-        this.router.navigate([
-          response.user.VAITRO === 'ADMIN'
-            ? '/admin/dashboard'
-            : '/student/dashboard',
-        ]);
-      },
+          this.router.navigate([
+            response.user.VAITRO === 'ADMIN' ? '/admin/dashboard' : '/student/dashboard',
+          ]);
+        },
 
-      error: (error) => {
-        this.isLoading = false;
-        this.errorMessage = this.getErrorMessage(error);
+        error: (error) => {
+          this.isLoading = false;
+          this.errorMessage = this.getErrorMessage(error);
 
-        // Hiện lỗi ngay, không cần click vào ô nhập
-        this.cdr.detectChanges();
-      },
-    });
+          this.cdr.detectChanges();
+        },
+      });
   }
 }

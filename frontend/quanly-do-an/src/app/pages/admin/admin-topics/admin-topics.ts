@@ -162,7 +162,7 @@ export class AdminTopics implements OnInit {
 
   get filteredTopics(): Detai[] {
     return this.topics.filter((topic) => {
-      // Tìm theo tên hoặc mã đề tài
+
       const keyword = this.searchText.trim().toLowerCase();
 
       const matchSearch =
@@ -170,10 +170,9 @@ export class AdminTopics implements OnInit {
         topic.name.toLowerCase().includes(keyword) ||
         topic.MDT.toString().includes(keyword);
 
-      // Lọc trạng thái
+  
       const matchStatus = !this.filterStatus || topic.status.toString() === this.filterStatus;
 
-      // Lọc giảng viên
       const matchLecturer = !this.filterLecturer || topic.lecturer === this.filterLecturer;
 
       return matchSearch && matchStatus && matchLecturer;
@@ -185,10 +184,7 @@ export class AdminTopics implements OnInit {
   }
 
   
-  // ==========================
-  // PHÂN TRANG
-  // ==========================
-
+ 
   currentPage = 1;
   pageSize = 10;
   pageSizeOptions = [5, 10, 20, 50];

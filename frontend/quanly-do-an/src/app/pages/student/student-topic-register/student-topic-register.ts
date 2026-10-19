@@ -41,14 +41,8 @@ export class StudentTopicRegister implements OnInit {
   isAddTopicModalOpen = false;
   isAddSuccessModalOpen = false;
   isRegisterSuccessModalOpen = false;
-
-  // Popup thông báo đăng ký thất bại
   isRegisterErrorModalOpen = false;
   registerErrorMessage = '';
-
-  // ==========================
-  // PHÂN TRANG
-  // ==========================
 
   currentPage = 1;
   pageSize = 10;
@@ -63,10 +57,6 @@ export class StudentTopicRegister implements OnInit {
   ngOnInit(): void {
     this.loadTopics();
   }
-
-  // ==========================
-  // LẤY DANH SÁCH ĐỀ TÀI
-  // ==========================
 
   loadTopics(): void {
     this.isLoading = true;
@@ -108,10 +98,6 @@ export class StudentTopicRegister implements OnInit {
     });
   }
 
-  // ==========================
-  // CHUẨN HÓA TIẾNG VIỆT
-  // ==========================
-
   normalizeText(
     value: string | null | undefined,
   ): string {
@@ -123,10 +109,6 @@ export class StudentTopicRegister implements OnInit {
       .toLowerCase()
       .trim();
   }
-
-  // ==========================
-  // TÌM KIẾM VÀ BỘ LỌC
-  // ==========================
 
   get filteredTopics(): Detai[] {
     const keyword = this.normalizeText(
@@ -164,10 +146,6 @@ export class StudentTopicRegister implements OnInit {
       ),
     ];
   }
-
-  // ==========================
-  // THÊM ĐỀ TÀI
-  // ==========================
 
   openAddTopicModal(): void {
     this.editTopicData = {};
@@ -250,10 +228,6 @@ export class StudentTopicRegister implements OnInit {
     this.isAddSuccessModalOpen = false;
   }
 
-  // ==========================
-  // LẤY THÔNG BÁO LỖI TỪ BACKEND
-  // ==========================
-
   private getServerMessage(err: any): string {
     const serverMessage = err?.error?.message;
 
@@ -268,10 +242,6 @@ export class StudentTopicRegister implements OnInit {
     return '';
   }
 
-  // ==========================
-  // HIỂN THỊ POPUP ĐĂNG KÝ LỖI
-  // ==========================
-
   private showRegisterError(
     message: string,
   ): void {
@@ -281,20 +251,13 @@ export class StudentTopicRegister implements OnInit {
     this.cdr.detectChanges();
   }
 
-  // ==========================
-  // ĐĂNG KÝ ĐỀ TÀI
-  // ==========================
-
   registerTopic(topic: Detai): void {
-    // Không cho đăng ký đề tài đã có người đăng ký
     if (Number(topic.status) === 1) {
       this.showRegisterError(
         'Đề tài này đã có sinh viên đăng ký. Vui lòng chọn đề tài khác.',
       );
       return;
     }
-
-    // Không cho nhấn đăng ký liên tục
     if (this.isRegistering) {
       return;
     }
@@ -309,11 +272,7 @@ export class StudentTopicRegister implements OnInit {
       .subscribe({
         next: () => {
           this.isRegistering = false;
-
-          // Hiển thị popup đăng ký thành công
           this.isRegisterSuccessModalOpen = true;
-
-          // Cập nhật lại danh sách đề tài
           this.loadTopics();
 
           this.cdr.detectChanges();
@@ -331,7 +290,6 @@ export class StudentTopicRegister implements OnInit {
             this.getServerMessage(err);
 
           if (err.status === 409) {
-            // Sinh viên đã đăng ký hoặc đề tài đã có người
             this.showRegisterError(
               message ||
               'Bạn đã đăng ký một đề tài. Vui lòng hủy đăng ký cũ trước khi đăng ký đề tài khác.',
@@ -375,10 +333,6 @@ export class StudentTopicRegister implements OnInit {
       });
   }
 
-  // ==========================
-  // POPUP ĐĂNG KÝ THÀNH CÔNG
-  // ==========================
-
   openRegisterSuccessModal(): void {
     this.isRegisterSuccessModalOpen = true;
   }
@@ -387,18 +341,10 @@ export class StudentTopicRegister implements OnInit {
     this.isRegisterSuccessModalOpen = false;
   }
 
-  // ==========================
-  // POPUP ĐĂNG KÝ THẤT BẠI
-  // ==========================
-
   closeRegisterErrorModal(): void {
     this.isRegisterErrorModalOpen = false;
     this.registerErrorMessage = '';
   }
-
-  // ==========================
-  // HIỂN THỊ TRẠNG THÁI
-  // ==========================
 
   getStatusText(status: number): string {
     return Number(status) === 1
@@ -411,10 +357,6 @@ export class StudentTopicRegister implements OnInit {
       ? 'badge badge-danger'
       : 'badge badge-success';
   }
-
-  // ==========================
-  // PHÂN TRANG
-  // ==========================
 
   get totalItems(): number {
     return this.filteredTopics.length;

@@ -1,37 +1,21 @@
-
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import {
-  ActivatedRoute,
-  NavigationEnd,
-  Router,
-  RouterOutlet,
-} from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 
 import { AdminSidebar } from '../../../components/admin-sidebar/admin-sidebar';
 import { Auth, LoginUser } from '../../../core/services/auth';
 
-import {
-  Subject,
-  filter,
-  map,
-  takeUntil,
-} from 'rxjs';
+import { Subject, filter, map, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterOutlet,
-    AdminSidebar,
-  ],
+  imports: [CommonModule, RouterOutlet, AdminSidebar],
   templateUrl: './admin-layout.html',
   styleUrl: './admin-layout.css',
 })
 export class AdminLayout implements OnInit, OnDestroy {
-
   pageTitle = 'Tổng quan hệ thống';
 
   currentUser: LoginUser | null = null;
@@ -45,18 +29,13 @@ export class AdminLayout implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-
-    // Lấy thông tin tài khoản đã đăng nhập
     this.currentUser = this.auth.getUser();
 
-    // Lấy tiêu đề trang hiện tại
     this.updateTitleFromRoute(this.activatedRoute);
 
     this.router.events
       .pipe(
-        filter(
-          (event) => event instanceof NavigationEnd,
-        ),
+        filter((event) => event instanceof NavigationEnd),
         map(() => {
           let route = this.activatedRoute;
 
@@ -64,10 +43,7 @@ export class AdminLayout implements OnInit, OnDestroy {
             route = route.firstChild;
           }
 
-          return (
-            route.snapshot.data['title'] ??
-            'Quản lý Đồ án Tốt nghiệp'
-          );
+          return route.snapshot.data['title'] ?? 'Quản lý Đồ án Tốt nghiệp';
         }),
         takeUntil(this.destroy$),
       )
@@ -105,16 +81,10 @@ export class AdminLayout implements OnInit, OnDestroy {
       return words[0].substring(0, 2).toUpperCase();
     }
 
-    return (
-      words[0].charAt(0) +
-      words[words.length - 1].charAt(0)
-    ).toUpperCase();
+    return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
   }
 
-  private updateTitleFromRoute(
-    route: ActivatedRoute,
-  ): void {
-
+  private updateTitleFromRoute(route: ActivatedRoute): void {
     let activeRoute = route;
 
     while (activeRoute.firstChild) {

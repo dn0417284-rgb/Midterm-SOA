@@ -74,9 +74,7 @@ export class AdminRegistrations implements OnInit {
     this.loadRegistrations();
   }
 
-  // ======================================
-  // LẤY TOKEN
-  // ======================================
+
 
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('access_token');
@@ -86,9 +84,7 @@ export class AdminRegistrations implements OnInit {
     });
   }
 
-  // ======================================
-  // LẤY DANH SÁCH ĐĂNG KÝ
-  // ======================================
+ 
 
   loadRegistrations(): void {
     this.isLoading = true;
@@ -104,7 +100,6 @@ export class AdminRegistrations implements OnInit {
             return of([] as RegistrationRow[]);
           }
 
-          // Lấy danh sách đề tài một lần
           const topicsRequest = this.http
             .get<DeTai[]>(this.detaiUrl, { headers })
             .pipe(
@@ -117,7 +112,7 @@ export class AdminRegistrations implements OnInit {
               }),
             );
 
-          // Lấy thông tin từng sinh viên
+      
           const uniqueMsv = [
             ...new Set(dangKyList.map((dk) => dk.MSV)),
           ];
@@ -203,9 +198,7 @@ export class AdminRegistrations implements OnInit {
       });
   }
 
-  // ======================================
-  // CHUẨN HÓA CHUỖI TÌM KIẾM
-  // ======================================
+ 
 
   normalizeText(value: string | null | undefined): string {
     return (value ?? '')
@@ -217,9 +210,7 @@ export class AdminRegistrations implements OnInit {
       .trim();
   }
 
-  // ======================================
-  // TÌM KIẾM ĐĂNG KÝ
-  // ======================================
+ 
 
   get filteredRegistrations(): RegistrationRow[] {
     const keyword = this.normalizeText(this.searchText);
@@ -238,9 +229,6 @@ export class AdminRegistrations implements OnInit {
     });
   }
 
-  // ======================================
-  // MỞ POPUP XÁC NHẬN HỦY
-  // ======================================
 
   openCancelModal(registration: RegistrationRow): void {
     if (this.isCancelling) {
@@ -252,9 +240,7 @@ export class AdminRegistrations implements OnInit {
     this.isCancelModalOpen = true;
   }
 
-  // ======================================
-  // ĐÓNG POPUP XÁC NHẬN HỦY
-  // ======================================
+
 
   closeCancelModal(): void {
     if (this.isCancelling) {
@@ -266,9 +252,7 @@ export class AdminRegistrations implements OnInit {
     this.modalErrorMessage = '';
   }
 
-  // ======================================
-  // XÁC NHẬN HỦY ĐĂNG KÝ
-  // ======================================
+ 
 
   confirmCancel(): void {
     if (!this.selectedRegistration || this.isCancelling) {
@@ -335,17 +319,12 @@ export class AdminRegistrations implements OnInit {
       });
   }
 
-  // ======================================
-  // ĐÓNG POPUP THÀNH CÔNG
-  // ======================================
+
 
   closeSuccessModal(): void {
     this.isSuccessModalOpen = false;
   }
 
-  // ======================================
-  // ĐÓNG POPUP LỖI
-  // ======================================
 
   closeErrorModal(): void {
     this.isErrorModalOpen = false;

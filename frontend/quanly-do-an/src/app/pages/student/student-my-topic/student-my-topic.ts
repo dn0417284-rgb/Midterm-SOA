@@ -1,4 +1,3 @@
-
 import { CommonModule } from '@angular/common';
 import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
@@ -33,8 +32,6 @@ export class StudentMyTopic implements OnInit {
   ngOnInit(): void {
     this.loadMyTopic();
   }
-
-  // Lấy mã sinh viên từ JWT
   getCurrentMSV(): string | null {
     const token = localStorage.getItem('access_token');
 
@@ -45,21 +42,15 @@ export class StudentMyTopic implements OnInit {
     try {
       const payload = token.split('.')[1];
 
-      const base64 = payload
-        .replace(/-/g, '+')
-        .replace(/_/g, '/');
+      const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
 
       const decoded = JSON.parse(atob(base64));
 
-      return decoded.sub != null
-        ? String(decoded.sub)
-        : null;
+      return decoded.sub != null ? String(decoded.sub) : null;
     } catch {
       return null;
     }
   }
-
-  // Lấy mã đề tài từ đăng ký
   get topicCode(): number | null {
     if (!this.registration) {
       return null;
@@ -67,11 +58,7 @@ export class StudentMyTopic implements OnInit {
 
     const data = this.registration as any;
 
-    const value =
-      data.detaiId ??
-      data.DETAI_ID ??
-      data.MDT ??
-      data.detai?.MDT;
+    const value = data.detaiId ?? data.DETAI_ID ?? data.MDT ?? data.detai?.MDT;
 
     if (value == null) {
       return null;
@@ -81,8 +68,6 @@ export class StudentMyTopic implements OnInit {
 
     return Number.isFinite(id) ? id : null;
   }
-
-  // Hiển thị ngày đăng ký
   get registrationDate(): string {
     if (!this.registration) {
       return 'Chưa cập nhật';
@@ -90,10 +75,7 @@ export class StudentMyTopic implements OnInit {
 
     const data = this.registration as any;
 
-    const date =
-      data.NGAY_DANG_KY ??
-      data.ngayDangKy ??
-      data.createdAt;
+    const date = data.NGAY_DANG_KY ?? data.ngayDangKy ?? data.createdAt;
 
     if (!date) {
       return 'Chưa cập nhật';
@@ -101,12 +83,8 @@ export class StudentMyTopic implements OnInit {
 
     const parsed = new Date(date);
 
-    return Number.isNaN(parsed.getTime())
-      ? 'Chưa cập nhật'
-      : parsed.toLocaleDateString('vi-VN');
+    return Number.isNaN(parsed.getTime()) ? 'Chưa cập nhật' : parsed.toLocaleDateString('vi-VN');
   }
-
-  // Lấy trạng thái đăng ký
   get registrationStatus(): string {
     if (!this.registration) {
       return '';
@@ -114,16 +92,10 @@ export class StudentMyTopic implements OnInit {
 
     const data = this.registration as any;
 
-    const status =
-      data.TRANG_THAI ??
-      data.trangThai;
+    const status = data.TRANG_THAI ?? data.trangThai;
 
-    return status == null
-      ? ''
-      : String(status).toUpperCase();
+    return status == null ? '' : String(status).toUpperCase();
   }
-
-  // Hiển thị trạng thái bằng tiếng Việt
   get statusText(): string {
     const status = this.registrationStatus;
 
@@ -147,8 +119,6 @@ export class StudentMyTopic implements OnInit {
         return status || 'Chưa cập nhật';
     }
   }
-
-  // Chỉ cho phép hủy đăng ký chưa được duyệt
   get canCancel(): boolean {
     return (
       this.registration !== null &&
@@ -157,8 +127,6 @@ export class StudentMyTopic implements OnInit {
       this.registrationStatus !== '1'
     );
   }
-
-  // Tải đề tài đã đăng ký
   loadMyTopic(): void {
     const msv = this.getCurrentMSV();
 
@@ -169,17 +137,14 @@ export class StudentMyTopic implements OnInit {
 
     if (!msv) {
       this.isLoading = false;
-      this.errorMessage =
-        'Không tìm thấy thông tin đăng nhập. Vui lòng đăng nhập lại.';
+      this.errorMessage = 'Không tìm thấy thông tin đăng nhập. Vui lòng đăng nhập lại.';
       this.cdr.detectChanges();
       return;
     }
 
     this.dangKyService.getBySinhVien(msv).subscribe({
       next: (response) => {
-        const item = Array.isArray(response)
-          ? response[0] ?? null
-          : response;
+        const item = Array.isArray(response) ? (response[0] ?? null) : response;
 
         this.registration = item;
 
@@ -193,8 +158,7 @@ export class StudentMyTopic implements OnInit {
 
         if (detaiId === null) {
           this.isLoading = false;
-          this.errorMessage =
-            'Không tìm thấy mã đề tài trong thông tin đăng ký.';
+          this.errorMessage = 'Không tìm thấy mã đề tài trong thông tin đăng ký.';
           this.cdr.detectChanges();
           return;
         }
@@ -209,9 +173,7 @@ export class StudentMyTopic implements OnInit {
           error: (error) => {
             this.isLoading = false;
 
-            this.errorMessage =
-              error.error?.message ??
-              'Không thể tải thông tin đề tài.';
+            this.errorMessage = error.error?.message ?? 'Không thể tải thông tin đề tài.';
 
             this.cdr.detectChanges();
           },
@@ -225,17 +187,13 @@ export class StudentMyTopic implements OnInit {
           this.registration = null;
           this.topic = null;
         } else {
-          this.errorMessage =
-            error.error?.message ??
-            'Không thể tải thông tin đăng ký đề tài.';
+          this.errorMessage = error.error?.message ?? 'Không thể tải thông tin đăng ký đề tài.';
         }
 
         this.cdr.detectChanges();
       },
     });
   }
-
-  // Mở popup xác nhận hủy
   openCancelModal(): void {
     if (!this.canCancel) {
       return;
@@ -243,8 +201,6 @@ export class StudentMyTopic implements OnInit {
 
     this.isCancelModalOpen = true;
   }
-
-  // Đóng popup xác nhận
   closeCancelModal(): void {
     if (this.isCancelling) {
       return;
@@ -252,52 +208,39 @@ export class StudentMyTopic implements OnInit {
 
     this.isCancelModalOpen = false;
   }
-
-  // Gọi API hủy đăng ký
   confirmCancel(): void {
     const detaiId = this.topicCode;
     const msv = this.getCurrentMSV();
 
-    if (
-      detaiId === null ||
-      !msv ||
-      !this.canCancel ||
-      this.isCancelling
-    ) {
+    if (detaiId === null || !msv || !this.canCancel || this.isCancelling) {
       return;
     }
 
     this.isCancelling = true;
     this.errorMessage = '';
 
-    this.dangKyService
-      .cancelRegistration(detaiId, msv)
-      .subscribe({
-        next: () => {
-          this.isCancelling = false;
-          this.isCancelModalOpen = false;
-          this.isSuccessModalOpen = true;
+    this.dangKyService.cancelRegistration(detaiId, msv).subscribe({
+      next: () => {
+        this.isCancelling = false;
+        this.isCancelModalOpen = false;
+        this.isSuccessModalOpen = true;
 
-          this.registration = null;
-          this.topic = null;
+        this.registration = null;
+        this.topic = null;
 
-          this.cdr.detectChanges();
-        },
+        this.cdr.detectChanges();
+      },
 
-        error: (error) => {
-          this.isCancelling = false;
-          this.isCancelModalOpen = false;
+      error: (error) => {
+        this.isCancelling = false;
+        this.isCancelModalOpen = false;
 
-          this.errorMessage =
-            error.error?.message ??
-            'Không thể hủy đăng ký. Vui lòng thử lại.';
+        this.errorMessage = error.error?.message ?? 'Không thể hủy đăng ký. Vui lòng thử lại.';
 
-          this.cdr.detectChanges();
-        },
-      });
+        this.cdr.detectChanges();
+      },
+    });
   }
-
-  // Đóng popup thành công
   closeSuccessModal(): void {
     this.isSuccessModalOpen = false;
   }
